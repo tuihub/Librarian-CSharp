@@ -1,21 +1,23 @@
 ﻿using Grpc.Core;
-using Librarian_CSharp;
 using System.Diagnostics;
+using TuiHub.Protos;
 
 namespace Librarian_CSharp.Services
 {
     public class FileGrpcService : FileGrpc.FileGrpcBase
     {
-        private readonly ILogger<FileGrpcService> _logger;
+        private readonly ILogger<FileGrpcService> Logger;
+        private readonly IConfiguration Configuration;
         private string? _name;
         private long _size;
         //private MemoryStream? _ms;
         private string? _dirPath;
         private string? _fileName;
 
-        public FileGrpcService(ILogger<FileGrpcService> logger)
+        public FileGrpcService(IConfiguration configuration, ILogger<FileGrpcService> logger)
         {
-            _logger = logger;
+            Logger = logger;
+            Configuration = configuration;
         }
 
         async Task<long> ProcessUploadStream(IAsyncStreamReader<UploadRequest> reqStream, IServerStreamWriter<UploadResponse> respStream)
@@ -41,7 +43,7 @@ namespace Librarian_CSharp.Services
                 offset += size;
                 await respStream.WriteAsync(new UploadResponse
                 {
-                    Status = Status.InProgress,
+                    Status = TuiHub.Protos.Status.InProgress,
                     ReceivedSize = offset,
                 });
             }
@@ -56,8 +58,9 @@ namespace Librarian_CSharp.Services
         public override async Task Upload(IAsyncStreamReader<UploadRequest> reqStream, IServerStreamWriter<UploadResponse> respStream, ServerCallContext context)
         {
             var resp = new UploadResponse();
-            _dirPath = @"C:\Users\gyx\Desktop\Temp\FileGrpcServiceUpload";
+            //_dirPath = @"C:\Users\gyx\Desktop\Temp\FileGrpcServiceUpload";
             //_dirPath = @"/var/www/html/ariang/dl/FileGrpcServiceUpload";
+            _dirPath = Configuration["SystemConfig:SaveDirPath"];
             try
             {
                 await reqStream.MoveNext();
@@ -81,13 +84,13 @@ namespace Librarian_CSharp.Services
                         throw new Exception("unknown content type");
                 }
                 resp.Name = _name;
-                resp.Status = Status.Success;
+                resp.Status = TuiHub.Protos.Status.Success;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 resp.Name = _name;
-                resp.Status = Status.Failed;
+                resp.Status = TuiHub.Protos.Status.Failed;
                 
                 string filePath = Path.Combine(_dirPath, _fileName);
                 File.Delete(filePath);

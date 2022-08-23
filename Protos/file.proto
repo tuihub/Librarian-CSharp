@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Librarian_CSharp";
+option csharp_namespace = "TuiHub.Protos";
 
 package file;
 
