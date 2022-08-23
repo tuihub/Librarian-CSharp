@@ -5,7 +5,7 @@ option csharp_namespace = "Librarian_CSharp";
 package file;
 
 service FileGrpc {
-    rpc Upload(stream UploadRequest) returns (UploadResponse);
+    rpc Upload(stream UploadRequest) returns (stream UploadResponse) {}
 }
 
 message UploadRequest {
@@ -18,6 +18,7 @@ message UploadRequest {
 message UploadResponse {
     string name = 1;
     Status status = 2;
+    int64 received_size = 3;
 }
 
 message FileBytes {

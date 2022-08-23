@@ -18,20 +18,20 @@ namespace Librarian_CSharp.Services
             _logger = logger;
         }
 
-        async Task<long> ProcessUploadStream(IAsyncStreamReader<UploadRequest> uploadStream)
+        async Task<long> ProcessUploadStream(IAsyncStreamReader<UploadRequest> reqStream, IServerStreamWriter<UploadResponse> respStream)
         {
-            _name = uploadStream.Current.MetaData.Name;
-            _size = uploadStream.Current.MetaData.Size;
+            _name = reqStream.Current.MetaData.Name;
+            _size = reqStream.Current.MetaData.Size;
             //_ms = new MemoryStream();
 
             _fileName = $"{DateTime.Now.ToString("yyyyMMddHHmmssffffff")}_{_name}";
             string filePath = Path.Combine(_dirPath, _fileName);
             using BinaryWriter bw = new BinaryWriter(File.OpenWrite(filePath));
             int offset = 0;
-            while (await uploadStream.MoveNext())
+            while (await reqStream.MoveNext())
             {
                 //Task.Delay(200).Wait();
-                var req = uploadStream.Current;
+                var req = reqStream.Current;
                 if (req.ContentCase != UploadRequest.ContentOneofCase.FileBytes)
                     break;
                 int size = req.FileBytes.Content.ToByteArray().Length;
@@ -39,6 +39,11 @@ namespace Librarian_CSharp.Services
                 bw.Write(req.FileBytes.Content.ToByteArray());
                 Debug.WriteLine($"offset = {offset}, size = {size}");
                 offset += size;
+                await respStream.WriteAsync(new UploadResponse
+                {
+                    Status = Status.InProgress,
+                    ReceivedSize = offset,
+                });
             }
             //var ret = _ms.Length;
             //_ms.Close();
@@ -48,15 +53,15 @@ namespace Librarian_CSharp.Services
             return ret;
         }
 
-        public override async Task<UploadResponse> Upload(IAsyncStreamReader<UploadRequest> uploadStream, ServerCallContext context)
+        public override async Task Upload(IAsyncStreamReader<UploadRequest> reqStream, IServerStreamWriter<UploadResponse> respStream, ServerCallContext context)
         {
-            var ret = new UploadResponse();
-            //_dirPath = @"C:\Users\gyx\Desktop\Temp\FileGrpcServiceUpload";
-            _dirPath = @"/var/www/html/ariang/dl/FileGrpcServiceUpload";
+            var resp = new UploadResponse();
+            _dirPath = @"C:\Users\gyx\Desktop\Temp\FileGrpcServiceUpload";
+            //_dirPath = @"/var/www/html/ariang/dl/FileGrpcServiceUpload";
             try
             {
-                await uploadStream.MoveNext();
-                var req = uploadStream.Current;
+                await reqStream.MoveNext();
+                var req = reqStream.Current;
                 if (req == null)
                     throw new Exception("request is null");
                 long actSize;
@@ -67,25 +72,27 @@ namespace Librarian_CSharp.Services
                     case UploadRequest.ContentOneofCase.FileBytes:
                         throw new Exception("no metadata");
                     case UploadRequest.ContentOneofCase.MetaData:
-                        actSize = await ProcessUploadStream(uploadStream);
+                        actSize = await ProcessUploadStream(reqStream, respStream);
+                        resp.ReceivedSize = actSize;
                         Debug.WriteLine($"actSize = {actSize}");
                         Debug.WriteLine($"Name = {_name}, Size = {_size}");
                         break;
                     default:
                         throw new Exception("unknown content type");
                 }
-                ret.Name = _name;
-                ret.Status = Status.Success;
+                resp.Name = _name;
+                resp.Status = Status.Success;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                ret.Name = _name;
-                ret.Status = Status.Failed;
+                resp.Name = _name;
+                resp.Status = Status.Failed;
+                
                 string filePath = Path.Combine(_dirPath, _fileName);
                 File.Delete(filePath);
             }
-            return ret;
+            await respStream.WriteAsync(resp);
         }
     }
 }
