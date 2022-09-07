@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "TuiHub.Protos.AppSavedata";
+
+package app_savedata;
+
+service AppSavedataGrpc {
+    rpc Upload (stream UploadRequest) returns (stream UploadResponse);
+    rpc Download (stream DownloadRequest) returns (stream DownloadResponse);
+    rpc GetLastModified (GetLastModifiedRequest) returns (GetLastModifiedResponse);
+}
+
+message GetLastModifiedRequest {
+    int64 app_id = 1;
+}
+
+message GetLastModifiedResponse {
+    google.protobuf.Timestamp last_modified = 1;
+}
+
+message DownloadRequest {
+    MetaData meta_data = 1;
+}
+
+message DownloadResponse {
+    FileBytes file_bytes = 2;
+}
+
+message UploadRequest {
+    oneof content {
+        MetaData meta_data = 1;
+        FileBytes file_bytes = 2;
+    }
+}
+
+message UploadResponse {
+    string name = 1;
+    Status status = 2;
+    int64 received_size = 3;
+}
+
+message FileBytes {
+    bytes content = 1;
+}
+
+message MetaData {
+    int64 app_id = 1;
+    int64 size = 2;
+}
+
+enum Status {
+    PENDING = 0;
+    IN_PROGRESS = 1;
+    SUCCESS = 2;
+    FAILED = 3;
+}
