@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using TuiHub.Protos;
 
-namespace Librarian_CSharp.Services
+namespace Librarian.Services
 {
     public class FileGrpcService : FileGrpc.FileGrpcBase
     {

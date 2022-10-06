@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Librarian_CSharp.Models
+namespace Librarian.Models
 {
     public partial class Game
     {

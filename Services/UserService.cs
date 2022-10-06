@@ -1,8 +1,12 @@
 using Grpc.Core;
 using TuiHub.Protos.User;
 
-namespace Librarian_CSharp.Services
+namespace Librarian.Services
 {
+    public class LibrarianSephirahService : TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceBase
+    {
+    }
+
     public class UserService : UserGrpc.UserGrpcBase
     {
         public override Task<LoginReply> Login(LoginRequest request, ServerCallContext context)

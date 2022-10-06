@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Librarian_CSharp.Models;
+using Librarian.Models;
 
-namespace Librarian_CSharp.Utils
+namespace Librarian.Utils
 {
     public partial class THeamDbContext : DbContext
     {

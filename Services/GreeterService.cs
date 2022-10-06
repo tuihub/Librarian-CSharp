@@ -1,7 +1,7 @@
 using Grpc.Core;
-using Librarian_CSharp;
+using Librarian;
 
-namespace Librarian_CSharp.Services
+namespace Librarian.Services
 {
     public class GreeterService : Greeter.GreeterBase
     {

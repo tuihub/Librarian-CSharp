@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Librarian_CSharp.Utils
+namespace Librarian.Utils
 {
     public static class PasswordHasher
     {
