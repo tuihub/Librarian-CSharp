@@ -3,11 +3,17 @@ using System.Collections.Generic;
 
 namespace Librarian.Models
 {
-    public partial class User
+    public class User
     {
         public long Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
-        public string Token { get; set; } = null!;
+        public long InternalId { get; set; }
+        public string UserName { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public StatusEnum Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+
+        public enum StatusEnum { Activated, Blocked }
     }
 }
