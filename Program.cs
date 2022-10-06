@@ -1,3 +1,6 @@
+using Librarian.Models;
+using Librarian.Utils;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Additional configuration is required to successfully run gRPC on macOS.
@@ -5,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
+
+// Get Configuration
+GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
 
 var app = builder.Build();
 
