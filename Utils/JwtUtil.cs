@@ -10,15 +10,17 @@ namespace Librarian.Utils
         public static string GenerateAccessToken(long internalId)
         {
             var expireMinutes = GlobalContext.JwtConfig.AccessTokenExpireMinutes;
-            return GenerateToken(expireMinutes, internalId);
+            var audience = GlobalContext.JwtConfig.AccessTokenAudience;
+            return GenerateToken(audience, expireMinutes, internalId);
 
         }
         public static string GenerateRefreshToken(long internalId)
         {
             var expireMinutes = GlobalContext.JwtConfig.RefreshTokenExpireMinutes;
-            return GenerateToken(expireMinutes, internalId);
+            var audience = GlobalContext.JwtConfig.RefreshTokenAudience;
+            return GenerateToken(audience, expireMinutes, internalId);
         }
-        static string GenerateToken(double expireMinutes, long internalId)
+        static string GenerateToken(string audience, double expireMinutes, long internalId)
         {
             var securityKey = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
             var handler = new JwtSecurityTokenHandler();
@@ -26,6 +28,7 @@ namespace Librarian.Utils
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim(JwtRegisteredClaimNames.Aud, audience),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("InternalId", internalId.ToString())
                 }),

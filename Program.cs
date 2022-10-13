@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new()
         {
             //ValidIssuer = GlobalContext.JwtConfig.Issuer,
-            //ValidAudience = GlobalContext.JwtConfig.Audience,
+            ValidAudience = GlobalContext.JwtConfig.AccessTokenAudience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             RequireExpirationTime = true
