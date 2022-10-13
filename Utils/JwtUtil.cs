@@ -26,6 +26,7 @@ namespace Librarian.Utils
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("InternalId", internalId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
