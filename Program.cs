@@ -18,6 +18,7 @@ GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtC
 
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    // AccessToken Auth (Default)
     .AddJwtBearer(options =>
     {
         var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
@@ -26,6 +27,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             //ValidIssuer = GlobalContext.JwtConfig.Issuer,
             ValidAudience = GlobalContext.JwtConfig.AccessTokenAudience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            RequireExpirationTime = true
+        };
+    })
+    // RefreshToken Auth
+    .AddJwtBearer("RefreshToken", options =>
+    {
+        var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = false,
+            //ValidIssuer = GlobalContext.JwtConfig.Issuer,
+            ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             RequireExpirationTime = true
