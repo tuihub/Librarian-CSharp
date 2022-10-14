@@ -23,6 +23,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
         options.TokenValidationParameters = new()
         {
+            ValidateIssuer = false,
             //ValidIssuer = GlobalContext.JwtConfig.Issuer,
             ValidAudience = GlobalContext.JwtConfig.AccessTokenAudience,
             ValidateIssuerSigningKey = true,

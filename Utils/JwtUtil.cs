@@ -46,6 +46,7 @@ namespace Librarian.Utils
             var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
             var parameters = new TokenValidationParameters
             {
+                ValidateIssuer = false,
                 //ValidIssuer = GlobalContext.JwtConfig.Issuer,
                 ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
                 ValidateIssuerSigningKey = true,
