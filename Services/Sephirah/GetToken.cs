@@ -22,7 +22,7 @@ namespace Librarian.Services.Sephirah
                 }
                 else
                 {
-                    throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthorized"));
+                    throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
                 }
             }
             catch (Exception e)
