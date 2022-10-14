@@ -30,7 +30,7 @@ namespace Librarian.Utils
                 {
                     new Claim(JwtRegisteredClaimNames.Aud, audience),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim("InternalId", internalId.ToString())
+                    new Claim("internal_id", internalId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
                 SigningCredentials = new SigningCredentials(
@@ -40,6 +40,20 @@ namespace Librarian.Utils
             var token = handler.CreateToken(descriptor);
             var jwtToken = handler.WriteToken(token);
             return jwtToken;
+        }
+        public static bool ValidateRefreshToken(JwtSecurityTokenHandler handler, string token)
+        {
+            var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
+            var parameters = new TokenValidationParameters
+            {
+                //ValidIssuer = GlobalContext.JwtConfig.Issuer,
+                ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                RequireExpirationTime = true
+            };
+            var principal = handler.ValidateToken(token, parameters, out _);
+            return principal != null;
         }
     }
 }
