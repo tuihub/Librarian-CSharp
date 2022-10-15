@@ -10,21 +10,21 @@ namespace Librarian.Services.Sephirah
         [Authorize]
         public override Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
         {
-            long internalIdNew;
+            long internalId;
             try
             {
-                internalIdNew = IdUtil.NewId();
+                internalId = IdUtil.NewId();
                 using var db = new TestDbContext();
                 // verify user type(admin)
                 var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-                var internalId = JwtUtil.GetInternalIdFromToken(token);
-                var user = db.Users.Single(x => x.InternalId == internalId);
-                if (user.Type != UserType.Admin)
+                var internalIdFromToken = JwtUtil.GetInternalIdFromToken(token);
+                var userFromToken = db.Users.Single(x => x.InternalId == internalIdFromToken);
+                if (userFromToken.Type != UserType.Admin)
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
                 // create user
-                var userNew = new Models.User()
+                var user = new Models.User()
                 {
-                    InternalId = internalIdNew,
+                    InternalId = internalId,
                     Name = request.User.Username,
                     Password = PasswordHasher.HashPassword(request.User.Password),
                     Status = Models.User.StatusEnum.Activated,
@@ -32,7 +32,7 @@ namespace Librarian.Services.Sephirah
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 };
-                db.Users.Add(userNew);
+                db.Users.Add(user);
                 db.SaveChanges();
             }
             catch (RpcException)
@@ -45,7 +45,7 @@ namespace Librarian.Services.Sephirah
             }
             return Task.FromResult(new CreateUserResponse()
             {
-                Id = new TuiHub.Protos.Librarian.V1.InternalID() { Id = internalIdNew }
+                Id = new TuiHub.Protos.Librarian.V1.InternalID() { Id = internalId }
             });
         }
     }
