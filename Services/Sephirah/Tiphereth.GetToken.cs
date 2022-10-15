@@ -14,7 +14,9 @@ namespace Librarian.Services.Sephirah
                 using var db = new TestDbContext();
                 var username = request.Username;
                 var password = request.Password;
-                var user = db.Users.Single(u => u.UserName == username);
+                var user = db.Users.SingleOrDefault(u => u.Name == username);
+                if (user == null) 
+                    throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
                 if (PasswordHasher.VerifyHashedPassword(user.Password, password))
                 {
                     accessToken = JwtUtil.GenerateAccessToken(user.InternalId);
@@ -24,6 +26,10 @@ namespace Librarian.Services.Sephirah
                 {
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
                 }
+            }
+            catch (RpcException e)
+            {
+                throw e;
             }
             catch (Exception e)
             {
