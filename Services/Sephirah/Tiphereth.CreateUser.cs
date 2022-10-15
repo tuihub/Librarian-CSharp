@@ -43,7 +43,10 @@ namespace Librarian.Services.Sephirah
             {
                 throw new RpcException(new Status(StatusCode.Unavailable, e.Message));
             }
-            return base.CreateUser(request, context);
+            return Task.FromResult(new CreateUserResponse()
+            {
+                Id = new TuiHub.Protos.Librarian.V1.InternalID() { Id = internalIdNew }
+            });
         }
     }
 }
