@@ -15,7 +15,7 @@ namespace Librarian.Services.Sephirah
                 var username = request.Username;
                 var password = request.Password;
                 var user = db.Users.SingleOrDefault(u => u.Name == username);
-                if (user == null) 
+                if (user == null)
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
                 if (PasswordHasher.VerifyHashedPassword(user.Password, password))
                 {
@@ -27,9 +27,9 @@ namespace Librarian.Services.Sephirah
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
                 }
             }
-            catch (RpcException e)
+            catch (RpcException)
             {
-                throw e;
+                throw;
             }
             catch (Exception e)
             {
