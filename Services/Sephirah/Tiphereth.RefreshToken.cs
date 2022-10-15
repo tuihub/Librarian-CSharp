@@ -1,7 +1,6 @@
 ﻿using Grpc.Core;
 using Librarian.Utils;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Services.Sephirah
@@ -15,10 +14,7 @@ namespace Librarian.Services.Sephirah
             try
             {
                 var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-                token = token.Substring("Bearer ".Length).Trim();
-                var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);
-                var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);
+                var internalId = JwtUtil.GetInternalIdFromToken(token);
                 accessTokenNew = JwtUtil.GenerateAccessToken(internalId);
                 refreshTokenNew = JwtUtil.GenerateRefreshToken(internalId);
             }

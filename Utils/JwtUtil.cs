@@ -56,5 +56,13 @@ namespace Librarian.Utils
         //    var principal = handler.ValidateToken(token, parameters, out _);
         //    return principal != null;
         //}
+        public static long GetInternalIdFromToken(string token)
+        {
+            token = token.Substring("Bearer ".Length).Trim();
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);
+            return internalId;
+        }
     }
 }
