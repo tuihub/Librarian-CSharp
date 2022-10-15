@@ -28,6 +28,7 @@ namespace Librarian.Services.Sephirah
                 if (userReq.Password.Length > 0) user.Password = PasswordHasher.HashPassword(userReq.Password);
                 if (userReq.Type != UserType.Unspecified) user.Type = userReq.Type;
                 if (userReq.Status != UserStatus.Unspecified) user.Status = userReq.Status;
+                user.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
             }
             catch (RpcException)
