@@ -11,11 +11,8 @@ namespace Librarian.Models
         public string Name { get; set; } = null!;
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
-        public StatusEnum Status { get; set; }
+        public UserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
-
-        public enum StatusEnum { Activated, Blocked }
     }
 }

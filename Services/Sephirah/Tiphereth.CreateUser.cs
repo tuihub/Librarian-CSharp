@@ -27,7 +27,7 @@ namespace Librarian.Services.Sephirah
                     InternalId = internalId,
                     Name = request.User.Username,
                     Password = PasswordHasher.HashPassword(request.User.Password),
-                    Status = Models.User.StatusEnum.Activated,
+                    Status = UserStatus.Active,
                     Type = request.User.Type,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
