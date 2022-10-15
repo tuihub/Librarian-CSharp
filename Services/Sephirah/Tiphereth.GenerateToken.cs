@@ -1,11 +1,13 @@
 ﻿using Grpc.Core;
 using Librarian.Utils;
+using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Services.Sephirah
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
+        [Authorize]
         public override Task<GenerateTokenResponse> GenerateToken(GenerateTokenRequest request, ServerCallContext context)
         {
             string refreshToken;
