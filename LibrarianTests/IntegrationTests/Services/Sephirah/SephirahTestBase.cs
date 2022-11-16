@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LibrarianTests.IntegrationTests.Services.Sephirah
 {
-    public class SephirahBase
+    public class SephirahTestBase
     {
         private GrpcChannel? _channel;
 

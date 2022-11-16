@@ -5,12 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using Xunit;
-using LibrarianTests.IntegrationTests.Services.Sephirah;
 using Grpc.Core;
 
-namespace LibrarianTests.Services.Sephirah.Tiphereth
+namespace LibrarianTests.IntegrationTests.Services.Sephirah
 {
-    public partial class Tiphereth : SephirahBase
+    public partial class SephirahTest : SephirahTestBase
     {
         [Fact]
         public async Task Test_UsernameOrPasswordError()
@@ -19,12 +18,17 @@ namespace LibrarianTests.Services.Sephirah.Tiphereth
 
             var usernames = new[] { "test1", "test", "test1" };
             var passwords = new[] { "test", "test1", "test1" };
-            var exception = StatusCode.PermissionDenied;
+            var statuses = new[] {
+                new Status(StatusCode.PermissionDenied, "User not exists."),
+                new Status(StatusCode.PermissionDenied, "Username and password not match."),
+                new Status(StatusCode.PermissionDenied, "User not exists."),
+            };
 
             for (int i = 0; i < usernames.Length; i++)
             {
                 var u = usernames[i];
                 var p = passwords[i];
+                var s = statuses[i];
 
                 var ex = Assert.Throws<RpcException>(() =>
                 {
@@ -34,7 +38,7 @@ namespace LibrarianTests.Services.Sephirah.Tiphereth
                         Password = p,
                     });
                 });
-                Assert.Equal(exception, ex.StatusCode);
+                Assert.Equal(s, ex.Status);
             }
         }
     }
