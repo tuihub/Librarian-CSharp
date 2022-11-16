@@ -26,7 +26,7 @@ namespace LibrarianTests.Services.Sephirah.Tiphereth
                 var u = usernames[i];
                 var p = passwords[i];
 
-                var ex = Assert.ThrowsException<RpcException>(() =>
+                var ex = Assert.Throws<RpcException>(() =>
                 {
                     var response = client.GetToken(new GetTokenRequest
                     {
@@ -34,7 +34,7 @@ namespace LibrarianTests.Services.Sephirah.Tiphereth
                         Password = p,
                     });
                 });
-                Assert.Equals(ex.StatusCode, exception);
+                Assert.Equal(exception, ex.StatusCode);
             }
         }
     }
