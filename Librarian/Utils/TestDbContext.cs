@@ -8,6 +8,7 @@ namespace Librarian.Utils
         public TestDbContext() { }
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<App> Apps { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (optionsBuilder.IsConfigured == false)
