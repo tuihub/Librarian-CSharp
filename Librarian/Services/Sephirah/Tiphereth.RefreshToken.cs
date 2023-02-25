@@ -28,9 +28,9 @@ namespace Librarian.Services.Sephirah
             {
                 throw;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new RpcException(new Status(StatusCode.Unavailable, e.Message));
+                throw new RpcException(new Status(StatusCode.Unavailable, ex.Message));
             }
             return Task.FromResult(new RefreshTokenResponse
             {
