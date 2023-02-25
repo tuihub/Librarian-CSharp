@@ -15,10 +15,7 @@ namespace Librarian.Services.Sephirah
             {
                 using var db = new TestDbContext();
                 // verify user type(admin)
-                var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-                var internalIdFromToken = JwtUtil.GetInternalIdFromToken(token);
-                var userFromToken = db.Users.Single(x => x.InternalId == internalIdFromToken);
-                if (userFromToken.Type != UserType.Admin)
+                if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
                 // create user
                 internalId = IdUtil.NewId();
