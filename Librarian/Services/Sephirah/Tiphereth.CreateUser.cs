@@ -13,7 +13,6 @@ namespace Librarian.Services.Sephirah
             long internalId;
             try
             {
-                internalId = IdUtil.NewId();
                 using var db = new TestDbContext();
                 // verify user type(admin)
                 var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
@@ -22,6 +21,7 @@ namespace Librarian.Services.Sephirah
                 if (userFromToken.Type != UserType.Admin)
                     throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
                 // create user
+                internalId = IdUtil.NewId();
                 var user = new Models.User()
                 {
                     InternalId = internalId,
