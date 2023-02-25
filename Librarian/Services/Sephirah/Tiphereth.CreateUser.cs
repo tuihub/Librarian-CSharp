@@ -30,7 +30,7 @@ namespace Librarian.Services.Sephirah
                     Status = UserStatus.Active,
                     Type = request.User.Type,
                     CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
+                    UpdatedAt = null
                 };
                 db.Users.Add(user);
                 db.SaveChanges();

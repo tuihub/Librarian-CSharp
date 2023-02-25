@@ -12,7 +12,7 @@ namespace Librarian.Models
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
