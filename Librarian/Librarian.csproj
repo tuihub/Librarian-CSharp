@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.22.0" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.51.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.22.3" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
     <PackageReference Include="IdGen" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.14" />
@@ -19,7 +19,7 @@
     </PackageReference>
     <PackageReference Include="NebulaNet" Version="3.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
-    <PackageReference Include="TuiHub.Protos" Version="0.2.6" />
+    <PackageReference Include="TuiHub.Protos" Version="0.2.19" />
   </ItemGroup>
 
 </Project>
