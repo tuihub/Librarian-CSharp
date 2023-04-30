@@ -9,35 +9,24 @@ namespace Librarian.Sephirah.Services
         public override Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
         {
             string accessToken, refreshToken;
-            try
+            using var db = new TestDbContext();
+            var username = request.Username;
+            var password = request.Password;
+            // get user
+            var user = db.Users.SingleOrDefault(u => u.Name == username);
+            if (user == null)
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
+            if (user.Status != UserStatus.Active)
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
+            if (PasswordHasher.VerifyHashedPassword(user.Password, password))
             {
-                using var db = new TestDbContext();
-                var username = request.Username;
-                var password = request.Password;
-                // get user
-                var user = db.Users.SingleOrDefault(u => u.Name == username);
-                if (user == null)
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
-                if (user.Status != UserStatus.Active)
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
-                if (PasswordHasher.VerifyHashedPassword(user.Password, password))
-                {
-                    // get token
-                    accessToken = JwtUtil.GenerateAccessToken(user.InternalId);
-                    refreshToken = JwtUtil.GenerateRefreshToken(user.InternalId);
-                }
-                else
-                {
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
-                }
+                // get token
+                accessToken = JwtUtil.GenerateAccessToken(user.InternalId);
+                refreshToken = JwtUtil.GenerateRefreshToken(user.InternalId);
             }
-            catch (RpcException)
+            else
             {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new RpcException(new Status(StatusCode.Unavailable, ex.Message));
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
             }
             return Task.FromResult(new GetTokenResponse
             {
