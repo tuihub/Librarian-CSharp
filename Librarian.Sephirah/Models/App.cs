@@ -43,5 +43,22 @@ namespace Librarian.Sephirah.Models
                 AppDetails = null
             };
         }
+        public TuiHub.Protos.Librarian.V1.App ToProtoApp()
+        {
+            var ret = new TuiHub.Protos.Librarian.V1.App
+            {
+                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.InternalId },
+                Source = this.Source,
+                SourceAppId = this.SourceAppId,
+                SourceUrl = this.SourceUrl,
+                Name = this.Name,
+                Type = this.Type,
+                ShortDescription = this.ShortDescription,
+                ImageUrl = this.ImageUrl
+            };
+            if (this.AppDetails != null ) 
+                ret.Details = this.AppDetails.ToProtoAppDetails();
+            return ret;
+        }
     }
 }

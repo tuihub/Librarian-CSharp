@@ -32,17 +32,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = apps.Count() }
             };
-            response.Apps.Add(apps.Select(x => new TuiHub.Protos.Librarian.V1.App
-            {
-                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = x.InternalId },
-                Source = x.Source,
-                SourceAppId = x.SourceAppId,
-                SourceUrl = x.SourceUrl,
-                Name = x.Name,
-                Type = x.Type,
-                ShortDescription = x.ShortDescription,
-                ImageUrl = x.ImageUrl
-            }));
+            response.Apps.Add(apps.Select(x => x.ToProtoApp()));
             return Task.FromResult(response);
         }
     }

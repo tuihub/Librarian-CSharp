@@ -23,5 +23,16 @@
                 Version = appDetails.Version,
             };
         }
+        public TuiHub.Protos.Librarian.V1.AppDetails ToProtoAppDetails()
+        {
+            return new TuiHub.Protos.Librarian.V1.AppDetails
+            {
+                Description = this.Description,
+                ReleaseDate = this.ReleaseDate.ToString(),
+                Developer = this.Developer,
+                Publisher = this.Publisher,
+                Version = this.Version
+            };
+        }
     }
 }
