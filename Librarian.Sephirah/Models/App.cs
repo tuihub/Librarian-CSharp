@@ -26,5 +26,22 @@ namespace Librarian.Sephirah.Models
             ImageUrl = app.ImageUrl;
             AppDetails = AppDetails.FromProtosAppDetails(app.Details);
         }
+        public App() : base() { }
+        public App GetAppWithoutDetails()
+        {
+            return new App
+            {
+                Id = this.Id,
+                InternalId = this.InternalId,
+                Source = this.Source,
+                SourceAppId = this.SourceAppId,
+                SourceUrl = this.SourceUrl,
+                Name = this.Name,
+                Type = this.Type,
+                ShortDescription = this.ShortDescription,
+                ImageUrl = this.ImageUrl,
+                AppDetails = null
+            };
+        }
     }
 }
