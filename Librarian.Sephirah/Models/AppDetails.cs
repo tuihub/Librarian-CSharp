@@ -1,4 +1,6 @@
-﻿namespace Librarian.Sephirah.Models
+﻿using System.Globalization;
+
+namespace Librarian.Sephirah.Models
 {
     public class AppDetails
     {
@@ -25,10 +27,11 @@
         }
         public TuiHub.Protos.Librarian.V1.AppDetails ToProtoAppDetails()
         {
+            var releaseDate = this.ReleaseDate ?? DateTime.MinValue;
             return new TuiHub.Protos.Librarian.V1.AppDetails
             {
                 Description = this.Description,
-                ReleaseDate = this.ReleaseDate.ToString(),
+                ReleaseDate = releaseDate.ToString("O", CultureInfo.InvariantCulture),
                 Developer = this.Developer,
                 Publisher = this.Publisher,
                 Version = this.Version
