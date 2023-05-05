@@ -9,6 +9,10 @@ namespace Librarian.Sephirah.Models
         public string? Developer { get; set; }
         public string? Publisher { get; set; }
         public string? Version { get; set; }
+        // parent
+        public long AppId { get; set; }
+        public App App { get; set; } = null!;
+        // func
         public static AppDetails FromProtosAppDetails(TuiHub.Protos.Librarian.V1.AppDetails appDetails)
         {
             DateTime? releaseDate;
