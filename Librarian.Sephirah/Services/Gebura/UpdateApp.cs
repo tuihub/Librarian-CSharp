@@ -20,7 +20,7 @@ namespace Librarian.Sephirah.Services
             var app = db.Apps.SingleOrDefault(x => x.InternalId == appReq.Id.Id);
             if (app == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
-            // ensure AppSource = APP_SOURCE_INTERNAL
+            // ensure AppSource == APP_SOURCE_INTERNAL
             if (appReq.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
             // update App
