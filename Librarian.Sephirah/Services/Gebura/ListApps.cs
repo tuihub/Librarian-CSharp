@@ -13,8 +13,6 @@ namespace Librarian.Sephirah.Services
             if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // get request param
-            var pageNum = request.Paging.PageNum;
-            var pageSize = request.Paging.PageSize;
             var sourceFilters = request.SourceFilter;
             var typeFilters = request.TypeFilter;
             var idFilters = request.IdFilter;
@@ -27,7 +25,7 @@ namespace Librarian.Sephirah.Services
                 apps = apps.Where(x => typeFilters.Contains(x.Type));
             if (sourceFilters.Count > 0)
                 apps = apps.Where(x => sourceFilters.Contains(x.Source));
-            apps = apps.Skip(pageSize * (pageNum - 1)).Take(pageSize);
+            apps = apps.ApplyPagingRequest(request.Paging);
             if (containDetails == false)
                 apps = apps.Select(x => x.GetAppWithoutDetails());
             // construct response

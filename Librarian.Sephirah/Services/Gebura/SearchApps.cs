@@ -13,13 +13,11 @@ namespace Librarian.Sephirah.Services
         {
             using var db = new TestDbContext();
             // get request param
-            var pageNum = request.Paging.PageNum;
-            var pageSize = request.Paging.PageSize;
             string keyword = request.Keywords;
             // filter apps
             IEnumerable<Models.App> apps = db.Apps;
             apps = apps.Where(a => a.Name.Contains(keyword));
-            apps = apps.Skip(pageSize * (pageNum - 1)).Take(pageSize);
+            apps = apps.ApplyPagingRequest(request.Paging);
             // construct response
             var response = new SearchAppsResponse
             {
