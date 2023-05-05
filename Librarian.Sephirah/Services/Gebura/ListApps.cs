@@ -9,6 +9,9 @@ namespace Librarian.Sephirah.Services
         public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
         {
             using var db = new TestDbContext();
+            // verify user type(admin)
+            if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // get request param
             var pageNum = request.Paging.PageNum;
             var pageSize = request.Paging.PageSize;
