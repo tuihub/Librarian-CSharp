@@ -14,6 +14,9 @@ namespace Librarian.Sephirah.Models
         public string? ShortDescription { get; set; }
         public string? ImageUrl { get; set; }
         public AppDetails? AppDetails { get; set; }
+        // many-to-many relations
+        public List<User> Users { get; } = new();
+        // func
         public App(long internalId, TuiHub.Protos.Librarian.V1.App app)
         {
             InternalId = internalId;
