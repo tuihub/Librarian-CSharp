@@ -11,13 +11,12 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<CreateAppResponse> CreateApp(CreateAppRequest request, ServerCallContext context)
         {
-            long internalId;
             using var db = new ApplicationDbContext();
             // verify user type(admin)
             if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // create app
-            internalId = IdUtil.NewId();
+            var internalId = IdUtil.NewId();
             if (request.App.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
             var app = new Models.App(internalId, request.App);
