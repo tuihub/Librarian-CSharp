@@ -11,16 +11,18 @@ namespace Librarian.Sephirah.Utils
         {
             var expireMinutes = GlobalContext.JwtConfig.AccessTokenExpireMinutes;
             var audience = GlobalContext.JwtConfig.AccessTokenAudience;
-            return GenerateToken(audience, expireMinutes, internalId);
+            var issuer = GlobalContext.JwtConfig.Issuer;
+            return GenerateToken(issuer, audience, expireMinutes, internalId);
 
         }
         public static string GenerateRefreshToken(long internalId)
         {
             var expireMinutes = GlobalContext.JwtConfig.RefreshTokenExpireMinutes;
             var audience = GlobalContext.JwtConfig.RefreshTokenAudience;
-            return GenerateToken(audience, expireMinutes, internalId);
+            var issuer = GlobalContext.JwtConfig.Issuer;
+            return GenerateToken(issuer, audience, expireMinutes, internalId);
         }
-        static string GenerateToken(string audience, double expireMinutes, long internalId)
+        static string GenerateToken(string issuer, string audience, double expireMinutes, long internalId)
         {
             var securityKey = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
             var handler = new JwtSecurityTokenHandler();
@@ -28,6 +30,7 @@ namespace Librarian.Sephirah.Utils
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim(JwtRegisteredClaimNames.Iss, issuer),
                     new Claim(JwtRegisteredClaimNames.Aud, audience),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("internal_id", internalId.ToString())
