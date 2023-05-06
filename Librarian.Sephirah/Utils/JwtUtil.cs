@@ -22,6 +22,13 @@ namespace Librarian.Sephirah.Utils
             var issuer = GlobalContext.JwtConfig.Issuer;
             return GenerateToken(issuer, audience, expireMinutes, internalId);
         }
+        public static string GenerateUploadToken(long internalId)
+        {
+            var expireMinutes = GlobalContext.JwtConfig.RefreshTokenExpireMinutes;
+            var audience = GlobalContext.JwtConfig.UploadTokenAudience;
+            var issuer = GlobalContext.JwtConfig.Issuer;
+            return GenerateToken(issuer, audience, expireMinutes, internalId);
+        }
         static string GenerateToken(string issuer, string audience, double expireMinutes, long internalId)
         {
             var securityKey = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
