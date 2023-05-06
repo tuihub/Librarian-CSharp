@@ -9,7 +9,7 @@ namespace Librarian.Sephirah.Services
         public override Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
         {
             string accessToken, refreshToken;
-            using var db = new TestDbContext();
+            using var db = new ApplicationDbContext();
             var username = request.Username;
             var password = request.Password;
             // get user

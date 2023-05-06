@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         public override Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
         {
             long internalId;
-            using var db = new TestDbContext();
+            using var db = new ApplicationDbContext();
             // verify user type(admin)
             if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));

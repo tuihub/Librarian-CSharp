@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<PurchaseAppResponse> PurchaseApp(PurchaseAppRequest request, ServerCallContext context)
         {
-            using var db = new TestDbContext();
+            using var db = new ApplicationDbContext();
             var appId = request.AppId.Id;
             var app = db.Apps.SingleOrDefault(x => x.InternalId == appId);
             if (app == null)

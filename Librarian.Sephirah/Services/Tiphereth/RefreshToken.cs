@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         public override Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request, ServerCallContext context)
         {
             string accessTokenNew, refreshTokenNew;
-            using var db = new TestDbContext();
+            using var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
             // get user

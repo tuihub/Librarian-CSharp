@@ -24,8 +24,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
         options.TokenValidationParameters = new()
         {
-            ValidateIssuer = false,
-            //ValidIssuer = GlobalContext.JwtConfig.Issuer,
+            ValidateIssuer = true,
+            ValidIssuer = GlobalContext.JwtConfig.Issuer,
             ValidAudience = GlobalContext.JwtConfig.AccessTokenAudience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -38,8 +38,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
         options.TokenValidationParameters = new()
         {
-            ValidateIssuer = false,
-            //ValidIssuer = GlobalContext.JwtConfig.Issuer,
+            ValidateIssuer = true,
+            ValidIssuer = GlobalContext.JwtConfig.Issuer,
             ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),

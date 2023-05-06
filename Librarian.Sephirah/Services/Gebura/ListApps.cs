@@ -10,7 +10,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
         {
-            using var db = new TestDbContext();
+            using var db = new ApplicationDbContext();
             // verify user type(admin)
             if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
