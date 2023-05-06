@@ -10,6 +10,7 @@
         public string Key { get; set; } = null!;
         public double AccessTokenExpireMinutes { get; set; }
         public double RefreshTokenExpireMinutes { get; set; }
-        public double BinahTokenExpireMinutes { get; set; }
+        public double UploadTokenExpireMinutes { get; set; }
+        public double DownloadTokenExpireMinutes { get; set; }
     }
 }
