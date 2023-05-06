@@ -1,11 +1,13 @@
 ﻿using Grpc.Core;
 using Librarian.Sephirah.Utils;
+using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
+        [Authorize]
         public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
         {
             using var db = new TestDbContext();
