@@ -16,10 +16,12 @@ namespace Librarian.Sephirah.Services
             var userInternalId = UserUtil.GetUserInternalIdFromToken(context);
             var appInternalId = request.AppPackageId.Id;
             var internalId = IdUtil.NewId();
+            var fileMetadata = new Models.FileMetadata(internalId, request.FileMetadata);
             var gameSaveFile = new GameSaveFile
             {
                 InternalId = internalId,
                 Status = GameSaveFileStatus.PENDING,
+                FileMetadata = fileMetadata,
                 UserId = userInternalId,
                 AppId = appInternalId,
             };
