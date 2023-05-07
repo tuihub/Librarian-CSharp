@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -80,6 +81,19 @@ namespace Librarian.Sephirah.Utils
             var jwtToken = handler.ReadJwtToken(token);
             var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);
             return internalId;
+        }
+        public static void GetJwtBearerOptions(this JwtBearerOptions options, string validAudience)
+        {
+            var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
+            options.TokenValidationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidIssuer = GlobalContext.JwtConfig.Issuer,
+                ValidAudience = validAudience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                RequireExpirationTime = true
+            };
         }
     }
 }

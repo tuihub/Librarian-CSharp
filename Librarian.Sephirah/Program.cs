@@ -19,33 +19,13 @@ GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtC
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     // AccessToken Auth (Default)
-    .AddJwtBearer(options =>
-    {
-        var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
-        options.TokenValidationParameters = new()
-        {
-            ValidateIssuer = true,
-            ValidIssuer = GlobalContext.JwtConfig.Issuer,
-            ValidAudience = GlobalContext.JwtConfig.AccessTokenAudience,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            RequireExpirationTime = true
-        };
-    })
+    .AddJwtBearer(options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.AccessTokenAudience))
     // RefreshToken Auth
-    .AddJwtBearer("RefreshToken", options =>
-    {
-        var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
-        options.TokenValidationParameters = new()
-        {
-            ValidateIssuer = true,
-            ValidIssuer = GlobalContext.JwtConfig.Issuer,
-            ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            RequireExpirationTime = true
-        };
-    });
+    .AddJwtBearer("RefreshToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.RefreshTokenAudience))
+    // UploadToken Auth
+    .AddJwtBearer("UploadToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.UploadTokenAudience))
+    // DownloadToken Auth
+    .AddJwtBearer("DownloadToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.DownloadTokenAudience));
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
