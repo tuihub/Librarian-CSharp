@@ -19,5 +19,16 @@ namespace Librarian.Sephirah.Models
             Type = metadata.Type;
             Sha256 = metadata.Sha256;
         }
+        public TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata ToProtoFileMetadata()
+        {
+            return new TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata
+            {
+                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = InternalId },
+                Name = Name,
+                Size = Size,
+                Type = Type,
+                Sha256 = Sha256
+            };
+        }
     }
 }
