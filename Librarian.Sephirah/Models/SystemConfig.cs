@@ -10,6 +10,7 @@
         public string MinioSecretKey { get; set; } = null!;
         public bool MinioWithSSL { get; set; }
         public string MinioBucket { get; set; } = null!;
+        public long BinahChunkBytes { get; set; }
     }
     public enum ApplicationDbType
     {
