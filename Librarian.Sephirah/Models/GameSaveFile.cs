@@ -9,8 +9,8 @@
         public FileMetadata FileMetadata { get; set; } = null!;
         public long UserId { get; set; }
         public User User { get; set; } = null!;
-        public long AppId { get; set; }
-        public App App { get; set; } = null!;
+        public long AppPackageId { get; set; }
+        public AppPackage AppPackage { get; set; } = null!;
     }
     public enum GameSaveFileStatus
     {

@@ -23,7 +23,7 @@ namespace Librarian.Sephirah.Services
                 Status = GameSaveFileStatus.PENDING,
                 FileMetadata = fileMetadata,
                 UserId = userInternalId,
-                AppId = appInternalId,
+                AppPackageId = appInternalId,
             };
             db.GameSaveFiles.Add(gameSaveFile);
             var token = JwtUtil.GenerateUploadToken(internalId);
