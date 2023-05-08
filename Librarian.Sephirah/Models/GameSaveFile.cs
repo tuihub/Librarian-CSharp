@@ -17,6 +17,7 @@
         PENDING,
         IN_PROGRESS,
         STORED,
+        SHA256_MISMATCH,
         FAILED,
     }
 }
