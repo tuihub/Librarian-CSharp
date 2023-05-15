@@ -1,7 +1,9 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Librarian.Sephirah.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Models
@@ -11,12 +13,15 @@ namespace Librarian.Sephirah.Models
     public class FileMetadata
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         [MaxLength(128)]
         public string? Name { get; set; }
         public long Size { get; set; }
         public FileType Type { get; set; }
-        public ByteString Sha256 { get; set; } = null!;
+        [MaxLength(32)]
+        [IsFixedLength]
+        public byte[] Sha256 { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
@@ -27,9 +32,10 @@ namespace Librarian.Sephirah.Models
             Name = string.IsNullOrEmpty(metadata.Name) ? null : metadata.Name;
             Size = metadata.Size;
             Type = metadata.Type;
-            Sha256 = metadata.Sha256;
+            Sha256 = metadata.Sha256.ToArray();
             CreatedAt = metadata.CreateTime.ToDateTime();
         }
+        public FileMetadata() { }
         public TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata ToProtoFileMetadata()
         {
             return new TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata
@@ -38,7 +44,7 @@ namespace Librarian.Sephirah.Models
                 Name = Name,
                 Size = Size,
                 Type = Type,
-                Sha256 = Sha256,
+                Sha256 = ByteString.CopyFrom(Sha256),
                 CreateTime = CreatedAt.ToTimestamp()
             };
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Models
@@ -13,6 +14,7 @@ namespace Librarian.Sephirah.Models
     public class App
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         public AppSource Source { get; set; }
         [MaxLength(64)]
@@ -47,7 +49,7 @@ namespace Librarian.Sephirah.Models
             Type = app.Type;
             ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
             ImageUrl = string.IsNullOrEmpty(app.ImageUrl) ? null : app.ImageUrl;
-            AppDetails = AppDetails.FromProtosAppDetails(app.Details);
+            AppDetails = AppDetails.FromProtosAppDetails(internalId, app.Details);
         }
         public App() : base() { }
         public App GetAppWithoutDetails()

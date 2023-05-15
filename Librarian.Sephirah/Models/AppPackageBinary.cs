@@ -1,6 +1,8 @@
 ﻿using Google.Protobuf;
+using Librarian.Sephirah.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Models
@@ -9,12 +11,18 @@ namespace Librarian.Sephirah.Models
     [Index(nameof(UpdatedAt))]
     public class AppPackageBinary
     {
+        // same as AppPackage Id
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long Id { get; set; }
         [MaxLength(128)]
         public string Name { get; set; } = null!;
         public long SizeByte { get; set; }
         [MaxLength(256)]
         public string PublicUrl { get; set; } = null!;
-        public ByteString? Sha256 { get; set; }
+        [MaxLength(32)]
+        [IsFixedLength]
+        public byte[]? Sha256 { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to parent)

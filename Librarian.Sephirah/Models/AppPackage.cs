@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Models
@@ -11,6 +12,7 @@ namespace Librarian.Sephirah.Models
     public class AppPackage
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         public AppPackageSource Source { get; set; }
         public long SourceAppId { get; set; }
@@ -38,5 +40,6 @@ namespace Librarian.Sephirah.Models
             Description = string.IsNullOrEmpty(appPackage.Description) ? null : appPackage.Description;
             IsPublic = appPackage.Public;
         }
+        public AppPackage() { }
     }
 }

@@ -1,10 +1,15 @@
 ﻿using Librarian.Sephirah.Utils;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Librarian.Sephirah.Models
 {
     public class AppDetails
     {
+        // same as App Id
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long Id { get; set; }
         public string? Description { get; set; }
         public DateTime? ReleaseDate { get; set; }
         [MaxLength(128)]
@@ -17,7 +22,7 @@ namespace Librarian.Sephirah.Models
         public long AppId { get; set; }
         public App App { get; set; } = null!;
         // func
-        public static AppDetails FromProtosAppDetails(TuiHub.Protos.Librarian.V1.AppDetails appDetails)
+        public static AppDetails FromProtosAppDetails(long appId, TuiHub.Protos.Librarian.V1.AppDetails appDetails)
         {
             DateTime? releaseDate;
             if (DateTime.TryParse(appDetails.ReleaseDate, out DateTime tmpDT) == true)
@@ -26,6 +31,7 @@ namespace Librarian.Sephirah.Models
                 releaseDate = null;
             return new AppDetails
             {
+                Id = appId,
                 Description = string.IsNullOrEmpty(appDetails.Description) ? null : appDetails.Description,
                 ReleaseDate = releaseDate,
                 Developer = string.IsNullOrEmpty(appDetails.Developer) ? null : appDetails.Developer,

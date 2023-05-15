@@ -1,6 +1,8 @@
 ﻿using Librarian.Sephirah.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace Librarian.Sephirah.Utils
 {
@@ -35,11 +37,44 @@ namespace Librarian.Sephirah.Utils
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>();
+            //modelBuilder.Entity<AppPackageBinary>()
+            //            .Property(x => x.Sha256)
+            //            .IsFixedLength(true);
+            //modelBuilder.Entity<FileMetadata>()
+            //            .Property(x => x.Sha256)
+            //            .IsFixedLength(true);
+
+            // applying custom attribute
+            // from https://stackoverflow.com/questions/41664713/using-a-custom-attribute-in-ef7-core-onmodelcreating
+            //examine custom annotations for shaping the schema in the database.
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                foreach (var property in entityType.GetProperties())
+                {
+                    var memberInfo = property.PropertyInfo ?? (MemberInfo)property.FieldInfo;
+                    var defaultValue = memberInfo?.GetCustomAttribute<IsFixedLengthAttribute>();
+                    if (defaultValue == null) continue;
+                    if (defaultValue.IsFixedLength == true)
+                        property.SetIsFixedLength(true);
+                }
         }
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
+        }
+    }
+    // from https://learn.microsoft.com/zh-cn/dotnet/standard/attributes/writing-custom-attributes
+    [AttributeUsage(AttributeTargets.Property)]
+    public class IsFixedLengthAttribute : Attribute
+    {
+        private bool _isFixedLength;
+        public IsFixedLengthAttribute()
+        {
+            _isFixedLength = true;
+        }
+        public virtual bool IsFixedLength
+        {
+            get { return _isFixedLength; }
+            set { _isFixedLength = value; }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Librarian.Sephirah.Models
 {
@@ -9,11 +10,13 @@ namespace Librarian.Sephirah.Models
     {
         // same InternalId as FileMeta
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         public GameSaveFileStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to parent)
+        public long FileMetadataId { get; set; }
         public FileMetadata FileMetadata { get; set; } = null!;
         // one-to-many relation(to parent)
         public long UserId { get; set; }
