@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Models
@@ -21,6 +22,7 @@ namespace Librarian.Sephirah.Models
             Size = metadata.Size;
             Type = metadata.Type;
             Sha256 = metadata.Sha256;
+            CreatedAt = metadata.CreateTime.ToDateTime();
         }
         public TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata ToProtoFileMetadata()
         {
@@ -30,7 +32,8 @@ namespace Librarian.Sephirah.Models
                 Name = Name,
                 Size = Size,
                 Type = Type,
-                Sha256 = Sha256
+                Sha256 = Sha256,
+                CreateTime = CreatedAt.ToTimestamp()
             };
         }
     }
