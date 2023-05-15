@@ -59,7 +59,7 @@ namespace Librarian.Sephirah.Utils
         }
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
-            configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
+            //configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
         }
     }
     // from https://learn.microsoft.com/zh-cn/dotnet/standard/attributes/writing-custom-attributes
