@@ -2,6 +2,7 @@
 {
     public class GameSaveFile
     {
+        // same InternalId as FileMeta
         public long Id { get; set; }
         public GameSaveFileStatus Status { get; set; }
         // relations

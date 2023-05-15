@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new PagingResponse { TotalSize = fileMetadatas.Count() }
             };
-            ret.FileList.Add(fileMetadatas.Select(x => x.ToProtoFileMetadata()));
+            ret.Files.Add(fileMetadatas.Select(x => x.ToProtoFileMetadata()));
             return Task.FromResult(ret);
         }
     }

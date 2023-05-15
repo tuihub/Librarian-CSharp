@@ -7,7 +7,6 @@ namespace Librarian.Sephirah.Models
         public long Id { get; set; }
         public AppPackageSource Source { get; set; }
         public long SourceId { get; set; }
-        public string SourcePackageId { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public Models.AppPackageBinary? AppPackageBinary { get; set; }
@@ -21,7 +20,6 @@ namespace Librarian.Sephirah.Models
             Id = internalId;
             Source = appPackage.Source;
             SourceId = appPackage.Id.Id;
-            SourcePackageId = appPackage.SourcePackageId;
             Name = appPackage.Name;
             Description = appPackage.Description;
             IsPublic = appPackage.Public;
