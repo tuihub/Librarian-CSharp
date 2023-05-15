@@ -22,7 +22,7 @@ namespace Librarian.Sephirah.Services
             // filter apps
             IEnumerable<Models.App> apps = db.Apps;
             if (idFilters.Count > 0)
-                apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.InternalId));
+                apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
             if (typeFilters.Count > 0)
                 apps = apps.Where(x => typeFilters.Contains(x.Type));
             if (sourceFilters.Count > 0)

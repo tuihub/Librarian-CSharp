@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             internalId = IdUtil.NewId();
             var user = new Models.User()
             {
-                InternalId = internalId,
+                Id = internalId,
                 Name = request.User.Username,
                 Password = PasswordHasher.HashPassword(request.User.Password),
                 Status = UserStatus.Active,

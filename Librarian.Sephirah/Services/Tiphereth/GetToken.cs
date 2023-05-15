@@ -21,8 +21,8 @@ namespace Librarian.Sephirah.Services
             if (PasswordHasher.VerifyHashedPassword(user.Password, password))
             {
                 // get token
-                accessToken = JwtUtil.GenerateAccessToken(user.InternalId);
-                refreshToken = JwtUtil.GenerateRefreshToken(user.InternalId);
+                accessToken = JwtUtil.GenerateAccessToken(user.Id);
+                refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
             }
             else
             {

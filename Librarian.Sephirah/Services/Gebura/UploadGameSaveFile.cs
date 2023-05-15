@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var fileMetadata = new Models.FileMetadata(internalId, request.FileMetadata);
             var gameSaveFile = new GameSaveFile
             {
-                InternalId = internalId,
+                Id = internalId,
                 Status = GameSaveFileStatus.PENDING,
                 FileMetadata = fileMetadata,
                 UserId = userInternalId,

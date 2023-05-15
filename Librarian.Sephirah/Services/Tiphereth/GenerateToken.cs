@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // generate token
             var internalId = request.Id.Id;
-            var user = db.Users.SingleOrDefault(x => x.InternalId == internalId);
+            var user = db.Users.SingleOrDefault(x => x.Id == internalId);
             if (user == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             refreshToken = JwtUtil.GenerateRefreshToken(internalId);

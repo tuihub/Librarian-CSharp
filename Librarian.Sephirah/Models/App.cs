@@ -5,7 +5,6 @@ namespace Librarian.Sephirah.Models
     public class App
     {
         public long Id { get; set; }
-        public long InternalId { get; set; }
         public AppSource Source { get; set; }
         public string SourceAppId { get; set; } = null!;
         public string? SourceUrl { get; set; }
@@ -21,7 +20,7 @@ namespace Librarian.Sephirah.Models
         // func
         public App(long internalId, TuiHub.Protos.Librarian.V1.App app)
         {
-            InternalId = internalId;
+            Id = internalId;
             Source = app.Source;
             SourceAppId = app.SourceAppId;
             SourceUrl = app.SourceUrl;
@@ -37,7 +36,6 @@ namespace Librarian.Sephirah.Models
             return new App
             {
                 Id = this.Id,
-                InternalId = this.InternalId,
                 Source = this.Source,
                 SourceAppId = this.SourceAppId,
                 SourceUrl = this.SourceUrl,
@@ -52,7 +50,7 @@ namespace Librarian.Sephirah.Models
         {
             var ret = new TuiHub.Protos.Librarian.V1.App
             {
-                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.InternalId },
+                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.Id },
                 Source = this.Source,
                 SourceAppId = this.SourceAppId,
                 SourceUrl = this.SourceUrl,

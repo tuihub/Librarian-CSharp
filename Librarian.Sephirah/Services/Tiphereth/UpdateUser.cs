@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // update user
             var userReq = request.User;
-            var user = db.Users.SingleOrDefault(x => x.InternalId == userReq.Id.Id);
+            var user = db.Users.SingleOrDefault(x => x.Id == userReq.Id.Id);
             if (user == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             if (userReq.Username.Length > 0) user.Name = userReq.Username;

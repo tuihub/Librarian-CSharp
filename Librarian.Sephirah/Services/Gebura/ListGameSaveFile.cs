@@ -18,8 +18,8 @@ namespace Librarian.Sephirah.Services
                                   .Where(x => x.AppPackageId == appPackageId)
                                   .ApplyPagingRequest(request.Paging)
                                   .Join(db.FileMetadatas,
-                                        gameSaveFile => gameSaveFile.InternalId,
-                                        fileMetadata => fileMetadata.InternalId,
+                                        gameSaveFile => gameSaveFile.Id,
+                                        fileMetadata => fileMetadata.Id,
                                         (gameSaveFile, fileMetadata) => fileMetadata);
             var ret = new ListGameSaveFileResponse
             {

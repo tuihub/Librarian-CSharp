@@ -19,10 +19,10 @@ namespace Librarian.Sephirah.Services
             using var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
-            var gameSaveFile = db.GameSaveFiles.Single(x => x.InternalId == internalId);
+            var gameSaveFile = db.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status != GameSaveFileStatus.STORED)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
-            var fileMetadata = db.FileMetadatas.Single(x => x.InternalId == internalId);
+            var fileMetadata = db.FileMetadatas.Single(x => x.Id == internalId);
             // pipe stream
             var pipeStreamServer = new AnonymousPipeServerStream();
             var pipeStreamClient = new AnonymousPipeClientStream(pipeStreamServer.GetClientHandleAsString());

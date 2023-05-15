@@ -5,7 +5,6 @@ namespace Librarian.Sephirah.Models
     public class AppPackage
     {
         public long Id { get; set; }
-        public long InternalId { get; set; }
         public AppPackageSource Source { get; set; }
         public long SourceId { get; set; }
         public string SourcePackageId { get; set; } = null!;
@@ -19,7 +18,7 @@ namespace Librarian.Sephirah.Models
         // func
         public AppPackage(long internalId, TuiHub.Protos.Librarian.V1.AppPackage appPackage)
         {
-            InternalId = internalId;
+            Id = internalId;
             Source = appPackage.Source;
             SourceId = appPackage.Id.Id;
             SourcePackageId = appPackage.SourcePackageId;

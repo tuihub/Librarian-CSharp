@@ -18,10 +18,10 @@ namespace Librarian.Sephirah.Services
             using var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
-            var gameSaveFile = db.GameSaveFiles.Single(x => x.InternalId == internalId);
+            var gameSaveFile = db.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status == GameSaveFileStatus.STORED)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Current game save has been stored."));
-            var fileMetadata = db.FileMetadatas.Single(x => x.InternalId == internalId);
+            var fileMetadata = db.FileMetadatas.Single(x => x.Id == internalId);
             // two stream, one for Sha256, the other for Minio
             var pipeStreamServer4Sha256 = new AnonymousPipeServerStream();
             var pipeStreamClient4Sha256 = new AnonymousPipeClientStream(pipeStreamServer4Sha256.GetClientHandleAsString());

@@ -3,7 +3,6 @@
     public class GameSaveFile
     {
         public long Id { get; set; }
-        public long InternalId { get; set; }
         public GameSaveFileStatus Status { get; set; }
         // relations
         public FileMetadata FileMetadata { get; set; } = null!;

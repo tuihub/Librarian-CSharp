@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // check App exists
             var appReq = request.App;
-            var app = db.Apps.SingleOrDefault(x => x.InternalId == appReq.Id.Id);
+            var app = db.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
             if (app == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             // ensure AppSource == APP_SOURCE_INTERNAL

@@ -21,7 +21,7 @@ namespace Librarian.Sephirah.Services
         {
             using var db = new ApplicationDbContext();
             var appId = request.AppId.Id;
-            var app = db.Apps.SingleOrDefault(x => x.InternalId == appId);
+            var app = db.Apps.SingleOrDefault(x => x.Id == appId);
             if (app == null) 
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             var ret = new GetBindAppsResponse();

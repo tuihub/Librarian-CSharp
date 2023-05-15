@@ -9,7 +9,7 @@ namespace Librarian.Sephirah.Utils
         public static UserType GetUserTypeFromToken(ServerCallContext context, ApplicationDbContext db)
         {
             long internalIdFromToken = GetUserInternalIdFromToken(context);
-            var userFromToken = db.Users.Single(x => x.InternalId == internalIdFromToken);
+            var userFromToken = db.Users.Single(x => x.Id == internalIdFromToken);
             return userFromToken.Type;
         }
 

@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
             // get user
-            var user = db.Users.Single(x => x.InternalId == internalId);
+            var user = db.Users.Single(x => x.Id == internalId);
             if (user.Status != UserStatus.Active)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
             // get new token
