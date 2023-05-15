@@ -32,6 +32,7 @@ namespace Librarian.Sephirah.Services
             if (appReq.ShortDescription != null) app.ShortDescription = appReq.ShortDescription;
             if (appReq.ImageUrl != null) app.ImageUrl = appReq.ImageUrl;
             if (appReq.Details != null) app.AppDetails = Models.AppDetails.FromProtosAppDetails(appReq.Details);
+            app.UpdatedAt = DateTime.Now;
             db.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }

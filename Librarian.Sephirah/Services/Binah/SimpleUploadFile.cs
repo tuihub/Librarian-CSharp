@@ -105,6 +105,7 @@ namespace Librarian.Sephirah.Services
             {
                 ret.Status = FileTransferStatus.Failed;
             }
+            gameSaveFile.UpdatedAt = DateTime.Now;
             db.SaveChanges();
             await responseStream.WriteAsync(ret);
         }

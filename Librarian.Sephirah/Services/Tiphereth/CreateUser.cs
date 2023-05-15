@@ -23,9 +23,7 @@ namespace Librarian.Sephirah.Services
                 Name = request.User.Username,
                 Password = PasswordHasher.HashPassword(request.User.Password),
                 Status = UserStatus.Active,
-                Type = request.User.Type,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = null
+                Type = request.User.Type
             };
             db.Users.Add(user);
             db.SaveChanges();

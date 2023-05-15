@@ -9,6 +9,8 @@ namespace Librarian.Sephirah.Models
         public long SourceAppId { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
         public AppPackageBinary? AppPackageBinary { get; set; }
         public bool IsPublic { get; set; }
@@ -24,7 +26,7 @@ namespace Librarian.Sephirah.Models
             Source = appPackage.Source;
             SourceAppId = appPackage.Id.Id;
             Name = appPackage.Name;
-            Description = appPackage.Description;
+            Description = string.IsNullOrEmpty(appPackage.Description) ? null : appPackage.Description;
             IsPublic = appPackage.Public;
         }
     }

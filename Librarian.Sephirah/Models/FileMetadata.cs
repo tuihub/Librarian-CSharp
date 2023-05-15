@@ -10,12 +10,14 @@ namespace Librarian.Sephirah.Models
         public long Size { get; set; }
         public FileType Type { get; set; }
         public ByteString Sha256 { get; set; } = null!;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
         public GameSaveFile? GameSaveFile { get; set; }
         public FileMetadata(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata metadata)
         {
             Id = internalId;
-            Name = metadata.Name;
+            Name = string.IsNullOrEmpty(metadata.Name) ? null : metadata.Name;
             Size = metadata.Size;
             Type = metadata.Type;
             Sha256 = metadata.Sha256;

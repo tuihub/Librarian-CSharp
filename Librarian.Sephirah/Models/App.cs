@@ -12,6 +12,8 @@ namespace Librarian.Sephirah.Models
         public AppType Type { get; set; }
         public string? ShortDescription { get; set; }
         public string? ImageUrl { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
         public AppDetails? AppDetails { get; set; }
         // one-to-many relation(required, to child)
@@ -25,12 +27,12 @@ namespace Librarian.Sephirah.Models
         {
             Id = internalId;
             Source = app.Source;
-            SourceAppId = app.SourceAppId;
-            SourceUrl = app.SourceUrl;
+            SourceAppId = app.Source == AppSource.Internal ? null : app.SourceAppId;
+            SourceUrl = string.IsNullOrEmpty(app.SourceUrl) ? null : app.SourceUrl;
             Name = app.Name;
             Type = app.Type;
-            ShortDescription = app.ShortDescription;
-            ImageUrl = app.ImageUrl;
+            ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
+            ImageUrl = string.IsNullOrEmpty(app.ImageUrl) ? null : app.ImageUrl;
             AppDetails = AppDetails.FromProtosAppDetails(app.Details);
         }
         public App() : base() { }
@@ -46,7 +48,9 @@ namespace Librarian.Sephirah.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription,
                 ImageUrl = this.ImageUrl,
-                AppDetails = null
+                AppDetails = null,
+                CreatedAt = this.CreatedAt,
+                UpdatedAt = this.UpdatedAt
             };
         }
         public TuiHub.Protos.Librarian.V1.App ToProtoApp()

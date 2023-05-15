@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using Librarian.Sephirah.Utils;
 
 namespace Librarian.Sephirah.Models
 {
@@ -22,11 +22,11 @@ namespace Librarian.Sephirah.Models
                 releaseDate = null;
             return new AppDetails
             {
-                Description = appDetails.Description,
+                Description = string.IsNullOrEmpty(appDetails.Description) ? null : appDetails.Description,
                 ReleaseDate = releaseDate,
-                Developer = appDetails.Developer,
-                Publisher = appDetails.Publisher,
-                Version = appDetails.Version,
+                Developer = string.IsNullOrEmpty(appDetails.Developer) ? null : appDetails.Developer,
+                Publisher = string.IsNullOrEmpty(appDetails.Publisher) ? null : appDetails.Publisher,
+                Version = string.IsNullOrEmpty(appDetails.Version) ? null : appDetails.Version,
             };
         }
         public TuiHub.Protos.Librarian.V1.AppDetails ToProtoAppDetails()
@@ -35,7 +35,7 @@ namespace Librarian.Sephirah.Models
             return new TuiHub.Protos.Librarian.V1.AppDetails
             {
                 Description = this.Description,
-                ReleaseDate = releaseDate.ToString("O", CultureInfo.InvariantCulture),
+                ReleaseDate = releaseDate.ToISO8601String(),
                 Developer = this.Developer,
                 Publisher = this.Publisher,
                 Version = this.Version

@@ -5,6 +5,8 @@
         // same InternalId as FileMeta
         public long Id { get; set; }
         public GameSaveFileStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to parent)
         public FileMetadata FileMetadata { get; set; } = null!;
         // one-to-many relation(to parent)
