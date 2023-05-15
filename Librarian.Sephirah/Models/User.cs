@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Models
         public UserStatus Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        // many-to-many relations
-        public List<App> Apps { get; } = new();
+        // many-to-many relation(wihtout entity, to other parent)
+        public ICollection<App> Apps { get; } = new List<App>();
     }
 }

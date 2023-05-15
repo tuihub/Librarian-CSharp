@@ -6,17 +6,20 @@ namespace Librarian.Sephirah.Models
     {
         public long Id { get; set; }
         public AppSource Source { get; set; }
-        public string SourceAppId { get; set; } = null!;
+        public string? SourceAppId { get; set; }
         public string? SourceUrl { get; set; }
         public string Name { get; set; } = null!;
         public AppType Type { get; set; }
         public string? ShortDescription { get; set; }
         public string? ImageUrl { get; set; }
+        // one-to-one relation(required, to child)
         public AppDetails? AppDetails { get; set; }
-        // one-to-many relations
-        public List<AppPackage> AppPackages { get; } = new();
-        // many-to-many relations
-        public List<User> Users { get; } = new();
+        // one-to-many relation(required, to child)
+        public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
+        // many-to-many relation(wihtout entity, to other parent)
+        public ICollection<User> Users { get; } = new List<User>();
+        // one-to-many relation(required, to child)
+        public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
         // func
         public App(long internalId, TuiHub.Protos.Librarian.V1.App app)
         {

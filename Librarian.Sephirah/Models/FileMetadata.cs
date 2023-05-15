@@ -10,6 +10,8 @@ namespace Librarian.Sephirah.Models
         public long Size { get; set; }
         public FileType Type { get; set; }
         public ByteString Sha256 { get; set; } = null!;
+        // one-to-one relation(required, to child)
+        public GameSaveFile? GameSaveFile { get; set; }
         public FileMetadata(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata metadata)
         {
             Id = internalId;

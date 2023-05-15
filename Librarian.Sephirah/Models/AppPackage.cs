@@ -9,9 +9,10 @@ namespace Librarian.Sephirah.Models
         public long SourceId { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public Models.AppPackageBinary? AppPackageBinary { get; set; }
+        // one-to-one relation(required, to child)
+        public AppPackageBinary? AppPackageBinary { get; set; }
         public bool IsPublic { get; set; }
-        // parent
+        // one-to-many relation(required, to parent)
         public long AppId { get; set; }
         public App App { get; set; } = null!;
         // func

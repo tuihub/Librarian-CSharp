@@ -12,9 +12,9 @@ namespace Librarian.Sephirah.Utils
         public DbSet<AppDetails> AppDetails { get; set; } = null!;
         public DbSet<AppPackage> AppPackages { get; set; } = null!;
         public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<GameSaveFile> GameSaveFiles { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
+        public DbSet<GameSaveFile> GameSaveFiles { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var dbType = GlobalContext.SystemConfig.DbType;

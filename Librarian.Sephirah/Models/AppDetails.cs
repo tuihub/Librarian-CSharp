@@ -9,7 +9,7 @@ namespace Librarian.Sephirah.Models
         public string? Developer { get; set; }
         public string? Publisher { get; set; }
         public string? Version { get; set; }
-        // parent
+        // one-to-one relation(required, to parent)
         public long AppId { get; set; }
         public App App { get; set; } = null!;
         // func
