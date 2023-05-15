@@ -16,10 +16,10 @@ namespace Librarian.Sephirah.Models
         public AppDetails? AppDetails { get; set; }
         // one-to-many relation(required, to child)
         public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
-        // many-to-many relation(wihtout entity, to other parent)
-        public ICollection<User> Users { get; } = new List<User>();
         // one-to-many relation(required, to child)
         public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
+        // many-to-many relation(wihtout entity, to other parent)
+        public ICollection<User> Users { get; } = new List<User>();
         // func
         public App(long internalId, TuiHub.Protos.Librarian.V1.App app)
         {

@@ -6,12 +6,14 @@ namespace Librarian.Sephirah.Models
     {
         public long Id { get; set; }
         public AppPackageSource Source { get; set; }
-        public long SourceId { get; set; }
+        public long SourceAppId { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         // one-to-one relation(required, to child)
         public AppPackageBinary? AppPackageBinary { get; set; }
         public bool IsPublic { get; set; }
+        // one-to-many relation(required, to child)
+        public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
         // one-to-many relation(required, to parent)
         public long AppId { get; set; }
         public App App { get; set; } = null!;
@@ -20,7 +22,7 @@ namespace Librarian.Sephirah.Models
         {
             Id = internalId;
             Source = appPackage.Source;
-            SourceId = appPackage.Id.Id;
+            SourceAppId = appPackage.Id.Id;
             Name = appPackage.Name;
             Description = appPackage.Description;
             IsPublic = appPackage.Public;
