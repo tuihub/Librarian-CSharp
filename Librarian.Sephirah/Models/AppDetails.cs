@@ -1,4 +1,5 @@
 ﻿using Librarian.Sephirah.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace Librarian.Sephirah.Models
 {
@@ -6,8 +7,11 @@ namespace Librarian.Sephirah.Models
     {
         public string? Description { get; set; }
         public DateTime? ReleaseDate { get; set; }
+        [MaxLength(128)]
         public string? Developer { get; set; }
+        [MaxLength(128)]
         public string? Publisher { get; set; }
+        [MaxLength(128)]
         public string? Version { get; set; }
         // one-to-one relation(required, to parent)
         public long AppId { get; set; }

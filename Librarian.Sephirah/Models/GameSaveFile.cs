@@ -1,8 +1,14 @@
-﻿namespace Librarian.Sephirah.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace Librarian.Sephirah.Models
 {
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class GameSaveFile
     {
         // same InternalId as FileMeta
+        [Key]
         public long Id { get; set; }
         public GameSaveFileStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;

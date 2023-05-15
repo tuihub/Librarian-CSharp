@@ -1,12 +1,18 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Models
 {
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class FileMetadata
     {
+        [Key]
         public long Id { get; set; }
+        [MaxLength(128)]
         public string? Name { get; set; }
         public long Size { get; set; }
         public FileType Type { get; set; }

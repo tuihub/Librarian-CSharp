@@ -1,13 +1,20 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Models
 {
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class User
     {
+        [Key]
         public long Id { get; set; }
+        [MaxLength(128)]
         public string Name { get; set; } = null!;
+        [MaxLength(128)]
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }

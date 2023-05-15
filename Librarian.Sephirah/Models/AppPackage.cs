@@ -1,13 +1,22 @@
-﻿using TuiHub.Protos.Librarian.V1;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Models
 {
+    [Index(nameof(Source))]
+    [Index(nameof(SourceAppId))]
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class AppPackage
     {
+        [Key]
         public long Id { get; set; }
         public AppPackageSource Source { get; set; }
         public long SourceAppId { get; set; }
+        [MaxLength(128)]
         public string Name { get; set; } = null!;
+        [MaxLength(1024)]
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
