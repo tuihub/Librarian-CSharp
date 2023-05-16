@@ -49,7 +49,7 @@ namespace Librarian.Sephirah.Models
             Type = app.Type;
             ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
             ImageUrl = string.IsNullOrEmpty(app.ImageUrl) ? null : app.ImageUrl;
-            AppDetails = AppDetails.FromProtosAppDetails(internalId, app.Details);
+            AppDetails = new AppDetails(internalId, app.Details);
         }
         public App() : base() { }
         public App GetAppWithoutDetails()
@@ -71,20 +71,18 @@ namespace Librarian.Sephirah.Models
         }
         public TuiHub.Protos.Librarian.V1.App ToProtoApp()
         {
-            var ret = new TuiHub.Protos.Librarian.V1.App
+            return new TuiHub.Protos.Librarian.V1.App
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.Id },
                 Source = this.Source,
-                SourceAppId = this.SourceAppId,
-                SourceUrl = this.SourceUrl,
+                SourceAppId = this.SourceAppId ?? string.Empty,
+                SourceUrl = this.SourceUrl ?? string.Empty,
                 Name = this.Name,
                 Type = this.Type,
-                ShortDescription = this.ShortDescription,
-                ImageUrl = this.ImageUrl
+                ShortDescription = this.ShortDescription ?? string.Empty,
+                ImageUrl = this.ImageUrl ?? string.Empty,
+                Details = (this.AppDetails ?? new AppDetails()).ToProtoAppDetails()
             };
-            if (this.AppDetails != null ) 
-                ret.Details = this.AppDetails.ToProtoAppDetails();
-            return ret;
         }
     }
 }

@@ -22,33 +22,31 @@ namespace Librarian.Sephirah.Models
         public long AppId { get; set; }
         public App App { get; set; } = null!;
         // func
-        public static AppDetails FromProtosAppDetails(long appId, TuiHub.Protos.Librarian.V1.AppDetails appDetails)
+        public AppDetails(long appId, TuiHub.Protos.Librarian.V1.AppDetails appDetails)
         {
             DateTime? releaseDate;
             if (DateTime.TryParse(appDetails.ReleaseDate, out DateTime tmpDT) == true)
                 releaseDate = tmpDT;
             else
                 releaseDate = null;
-            return new AppDetails
-            {
-                Id = appId,
-                Description = string.IsNullOrEmpty(appDetails.Description) ? null : appDetails.Description,
-                ReleaseDate = releaseDate,
-                Developer = string.IsNullOrEmpty(appDetails.Developer) ? null : appDetails.Developer,
-                Publisher = string.IsNullOrEmpty(appDetails.Publisher) ? null : appDetails.Publisher,
-                Version = string.IsNullOrEmpty(appDetails.Version) ? null : appDetails.Version,
-            };
+            Id = appId;
+            AppId = appId;
+            Description = string.IsNullOrEmpty(appDetails.Description) ? null : appDetails.Description;
+            ReleaseDate = releaseDate;
+            Developer = string.IsNullOrEmpty(appDetails.Developer) ? null : appDetails.Developer;
+            Publisher = string.IsNullOrEmpty(appDetails.Publisher) ? null : appDetails.Publisher;
+            Version = string.IsNullOrEmpty(appDetails.Version) ? null : appDetails.Version;
         }
+        public AppDetails() { }
         public TuiHub.Protos.Librarian.V1.AppDetails ToProtoAppDetails()
         {
-            var releaseDate = this.ReleaseDate ?? DateTime.MinValue;
             return new TuiHub.Protos.Librarian.V1.AppDetails
             {
-                Description = this.Description,
-                ReleaseDate = releaseDate.ToISO8601String(),
-                Developer = this.Developer,
-                Publisher = this.Publisher,
-                Version = this.Version
+                Description = this.Description ?? string.Empty,
+                ReleaseDate = (this.ReleaseDate ?? DateTime.MinValue).ToISO8601String(),
+                Developer = this.Developer ?? string.Empty,
+                Publisher = this.Publisher ?? string.Empty,
+                Version = this.Version ?? string.Empty
             };
         }
     }

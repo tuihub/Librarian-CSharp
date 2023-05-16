@@ -41,7 +41,7 @@ namespace Librarian.Sephirah.Models
             return new TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
-                Name = Name,
+                Name = Name ?? string.Empty,
                 Size = Size,
                 Type = Type,
                 Sha256 = ByteString.CopyFrom(Sha256),

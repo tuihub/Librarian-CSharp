@@ -1,6 +1,8 @@
 ﻿using Grpc.Core;
+using Librarian.Sephirah.Models;
 using Librarian.Sephirah.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 
@@ -21,7 +23,8 @@ namespace Librarian.Sephirah.Services
             var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var userId = JwtUtil.GetInternalIdFromToken(token);
-            var apps = db.Users.Single(x => x.Id == userId)
+            var apps = db.Users.Include(x => x.Apps)
+                               .Single(x => x.Id == userId)
                                .Apps
                                .Select(x => x.GetAppWithoutDetails().ToProtoApp());
             var ret = new GetPurchasedAppsResponse();
