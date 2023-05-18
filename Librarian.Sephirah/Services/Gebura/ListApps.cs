@@ -10,9 +10,8 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
+            if (UserUtil.GetUserTypeFromToken(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // get request param
             var sourceFilters = request.SourceFilter;
@@ -20,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter apps
-            IEnumerable<Models.App> apps = db.Apps;
+            IEnumerable<Models.App> apps = _dbContext.Apps;
             if (idFilters.Count > 0)
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
             if (typeFilters.Count > 0)

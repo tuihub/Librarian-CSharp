@@ -10,13 +10,12 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
+            if (UserUtil.GetUserTypeFromToken(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // update user
             var userReq = request.User;
-            var user = db.Users.SingleOrDefault(x => x.Id == userReq.Id.Id);
+            var user = _dbContext.Users.SingleOrDefault(x => x.Id == userReq.Id.Id);
             if (user == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             if (userReq.Username.Length > 0) user.Name = userReq.Username;
@@ -24,7 +23,7 @@ namespace Librarian.Sephirah.Services
             if (userReq.Type != UserType.Unspecified) user.Type = userReq.Type;
             if (userReq.Status != UserStatus.Unspecified) user.Status = userReq.Status;
             user.UpdatedAt = DateTime.Now;
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             return Task.FromResult(new UpdateUserResponse());
         }
     }

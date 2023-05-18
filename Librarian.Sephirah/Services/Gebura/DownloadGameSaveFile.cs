@@ -12,7 +12,6 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<DownloadGameSaveFileResponse> DownloadGameSaveFile(DownloadGameSaveFileRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var internalId = request.Id.Id;
             var token = JwtUtil.GenerateDownloadToken(internalId);
             return Task.FromResult(new DownloadGameSaveFileResponse

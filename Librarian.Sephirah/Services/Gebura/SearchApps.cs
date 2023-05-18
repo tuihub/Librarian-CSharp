@@ -11,11 +11,10 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<SearchAppsResponse> SearchApps(SearchAppsRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             // get request param
             string keyword = request.Keywords;
             // filter apps
-            IEnumerable<Models.App> apps = db.Apps;
+            IEnumerable<Models.App> apps = _dbContext.Apps;
             apps = apps.Where(a => a.Name.Contains(keyword));
             apps = apps.ApplyPagingRequest(request.Paging);
             // construct response

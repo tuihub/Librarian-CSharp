@@ -11,9 +11,8 @@ namespace Librarian.Sephirah.Services
         public override Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
         {
             long internalId;
-            using var db = new ApplicationDbContext();
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
+            if (UserUtil.GetUserTypeFromToken(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // create user
             internalId = IdUtil.NewId();
@@ -25,8 +24,8 @@ namespace Librarian.Sephirah.Services
                 Status = UserStatus.Active,
                 Type = request.User.Type
             };
-            db.Users.Add(user);
-            db.SaveChanges();
+            _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
             return Task.FromResult(new CreateUserResponse()
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID() { Id = internalId }

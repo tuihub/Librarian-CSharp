@@ -12,7 +12,6 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UploadGameSaveFileResponse> UploadGameSaveFile(UploadGameSaveFileRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var userInternalId = UserUtil.GetUserInternalIdFromToken(context);
             var appInternalId = request.AppPackageId.Id;
             var internalId = IdUtil.NewId();
@@ -25,9 +24,9 @@ namespace Librarian.Sephirah.Services
                 UserId = userInternalId,
                 AppPackageId = appInternalId,
             };
-            db.GameSaveFiles.Add(gameSaveFile);
+            _dbContext.GameSaveFiles.Add(gameSaveFile);
             var token = JwtUtil.GenerateUploadToken(internalId);
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             return Task.FromResult(new UploadGameSaveFileResponse
             {
                 UploadToken = token,

@@ -16,13 +16,12 @@ namespace Librarian.Sephirah.Services
         [Authorize(AuthenticationSchemes = "DownloadToken")]
         public override async Task SimpleDownloadFile(SimpleDownloadFileRequest request, IServerStreamWriter<SimpleDownloadFileResponse> responseStream, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
-            var gameSaveFile = db.GameSaveFiles.Single(x => x.Id == internalId);
+            var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status != GameSaveFileStatus.STORED)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
-            var fileMetadata = db.FileMetadatas.Single(x => x.Id == internalId);
+            var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // pipe stream
             var pipeStreamServer = new AnonymousPipeServerStream();
             var pipeStreamClient = new AnonymousPipeClientStream(pipeStreamServer.GetClientHandleAsString());

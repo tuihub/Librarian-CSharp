@@ -11,17 +11,16 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<PurchaseAppResponse> PurchaseApp(PurchaseAppRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var appId = request.AppId.Id;
-            var app = db.Apps.SingleOrDefault(x => x.Id == appId);
+            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appId);
             if (app == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             if (app.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-            var user = db.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromToken(token));
+            var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromToken(token));
             user.Apps.Add(app);
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             return Task.FromResult(new PurchaseAppResponse());
         }
     }

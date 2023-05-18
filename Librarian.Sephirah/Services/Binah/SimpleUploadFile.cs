@@ -15,13 +15,12 @@ namespace Librarian.Sephirah.Services
         [Authorize(AuthenticationSchemes = "UploadToken")]
         public override async Task SimpleUploadFile(IAsyncStreamReader<SimpleUploadFileRequest> requestStream, IServerStreamWriter<SimpleUploadFileResponse> responseStream, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
-            var gameSaveFile = db.GameSaveFiles.Single(x => x.Id == internalId);
+            var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status == GameSaveFileStatus.STORED)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Current game save has been stored."));
-            var fileMetadata = db.FileMetadatas.Single(x => x.Id == internalId);
+            var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // two stream, one for Sha256, the other for Minio
             var pipeStreamServer4Sha256 = new AnonymousPipeServerStream();
             var pipeStreamClient4Sha256 = new AnonymousPipeClientStream(pipeStreamServer4Sha256.GetClientHandleAsString());
@@ -106,7 +105,7 @@ namespace Librarian.Sephirah.Services
                 ret.Status = FileTransferStatus.Failed;
             }
             gameSaveFile.UpdatedAt = DateTime.Now;
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             await responseStream.WriteAsync(ret);
         }
     }

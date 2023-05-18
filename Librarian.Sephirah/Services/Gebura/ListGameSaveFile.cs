@@ -12,12 +12,11 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<ListGameSaveFileResponse> ListGameSaveFile(ListGameSaveFileRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             var appPackageId = request.AppPackageId.Id;
-            var fileMetadatas = db.GameSaveFiles
+            var fileMetadatas = _dbContext.GameSaveFiles
                                   .Where(x => x.AppPackageId == appPackageId)
                                   .ApplyPagingRequest(request.Paging)
-                                  .Join(db.FileMetadatas,
+                                  .Join(_dbContext.FileMetadatas,
                                         gameSaveFile => gameSaveFile.Id,
                                         fileMetadata => fileMetadata.Id,
                                         (gameSaveFile, fileMetadata) => fileMetadata);

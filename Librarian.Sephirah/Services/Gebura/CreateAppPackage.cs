@@ -11,13 +11,12 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<CreateAppPackageResponse> CreateAppPackage(CreateAppPackageRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             // create app package
             var internalId = IdUtil.NewId();
             var appPackage = new Models.AppPackage(internalId, request.AppPackage);
-            var app = db.Apps.Single(x => x.Id == appPackage.SourceAppId);
+            var app = _dbContext.Apps.Single(x => x.Id == appPackage.SourceAppId);
             app.AppPackages.Add(appPackage);
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppPackageResponse
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = internalId }

@@ -9,11 +9,10 @@ namespace Librarian.Sephirah.Services
         public override Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
         {
             string accessToken, refreshToken;
-            using var db = new ApplicationDbContext();
             var username = request.Username;
             var password = request.Password;
             // get user
-            var user = db.Users.SingleOrDefault(u => u.Name == username);
+            var user = _dbContext.Users.SingleOrDefault(u => u.Name == username);
             if (user == null)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
             if (user.Status != UserStatus.Active)

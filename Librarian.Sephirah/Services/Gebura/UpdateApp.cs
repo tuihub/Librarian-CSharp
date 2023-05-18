@@ -11,13 +11,12 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UpdateAppResponse> UpdateApp(UpdateAppRequest request, ServerCallContext context)
         {
-            using var db = new ApplicationDbContext();
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromToken(context, db) != UserType.Admin)
+            if (UserUtil.GetUserTypeFromToken(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // check App exists
             var appReq = request.App;
-            var app = db.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
+            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
             if (app == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             // ensure AppSource == APP_SOURCE_INTERNAL
@@ -33,7 +32,7 @@ namespace Librarian.Sephirah.Services
             if (appReq.ImageUrl != null) app.ImageUrl = appReq.ImageUrl;
             if (appReq.Details != null) app.AppDetails = new Models.AppDetails(app.Id, appReq.Details);
             app.UpdatedAt = DateTime.Now;
-            db.SaveChanges();
+            _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }
     }

@@ -20,10 +20,9 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<GetPurchasedAppsResponse> GetPurchasedApps(GetPurchasedAppsRequest request, ServerCallContext context)
         {
-            var db = new ApplicationDbContext();
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var userId = JwtUtil.GetInternalIdFromToken(token);
-            var apps = db.Users.Include(x => x.Apps)
+            var apps = _dbContext.Users.Include(x => x.Apps)
                                .Single(x => x.Id == userId)
                                .Apps
                                .Select(x => x.GetAppWithoutDetails().ToProtoApp());
