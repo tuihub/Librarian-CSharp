@@ -44,7 +44,7 @@ namespace Librarian.Sephirah.Models
                 Name = Name ?? string.Empty,
                 Size = Size,
                 Type = Type,
-                Sha256 = ByteString.CopyFrom(Sha256),
+                Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory()),
                 CreateTime = CreatedAt.ToTimestamp()
             };
         }

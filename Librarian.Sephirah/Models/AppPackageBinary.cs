@@ -36,7 +36,7 @@ namespace Librarian.Sephirah.Models
                 Name = Name,
                 SizeByte = SizeByte,
                 PublicUrl = PublicUrl,
-                Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256)
+                Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory())
             };
         }
     }
