@@ -28,5 +28,16 @@ namespace Librarian.Sephirah.Models
         // one-to-one relation(required, to parent)
         public long AppPackageId { get; set; }
         public AppPackage AppPackage { get; set; } = null!;
+
+        public TuiHub.Protos.Librarian.V1.AppPackageBinary ToProtoAppPackageBinary()
+        {
+            return new TuiHub.Protos.Librarian.V1.AppPackageBinary
+            {
+                Name = Name,
+                SizeByte = SizeByte,
+                PublicUrl = PublicUrl,
+                Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256)
+            };
+        }
     }
 }

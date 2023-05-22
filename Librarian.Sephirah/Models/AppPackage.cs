@@ -41,5 +41,18 @@ namespace Librarian.Sephirah.Models
             IsPublic = appPackage.Public;
         }
         public AppPackage() { }
+        public TuiHub.Protos.Librarian.V1.AppPackage ToProtoAppPackage()
+        {
+            return new TuiHub.Protos.Librarian.V1.AppPackage
+            {
+                Id = new InternalID { Id = Id },
+                Source = Source,
+                SourceId = new InternalID { Id = SourceAppId },
+                Name = Name,
+                Description = Description,
+                Binary = AppPackageBinary?.ToProtoAppPackageBinary(),
+                Public = IsPublic
+            };
+        }
     }
 }
