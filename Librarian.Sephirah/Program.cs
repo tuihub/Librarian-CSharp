@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>();
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 
 // Get Configuration
 GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
@@ -35,6 +36,13 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
+
+// add server reflection when env is dev
+IWebHostEnvironment env = app.Environment;
+if (env.IsDevelopment())
+{
+    app.MapGrpcReflectionService();
+}
 
 //app.MapGrpcService<GreeterService>();
 //app.MapGrpcService<FileGrpcService>();
