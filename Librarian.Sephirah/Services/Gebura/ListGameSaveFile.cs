@@ -15,11 +15,11 @@ namespace Librarian.Sephirah.Services
             var appPackageId = request.AppPackageId.Id;
             var fileMetadatas = _dbContext.GameSaveFiles
                                   .Where(x => x.AppPackageId == appPackageId)
-                                  .ApplyPagingRequest(request.Paging)
                                   .Join(_dbContext.FileMetadatas,
                                         gameSaveFile => gameSaveFile.Id,
                                         fileMetadata => fileMetadata.Id,
-                                        (gameSaveFile, fileMetadata) => fileMetadata);
+                                        (gameSaveFile, fileMetadata) => fileMetadata)
+                                  .ApplyPagingRequest(request.Paging);
             var ret = new ListGameSaveFileResponse
             {
                 Paging = new PagingResponse { TotalSize = fileMetadatas.Count() }
