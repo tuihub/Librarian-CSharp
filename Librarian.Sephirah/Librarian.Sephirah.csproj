@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.23.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.23.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.53.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.53.0" />
     <PackageReference Include="IdGen" Version="3.0.3" />
@@ -20,7 +20,7 @@
     <PackageReference Include="Minio" Version="5.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
-    <PackageReference Include="TuiHub.Protos" Version="0.2.21" />
+    <PackageReference Include="TuiHub.Protos" Version="0.2.26" />
   </ItemGroup>
 
   <ItemGroup>
