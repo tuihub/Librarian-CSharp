@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
                 Duration = duration
             };
             _dbContext.AppPackageRunTimes.Add(appPackageRunTime);
-            _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
             return Task.FromResult(new AddAppPackageRunTimeResponse());
         }
     }
