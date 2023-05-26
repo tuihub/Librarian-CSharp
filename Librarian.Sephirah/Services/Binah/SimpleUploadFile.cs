@@ -44,6 +44,7 @@ namespace Librarian.Sephirah.Services
                         //receivedBytes += message.Data.Length;
                     }
                 }
+                // must close pipeStream
                 pipeStreamServer4Sha256.Close();
                 pipeStreamServer4Minio.Close();
             });
@@ -78,7 +79,8 @@ namespace Librarian.Sephirah.Services
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
                                     .WithStreamData(pipeStreamClient4Minio)
-                                    .WithObjectSize(fileMetadata.Size);
+                                    // https://youtu.be/V_T8x1n358U?t=348, set size = -1, take all
+                                    .WithObjectSize(-1);
             Debug.WriteLine($"SimpleUploadFile: Starting minioPutTask");
             var minioPutTask = minioClient.PutObjectAsync(putObjectArgs);
             // calc Sha256
