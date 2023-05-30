@@ -33,6 +33,7 @@ namespace Librarian.Sephirah.Services
             var readTask = Task.Run(async () =>
             {
                 gameSaveFile.Status = GameSaveFileStatus.InProgress;
+                await _dbContext.SaveChangesAsync();
                 await foreach (var message in requestStream.ReadAllAsync())
                 {
                     Debug.WriteLine($"SimpleUploadFile: readTask message.Data.Length = {message.Data?.Length}");
