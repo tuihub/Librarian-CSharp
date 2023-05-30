@@ -69,13 +69,7 @@ namespace Librarian.Sephirah.Services
                 }
             }, writeTaskCancellationTokenSource.Token);
             // upload to minio
-            var minioClient = new MinioClient()
-                                  .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)
-                                  .WithCredentials(
-                                      GlobalContext.SystemConfig.MinioAccessKey,
-                                      GlobalContext.SystemConfig.MinioSecretKey)
-                                  .WithSSL(GlobalContext.SystemConfig.MinioWithSSL)
-                                  .Build();
+            var minioClient = MinioClientUtil.GetMinioClient();
             var putObjectArgs = new PutObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())

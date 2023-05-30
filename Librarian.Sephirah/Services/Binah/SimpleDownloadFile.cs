@@ -26,13 +26,7 @@ namespace Librarian.Sephirah.Services
             var pipeStreamServer = new AnonymousPipeServerStream();
             var pipeStreamClient = new AnonymousPipeClientStream(pipeStreamServer.GetClientHandleAsString());
             // get object from minio
-            var minioClient = new MinioClient()
-                                  .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)
-                                  .WithCredentials(
-                                      GlobalContext.SystemConfig.MinioAccessKey,
-                                      GlobalContext.SystemConfig.MinioSecretKey)
-                                  .WithSSL(GlobalContext.SystemConfig.MinioWithSSL)
-                                  .Build();
+            var minioClient = MinioClientUtil.GetMinioClient();
             var getObjectArgs = new GetObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
