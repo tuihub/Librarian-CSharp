@@ -48,6 +48,7 @@ namespace Librarian.Sephirah.Services
                                             }
                                             await pipeStreamServer.WriteAsync(buffer);
                                         }
+                                        pipeStreamServer.Close();
                                     });
             // send
             var buffer = new byte[GlobalContext.SystemConfig.BinahChunkBytes];
