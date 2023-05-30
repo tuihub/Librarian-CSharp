@@ -13,6 +13,7 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         // UNDONE: Current only support GameSaveFile upload
+        // TODO: add check uploaded file
         [Authorize(AuthenticationSchemes = "UploadToken")]
         public override async Task SimpleUploadFile(IAsyncStreamReader<SimpleUploadFileRequest> requestStream, IServerStreamWriter<SimpleUploadFileResponse> responseStream, ServerCallContext context)
         {
