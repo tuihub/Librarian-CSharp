@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         {
             string refreshToken;
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromToken(context, _dbContext) != UserType.Admin)
+            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // generate token
             var internalId = request.Id.Id;

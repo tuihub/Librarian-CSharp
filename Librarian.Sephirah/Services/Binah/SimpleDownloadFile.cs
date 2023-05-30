@@ -16,8 +16,7 @@ namespace Librarian.Sephirah.Services
         [Authorize(AuthenticationSchemes = "DownloadToken")]
         public override async Task SimpleDownloadFile(SimpleDownloadFileRequest request, IServerStreamWriter<SimpleDownloadFileResponse> responseStream, ServerCallContext context)
         {
-            var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-            var internalId = JwtUtil.GetInternalIdFromToken(token);
+            var internalId = JwtUtil.GetInternalIdFromJwt(context);
             var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status != GameSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));

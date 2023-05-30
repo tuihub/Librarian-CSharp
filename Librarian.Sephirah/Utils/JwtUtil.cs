@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Grpc.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -74,7 +75,13 @@ namespace Librarian.Sephirah.Utils
         //    var principal = handler.ValidateToken(token, parameters, out _);
         //    return principal != null;
         //}
-        public static long GetInternalIdFromToken(string token)
+        public static long GetInternalIdFromJwt(ServerCallContext context)
+        {
+            var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
+            var internalId = GetInternalIdFromJwt(token);
+            return internalId;
+        }
+        private static long GetInternalIdFromJwt(string token)
         {
             token = token.Substring("Bearer ".Length).Trim();
             var handler = new JwtSecurityTokenHandler();

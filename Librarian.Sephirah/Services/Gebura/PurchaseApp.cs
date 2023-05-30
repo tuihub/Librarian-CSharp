@@ -17,8 +17,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             if (app.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
-            var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-            var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromToken(token));
+            var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromJwt(context));
             user.Apps.Add(app);
             _dbContext.SaveChanges();
             return Task.FromResult(new PurchaseAppResponse());

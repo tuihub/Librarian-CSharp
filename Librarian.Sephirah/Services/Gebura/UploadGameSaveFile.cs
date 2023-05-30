@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UploadGameSaveFileResponse> UploadGameSaveFile(UploadGameSaveFileRequest request, ServerCallContext context)
         {
-            var userInternalId = UserUtil.GetUserInternalIdFromToken(context);
+            var userInternalId = JwtUtil.GetInternalIdFromJwt(context);
             var appInternalId = request.AppPackageId.Id;
             var internalId = IdUtil.NewId();
             var fileMetadata = new Models.FileMetadata(internalId, request.FileMetadata);
