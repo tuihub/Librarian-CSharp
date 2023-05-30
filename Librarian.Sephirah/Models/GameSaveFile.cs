@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace Librarian.Sephirah.Models
 {
@@ -13,6 +14,7 @@ namespace Librarian.Sephirah.Models
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         public GameSaveFileStatus Status { get; set; }
+        public bool IsPinned { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to parent)

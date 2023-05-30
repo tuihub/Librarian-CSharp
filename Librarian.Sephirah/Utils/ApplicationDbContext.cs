@@ -17,6 +17,7 @@ namespace Librarian.Sephirah.Utils
         public DbSet<AppPackageRunTime> AppPackageRunTimes { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<GameSaveFile> GameSaveFiles { get; set; } = null!;
+        public DbSet<GameSaveFileRotation> GameSaveFileRotations { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
