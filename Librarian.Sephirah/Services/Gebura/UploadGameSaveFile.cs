@@ -12,8 +12,21 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UploadGameSaveFileResponse> UploadGameSaveFile(UploadGameSaveFileRequest request, ServerCallContext context)
         {
+            // check rotation count
             var userInternalId = JwtUtil.GetInternalIdFromJwt(context);
-            var appInternalId = request.AppPackageId.Id;
+            var appPackageInternalId = request.AppPackageId.Id;
+            var appPackageSaveFileCount = _dbContext.GameSaveFiles.Count(x => x.AppPackageId == appPackageInternalId);
+            var saveFileRotationCount = GameSaveFileRotationUtil.GetGameSaveFileRotation(_dbContext, userInternalId, appPackageInternalId);
+            if (appPackageSaveFileCount >= saveFileRotationCount)
+                throw new RpcException(new Status(StatusCode.ResourceExhausted,
+                    $"Rotation limit reached or exceeded({appPackageSaveFileCount} used / {saveFileRotationCount} limit)."));
+            // check capacity
+            var user = _dbContext.Users.Single(x => x.Id == userInternalId);
+            if (user.GameSaveFileCapacityBytes != null && user.GameSaveFileUsedCapacityBytes + request.FileMetadata.SizeBytes > user.GameSaveFileCapacityBytes)
+                throw new RpcException(new Status(StatusCode.ResourceExhausted,
+                        $"User game save file capacity exceeded({HumanizeUtil.BytesToString(user.GameSaveFileUsedCapacityBytes)} used" +
+                        $" + {HumanizeUtil.BytesToString(request.FileMetadata.SizeBytes)} file" +
+                        $" > {HumanizeUtil.BytesToString((long)user.GameSaveFileCapacityBytes)} limit)."));
             var internalId = IdUtil.NewId();
             var fileMetadata = new Models.FileMetadata(internalId, request.FileMetadata);
             var gameSaveFile = new GameSaveFile
@@ -22,10 +35,12 @@ namespace Librarian.Sephirah.Services
                 Status = GameSaveFileStatus.Pending,
                 FileMetadata = fileMetadata,
                 UserId = userInternalId,
-                AppPackageId = appInternalId,
+                AppPackageId = appPackageInternalId,
             };
             _dbContext.GameSaveFiles.Add(gameSaveFile);
             var token = JwtUtil.GenerateUploadToken(internalId);
+            // update user save file capacity stat
+            user.GameSaveFileUsedCapacityBytes += fileMetadata.SizeBytes;
             _dbContext.SaveChanges();
             return Task.FromResult(new UploadGameSaveFileResponse
             {
