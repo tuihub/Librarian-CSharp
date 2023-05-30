@@ -20,6 +20,7 @@ namespace Librarian.Sephirah.Models
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }
+        public long GameSaveFileUsedCapacityBytes { get; set; } = 0;
         public long? GameSaveFileCapacityBytes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
