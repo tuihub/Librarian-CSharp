@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Models
         public long Id { get; set; }
         [MaxLength(128)]
         public string Name { get; set; } = null!;
-        public long SizeByte { get; set; }
+        public long SizeBytes { get; set; }
         [MaxLength(256)]
         public string PublicUrl { get; set; } = null!;
         [MaxLength(32)]
@@ -34,7 +34,7 @@ namespace Librarian.Sephirah.Models
             return new TuiHub.Protos.Librarian.V1.AppPackageBinary
             {
                 Name = Name,
-                SizeByte = SizeByte,
+                SizeBytes = SizeBytes,
                 PublicUrl = PublicUrl,
                 Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory())
             };

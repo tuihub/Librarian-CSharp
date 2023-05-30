@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Models
         public long Id { get; set; }
         [MaxLength(128)]
         public string? Name { get; set; }
-        public long Size { get; set; }
+        public long SizeBytes { get; set; }
         public FileType Type { get; set; }
         [MaxLength(32)]
         [IsFixedLength]
@@ -30,7 +30,7 @@ namespace Librarian.Sephirah.Models
         {
             Id = internalId;
             Name = string.IsNullOrEmpty(metadata.Name) ? null : metadata.Name;
-            Size = metadata.Size;
+            SizeBytes = metadata.SizeBytes;
             Type = metadata.Type;
             Sha256 = metadata.Sha256.ToArray();
             CreatedAt = metadata.CreateTime.ToDateTime();
@@ -42,7 +42,7 @@ namespace Librarian.Sephirah.Models
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
                 Name = Name ?? string.Empty,
-                Size = Size,
+                SizeBytes = SizeBytes,
                 Type = Type,
                 Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory()),
                 CreateTime = CreatedAt.ToTimestamp()

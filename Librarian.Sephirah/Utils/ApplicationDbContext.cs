@@ -23,7 +23,7 @@ namespace Librarian.Sephirah.Utils
         {
             var dbType = GlobalContext.SystemConfig.DbType;
             var dbConnStr = GlobalContext.SystemConfig.DbConnStr;
-            if (dbType == ApplicationDbType.Sqlite)
+            if (dbType == ApplicationDbType.SQLite)
             {
                 optionsBuilder.UseSqlite(dbConnStr);
             }
@@ -31,7 +31,7 @@ namespace Librarian.Sephirah.Utils
             {
                 optionsBuilder.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr));
             }
-            else if (dbType == ApplicationDbType.Postgres)
+            else if (dbType == ApplicationDbType.PostgreSQL)
             {
                 optionsBuilder.UseNpgsql(dbConnStr);
             }

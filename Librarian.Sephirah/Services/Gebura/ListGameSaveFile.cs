@@ -10,7 +10,7 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         [Authorize]
-        public override Task<ListGameSaveFileResponse> ListGameSaveFile(ListGameSaveFileRequest request, ServerCallContext context)
+        public override Task<ListGameSaveFilesResponse> ListGameSaveFiles(ListGameSaveFilesRequest request, ServerCallContext context)
         {
             var appPackageId = request.AppPackageId.Id;
             var fileMetadatas = _dbContext.GameSaveFiles
@@ -18,13 +18,21 @@ namespace Librarian.Sephirah.Services
                                   .Join(_dbContext.FileMetadatas,
                                         gameSaveFile => gameSaveFile.Id,
                                         fileMetadata => fileMetadata.Id,
-                                        (gameSaveFile, fileMetadata) => fileMetadata)
+                                        (gameSaveFile, fileMetadata) => new
+                                        {
+                                            FileMetadata = fileMetadata,
+                                            IsPinned = gameSaveFile.IsPinned
+                                        })
                                   .ApplyPagingRequest(request.Paging);
-            var ret = new ListGameSaveFileResponse
+            var ret = new ListGameSaveFilesResponse
             {
                 Paging = new PagingResponse { TotalSize = fileMetadatas.Count() }
             };
-            ret.Files.Add(fileMetadatas.Select(x => x.ToProtoFileMetadata()));
+            ret.Results.Add(fileMetadatas.Select(x => new ListGameSaveFilesResponse.Types.Result
+            {
+                File = x.FileMetadata.ToProtoFileMetadata(),
+                Pinned = x.IsPinned
+            }));
             return Task.FromResult(ret);
         }
     }
