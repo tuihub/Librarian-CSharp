@@ -14,8 +14,8 @@
     }
     public enum ApplicationDbType
     {
-        SQLITE,
-        MYSQL,
-        POSTGRES
+        SQLite,
+        MySQL,
+        PostgreSQL
     }
 }

@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var gameSaveFile = new GameSaveFile
             {
                 Id = internalId,
-                Status = GameSaveFileStatus.PENDING,
+                Status = GameSaveFileStatus.Pending,
                 FileMetadata = fileMetadata,
                 UserId = userInternalId,
                 AppPackageId = appInternalId,

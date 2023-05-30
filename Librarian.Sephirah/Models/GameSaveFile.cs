@@ -29,10 +29,10 @@ namespace Librarian.Sephirah.Models
     }
     public enum GameSaveFileStatus
     {
-        PENDING,
-        IN_PROGRESS,
-        STORED,
-        SHA256_MISMATCH,
-        FAILED,
+        Pending,
+        InProgress,
+        Stored,
+        Sha256Mismatch,
+        Failed,
     }
 }

@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
             var internalId = JwtUtil.GetInternalIdFromToken(token);
             var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
-            if (gameSaveFile.Status != GameSaveFileStatus.STORED)
+            if (gameSaveFile.Status != GameSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // pipe stream
