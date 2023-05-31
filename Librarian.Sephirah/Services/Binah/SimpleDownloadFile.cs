@@ -34,26 +34,25 @@ namespace Librarian.Sephirah.Services
                                     .WithObject(internalId.ToString())
                                     .WithCallbackStream(stream =>
                                     {
-                                        var ms = new MemoryStream();
-                                        stream.CopyTo(ms);
-                                        Debug.WriteLine($"SimpleDownloadFile: ms.Length = {ms.Length}");
-                                        ms.Position = 0;
-                                        var buffer = new byte[GlobalContext.SystemConfig.BinahChunkBytes];
-                                        while (true)
+                                        Task.Run(async () =>
                                         {
-                                            var bytesRead = ms.Read(buffer);
-                                            Debug.WriteLine($"SimpleDownloadFile: callback stream bytesRead = {bytesRead}");
-                                            if (bytesRead == 0)
+                                            var buffer = new byte[GlobalContext.SystemConfig.BinahChunkBytes];
+                                            while (true)
                                             {
-                                                break;
+                                                var bytesRead = await stream.ReadAsync(buffer);
+                                                Debug.WriteLine($"SimpleDownloadFile: callback stream bytesRead = {bytesRead}");
+                                                if (bytesRead == 0)
+                                                {
+                                                    break;
+                                                }
+                                                // must wait?
+                                                await responseStream.WriteAsync(new SimpleDownloadFileResponse
+                                                {
+                                                    Data = UnsafeByteOperations.UnsafeWrap(buffer.AsMemory(0, bytesRead))
+                                                });
+                                                Debug.WriteLine($"SimpleDownloadFile: sent {bytesRead} bytes");
                                             }
-                                            // must wait?
-                                            responseStream.WriteAsync(new SimpleDownloadFileResponse
-                                            {
-                                                Data = UnsafeByteOperations.UnsafeWrap(buffer.AsMemory(0, bytesRead))
-                                            }).Wait();
-                                            Debug.WriteLine($"SimpleDownloadFile: sent {bytesRead} bytes");
-                                        }
+                                        }).Wait();
                                     });
             await minioClient.GetObjectAsync(getObjectArgs);
             Debug.WriteLine($"SimpleDownloadFile: GetObject finished");
