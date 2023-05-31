@@ -45,7 +45,7 @@ namespace Librarian.Sephirah.Models
                 SizeBytes = SizeBytes,
                 Type = Type,
                 Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory()),
-                CreateTime = CreatedAt.ToTimestamp()
+                CreateTime = CreatedAt.ToUniversalTime().ToTimestamp()
             };
         }
     }
