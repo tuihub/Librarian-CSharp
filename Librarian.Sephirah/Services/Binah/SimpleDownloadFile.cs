@@ -4,6 +4,7 @@ using Librarian.Sephirah.Models;
 using Librarian.Sephirah.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Minio;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Security.Cryptography;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -21,42 +22,41 @@ namespace Librarian.Sephirah.Services
             if (gameSaveFile.Status != GameSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
-            // pipe stream
-            var pipeStreamServer = new AnonymousPipeServerStream();
-            var pipeStreamClient = new AnonymousPipeClientStream(pipeStreamServer.GetClientHandleAsString());
+            // get object stat from minio 
+            //var statObjectArgs = new StatObjectArgs()
+            //                         .WithBucket(GlobalContext.SystemConfig.MinioBucket)
+            //                         .WithObject(internalId.ToString());
+            //var objectStat = await minioClient.StatObjectAsync(statObjectArgs);
             // get object from minio
             var minioClient = MinioClientUtil.GetMinioClient();
             var getObjectArgs = new GetObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
-                                    .WithCallbackStream(async stream =>
+                                    .WithCallbackStream(stream =>
                                     {
+                                        var ms = new MemoryStream();
+                                        stream.CopyTo(ms);
+                                        Debug.WriteLine($"SimpleDownloadFile: ms.Length = {ms.Length}");
+                                        ms.Position = 0;
                                         var buffer = new byte[GlobalContext.SystemConfig.BinahChunkBytes];
                                         while (true)
                                         {
-                                            var bytesRead = await stream.ReadAsync(buffer);
+                                            var bytesRead = ms.Read(buffer);
+                                            Debug.WriteLine($"SimpleDownloadFile: callback stream bytesRead = {bytesRead}");
                                             if (bytesRead == 0)
                                             {
                                                 break;
                                             }
-                                            await pipeStreamServer.WriteAsync(buffer);
+                                            // must wait?
+                                            responseStream.WriteAsync(new SimpleDownloadFileResponse
+                                            {
+                                                Data = UnsafeByteOperations.UnsafeWrap(buffer.AsMemory(0, bytesRead))
+                                            }).Wait();
+                                            Debug.WriteLine($"SimpleDownloadFile: sent {bytesRead} bytes");
                                         }
-                                        pipeStreamServer.Close();
                                     });
-            // send
-            var buffer = new byte[GlobalContext.SystemConfig.BinahChunkBytes];
-            while (true)
-            {
-                var numBytesRead = await pipeStreamClient.ReadAsync(buffer);
-                if (numBytesRead == 0)
-                {
-                    break;
-                }
-                await responseStream.WriteAsync(new SimpleDownloadFileResponse
-                {
-                    Data = UnsafeByteOperations.UnsafeWrap(buffer.AsMemory(0, numBytesRead))
-                });
-            }
+            await minioClient.GetObjectAsync(getObjectArgs);
+            Debug.WriteLine($"SimpleDownloadFile: GetObject finished");
         }
     }
 }
