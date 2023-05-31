@@ -22,11 +22,6 @@ namespace Librarian.Sephirah.Services
             if (gameSaveFile.Status != GameSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
-            // get object stat from minio 
-            //var statObjectArgs = new StatObjectArgs()
-            //                         .WithBucket(GlobalContext.SystemConfig.MinioBucket)
-            //                         .WithObject(internalId.ToString());
-            //var objectStat = await minioClient.StatObjectAsync(statObjectArgs);
             // get object from minio
             var minioClient = MinioClientUtil.GetMinioClient();
             var getObjectArgs = new GetObjectArgs()
@@ -45,7 +40,6 @@ namespace Librarian.Sephirah.Services
                                                 {
                                                     break;
                                                 }
-                                                // must wait?
                                                 await responseStream.WriteAsync(new SimpleDownloadFileResponse
                                                 {
                                                     Data = UnsafeByteOperations.UnsafeWrap(buffer.AsMemory(0, bytesRead))
