@@ -30,6 +30,7 @@ namespace Librarian.Sephirah.Services
             app.Type = appReq.Type;
             if (appReq.ShortDescription != null) app.ShortDescription = appReq.ShortDescription;
             if (appReq.IconImageUrl != null) app.IconImageUrl = appReq.IconImageUrl;
+            if (appReq.HeroImageUrl != null) app.HeroImageUrl = appReq.HeroImageUrl;
             if (appReq.Details != null) app.AppDetails = new Models.AppDetails(app.Id, appReq.Details);
             app.UpdatedAt = DateTime.Now;
             _dbContext.SaveChanges();

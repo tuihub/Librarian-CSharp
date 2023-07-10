@@ -28,6 +28,8 @@ namespace Librarian.Sephirah.Models
         public string? ShortDescription { get; set; }
         [MaxLength(256)]
         public string? IconImageUrl { get; set; }
+        [MaxLength(256)]
+        public string? HeroImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
@@ -36,6 +38,8 @@ namespace Librarian.Sephirah.Models
         public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
         // one-to-many relation(required, to child)
         public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
+        // one-to-many relation(required, to child)
+        public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
         // many-to-many relation(wihtout entity, to other parent)
         public ICollection<User> Users { get; } = new List<User>();
         // func
@@ -49,6 +53,7 @@ namespace Librarian.Sephirah.Models
             Type = app.Type;
             ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
             IconImageUrl = string.IsNullOrEmpty(app.IconImageUrl) ? null : app.IconImageUrl;
+            HeroImageUrl = string.IsNullOrEmpty(app.HeroImageUrl) ? null : app.HeroImageUrl;
             AppDetails = new AppDetails(internalId, app.Details);
         }
         public App() : base() { }
@@ -64,6 +69,7 @@ namespace Librarian.Sephirah.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription,
                 IconImageUrl = this.IconImageUrl,
+                HeroImageUrl = this.HeroImageUrl,
                 AppDetails = null,
                 CreatedAt = this.CreatedAt,
                 UpdatedAt = this.UpdatedAt
@@ -81,6 +87,7 @@ namespace Librarian.Sephirah.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription ?? string.Empty,
                 IconImageUrl = this.IconImageUrl ?? string.Empty,
+                HeroImageUrl = this.HeroImageUrl ?? string.Empty,
                 Details = (this.AppDetails ?? new AppDetails()).ToProtoAppDetails()
             };
         }
