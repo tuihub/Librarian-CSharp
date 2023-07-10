@@ -27,7 +27,7 @@ namespace Librarian.Sephirah.Models
         [MaxLength(1024)]
         public string? ShortDescription { get; set; }
         [MaxLength(256)]
-        public string? ImageUrl { get; set; }
+        public string? IconImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to child)
@@ -48,7 +48,7 @@ namespace Librarian.Sephirah.Models
             Name = app.Name;
             Type = app.Type;
             ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
-            ImageUrl = string.IsNullOrEmpty(app.ImageUrl) ? null : app.ImageUrl;
+            IconImageUrl = string.IsNullOrEmpty(app.IconImageUrl) ? null : app.IconImageUrl;
             AppDetails = new AppDetails(internalId, app.Details);
         }
         public App() : base() { }
@@ -63,7 +63,7 @@ namespace Librarian.Sephirah.Models
                 Name = this.Name,
                 Type = this.Type,
                 ShortDescription = this.ShortDescription,
-                ImageUrl = this.ImageUrl,
+                IconImageUrl = this.IconImageUrl,
                 AppDetails = null,
                 CreatedAt = this.CreatedAt,
                 UpdatedAt = this.UpdatedAt
@@ -80,7 +80,7 @@ namespace Librarian.Sephirah.Models
                 Name = this.Name,
                 Type = this.Type,
                 ShortDescription = this.ShortDescription ?? string.Empty,
-                ImageUrl = this.ImageUrl ?? string.Empty,
+                IconImageUrl = this.IconImageUrl ?? string.Empty,
                 Details = (this.AppDetails ?? new AppDetails()).ToProtoAppDetails()
             };
         }
