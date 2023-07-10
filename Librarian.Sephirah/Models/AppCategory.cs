@@ -23,5 +23,14 @@ namespace Librarian.Sephirah.Models
         public User User { get; set; } = null!;
         // one-to-many relation(required, to child)
         public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
+        public AppCategory() { }
+        public TuiHub.Protos.Librarian.V1.AppCategory ToProtoAppCategory()
+        {
+            return new TuiHub.Protos.Librarian.V1.AppCategory
+            {
+                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
+                Name = Name
+            };
+        }
     }
 }
