@@ -18,6 +18,9 @@ namespace Librarian.Sephirah.Models
         public string Name { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // one-to-many relation(required, to parent)
+        public long UserId { get; set; }
+        public User User { get; set; } = null!;
         // one-to-many relation(required, to child)
         public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
     }
