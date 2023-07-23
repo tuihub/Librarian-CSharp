@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // create user
             internalId = IdUtil.NewId();
-            var user = new Models.User()
+            var user = new Common.Models.User()
             {
                 Id = internalId,
                 Name = request.User.Username,

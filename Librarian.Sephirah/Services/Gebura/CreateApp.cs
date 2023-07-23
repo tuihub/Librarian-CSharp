@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -18,7 +18,7 @@ namespace Librarian.Sephirah.Services
             var internalId = IdUtil.NewId();
             if (request.App.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
-            var app = new Models.App(internalId, request.App);
+            var app = new Common.Models.App(internalId, request.App);
             _dbContext.Apps.Add(app);
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppResponse

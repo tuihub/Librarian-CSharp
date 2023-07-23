@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Models;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Models;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -28,7 +28,7 @@ namespace Librarian.Sephirah.Services
                         $" + {HumanizeUtil.BytesToString(request.FileMetadata.SizeBytes)} file" +
                         $" > {HumanizeUtil.BytesToString((long)user.GameSaveFileCapacityBytes)} limit)."));
             var internalId = IdUtil.NewId();
-            var fileMetadata = new Models.FileMetadata(internalId, request.FileMetadata);
+            var fileMetadata = new Common.Models.FileMetadata(internalId, request.FileMetadata);
             var gameSaveFile = new GameSaveFile
             {
                 Id = internalId,

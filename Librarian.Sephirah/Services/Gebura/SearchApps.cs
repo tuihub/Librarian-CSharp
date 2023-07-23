@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -14,7 +14,7 @@ namespace Librarian.Sephirah.Services
             // get request param
             string keyword = request.Keywords;
             // filter apps
-            IEnumerable<Models.App> apps = _dbContext.Apps;
+            IEnumerable<Common.Models.App> apps = _dbContext.Apps;
             apps = apps.Where(a => a.Name.Contains(keyword));
             apps = apps.ApplyPagingRequest(request.Paging);
             // construct response

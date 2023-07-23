@@ -1,7 +1,7 @@
 ﻿using Google.Protobuf;
 using Grpc.Core;
-using Librarian.Sephirah.Models;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Models;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Minio;
 using System.Diagnostics;

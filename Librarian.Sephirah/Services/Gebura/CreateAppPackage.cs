@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         {
             // create app package
             var internalId = IdUtil.NewId();
-            var appPackage = new Models.AppPackage(internalId, request.AppPackage);
+            var appPackage = new Common.Models.AppPackage(internalId, request.AppPackage);
             var app = _dbContext.Apps.Single(x => x.Id == appPackage.SourceAppId);
             app.AppPackages.Add(appPackage);
             _dbContext.SaveChanges();

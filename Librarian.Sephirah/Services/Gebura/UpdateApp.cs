@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -31,7 +31,7 @@ namespace Librarian.Sephirah.Services
             if (appReq.ShortDescription != null) app.ShortDescription = appReq.ShortDescription;
             if (appReq.IconImageUrl != null) app.IconImageUrl = appReq.IconImageUrl;
             if (appReq.HeroImageUrl != null) app.HeroImageUrl = appReq.HeroImageUrl;
-            if (appReq.Details != null) app.AppDetails = new Models.AppDetails(app.Id, appReq.Details);
+            if (appReq.Details != null) app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details);
             app.UpdatedAt = DateTime.Now;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());

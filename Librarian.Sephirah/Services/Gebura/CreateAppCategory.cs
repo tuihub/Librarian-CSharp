@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Utils;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         {
             var userId = JwtUtil.GetInternalIdFromJwt(context);
             var internalId = IdUtil.NewId();
-            var appCategory = new Models.AppCategory(internalId, userId, request.AppCategory);
+            var appCategory = new Common.Models.AppCategory(internalId, userId, request.AppCategory);
             _dbContext.AppCategories.Add(appCategory);
             _dbContext.SaveChanges();
             var ret = new CreateAppCategoryResponse
