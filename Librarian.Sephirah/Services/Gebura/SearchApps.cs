@@ -14,7 +14,7 @@ namespace Librarian.Sephirah.Services
             // get request param
             string keyword = request.Keywords;
             // filter apps
-            IEnumerable<Common.Models.App> apps = _dbContext.Apps;
+            var apps = _dbContext.Apps.AsQueryable();
             apps = apps.Where(a => a.Name.Contains(keyword));
             apps = apps.ApplyPagingRequest(request.Paging);
             // construct response

@@ -4,7 +4,7 @@ namespace Librarian.Common.Utils
 {
     public static class ProtoPagingUtil
     {
-        public static IEnumerable<T> ApplyPagingRequest<T>(this IEnumerable<T> source, PagingRequest pagingRequest)
+        public static IQueryable<T> ApplyPagingRequest<T>(this IQueryable<T> source, PagingRequest pagingRequest)
         {
             var pageSize = pagingRequest.PageSize;
             var pageNum = pagingRequest.PageNum;

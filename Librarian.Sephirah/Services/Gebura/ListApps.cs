@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter apps
-            IEnumerable<Common.Models.App> apps = _dbContext.Apps;
+            var apps = _dbContext.Apps.AsQueryable();
             if (idFilters.Count > 0)
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
             if (typeFilters.Count > 0)
