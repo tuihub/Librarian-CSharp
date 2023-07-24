@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             if (idFilter.Count > 0)
                 appPackages = appPackages.Where(x => idFilter.Select(x => x.Id).Contains(x.Id));
             if (assignedAppIdFilter.Count > 0)
-                appPackages = appPackages.Where(x => assignedAppIdFilter.Select(x => x.Id).Contains(x.Id));
+                appPackages = appPackages.Where(x => assignedAppIdFilter.Select(x => x.Id).Contains(x.SourceAppId));
             if (sourceFilter.Count > 0)
                 appPackages = appPackages.Where(x => sourceFilter.Contains(x.Source));
             appPackages = appPackages.ApplyPagingRequest(request.Paging);
