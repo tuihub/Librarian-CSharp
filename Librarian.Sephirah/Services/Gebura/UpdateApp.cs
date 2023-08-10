@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 
@@ -16,7 +17,8 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // check App exists
             var appReq = request.App;
-            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
+            var app = _dbContext.Apps.Include(x => x.AppDetails)
+                                     .SingleOrDefault(x => x.Id == appReq.Id.Id);
             if (app == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
             // ensure AppSource == APP_SOURCE_INTERNAL
@@ -31,7 +33,11 @@ namespace Librarian.Sephirah.Services
             if (appReq.ShortDescription != null) app.ShortDescription = appReq.ShortDescription;
             if (appReq.IconImageUrl != null) app.IconImageUrl = appReq.IconImageUrl;
             if (appReq.HeroImageUrl != null) app.HeroImageUrl = appReq.HeroImageUrl;
-            if (appReq.Details != null) app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details);
+            if (appReq.Details != null)
+            {
+                if (app.AppDetails == null) app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details);
+                else app.AppDetails!.UpdateFromProtoAppDetails(appReq.Details);
+            }
             app.UpdatedAt = DateTime.Now;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());

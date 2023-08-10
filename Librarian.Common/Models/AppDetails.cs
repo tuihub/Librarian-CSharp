@@ -49,5 +49,18 @@ namespace Librarian.Common.Models
                 Version = this.Version ?? string.Empty
             };
         }
+        public void UpdateFromProtoAppDetails(TuiHub.Protos.Librarian.V1.AppDetails appDetails)
+        {
+            DateTime? releaseDate;
+            if (DateTime.TryParse(appDetails.ReleaseDate, out DateTime tmpDT) == true)
+                releaseDate = tmpDT;
+            else
+                releaseDate = null;
+            this.Description = string.IsNullOrEmpty(appDetails.Description) ? null : appDetails.Description;
+            this.ReleaseDate = releaseDate;
+            this.Developer = string.IsNullOrEmpty(appDetails.Developer) ? null : appDetails.Developer;
+            this.Publisher = string.IsNullOrEmpty(appDetails.Publisher) ? null : appDetails.Publisher;
+            this.Version = string.IsNullOrEmpty(appDetails.Version) ? null : appDetails.Version;
+        }
     }
 }
