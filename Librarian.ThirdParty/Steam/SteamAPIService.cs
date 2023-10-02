@@ -22,13 +22,13 @@ namespace Librarian.ThirdParty.Steam
             _webInterfaceFactory = new SteamWebInterfaceFactory(_steamAPIKey);
         }
 
-        public async Task<App> GetAppAsync(uint appId, string currencyCode = "", string language = "")
+        public async Task<(App, AppDetails)> GetAppAsync(uint appId, string currencyCode = "", string language = "")
         {
             var webInterface = _webInterfaceFactory.CreateSteamWebInterface<SteamStore>(new HttpClient());
             var appDetails = await webInterface.GetStoreAppDetailsAsync(appId, currencyCode, language);
             if (DateTime.TryParse(appDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
                 appReleaseDate = DateTime.MinValue;
-            return new App
+            return (new App
             {
                 Source = TuiHub.Protos.Librarian.V1.AppSource.Steam,
                 SourceAppId = appDetails.SteamAppId.ToString(),
@@ -38,15 +38,15 @@ namespace Librarian.ThirdParty.Steam
                 ShortDescription = appDetails.ShortDescription,
                 IconImageUrl = null,
                 HeroImageUrl = appDetails.HeaderImage,
-                AppDetails = new AppDetails
-                {
-                    Description = appDetails.DetailedDescription,
-                    ReleaseDate = appReleaseDate,
-                    Developer = string.Join(',', appDetails.Developers),
-                    Publisher = string.Join(',', appDetails.Publishers),
-                    Version = null
-                }
-            };
+            },
+            new AppDetails
+            {
+                Description = appDetails.DetailedDescription,
+                ReleaseDate = appReleaseDate,
+                Developer = string.Join(',', appDetails.Developers),
+                Publisher = string.Join(',', appDetails.Publishers),
+                Version = null
+            });
         }
     }
 }
