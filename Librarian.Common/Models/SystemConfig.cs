@@ -11,6 +11,7 @@
         public bool MinioWithSSL { get; set; }
         public string MinioBucket { get; set; } = null!;
         public long BinahChunkBytes { get; set; }
+        public string SteamAPIKey { get; set; } = null!;
     }
     public enum ApplicationDbType
     {
