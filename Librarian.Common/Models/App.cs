@@ -32,6 +32,10 @@ namespace Librarian.Common.Models
         public string? HeroImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // one-to-many relation to self(optional)
+        public long? ParentAppId { get; set; }
+        public App? ParentApp { get; set; }
+        public ICollection<App> ChildApps { get; } = new List<App>();
         // one-to-one relation(required, to child)
         public AppDetails? AppDetails { get; set; }
         // one-to-many relation(required, to child)

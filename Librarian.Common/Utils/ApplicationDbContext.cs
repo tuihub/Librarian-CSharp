@@ -48,6 +48,12 @@ namespace Librarian.Common.Utils
             //            .Property(x => x.Sha256)
             //            .IsFixedLength(true);
 
+            modelBuilder.Entity<App>()
+                        .HasOne(e => e.ParentApp)
+                        .WithMany(e => e.ChildApps)
+                        .HasForeignKey(e => e.ParentAppId)
+                        .IsRequired(false);
+
             // applying custom attribute
             // from https://stackoverflow.com/questions/41664713/using-a-custom-attribute-in-ef7-core-onmodelcreating
             //examine custom annotations for shaping the schema in the database.
