@@ -18,7 +18,7 @@ namespace Librarian.Angela
         private readonly CancellationTokenSource _cts = new();
         private readonly ManualResetEventSlim _steamProviderEvent = new(false);
 
-        private Queue<AppID> _appIDs = new();
+        private readonly Queue<AppID> _appIDs = new();
 
         public PullMetadataService(ILogger<PullMetadataService> logger)
         {
@@ -37,21 +37,42 @@ namespace Librarian.Angela
         {
             try
             {
-                _steamProviderEvent.Wait(token);
-                while (_appIDs.Count > 0)
+                while (true)
                 {
-                    var appID = _appIDs.Dequeue();
-                    await _steamProvider.PullAppAsync(appID);
+                    _steamProviderEvent.Wait(token);
+                    while (_appIDs.Count > 0)
+                    {
+                        var appID = _appIDs.Dequeue();
+                        try
+                        {
+                            await _steamProvider.PullAppAsync(appID);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to pull app {SourceAppId}, retrying in {RetrySeconds} seconds",
+                                appID.SourceAppId, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
+                            await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.MetadataServiceRetrySeconds * 1000), token);
+                        }
 
-                    if (token.IsCancellationRequested)
-                        throw new OperationCanceledException(token);
-                    Thread.Sleep(10000);
+                        if (token.IsCancellationRequested)
+                            throw new OperationCanceledException(token);
+                        _logger.LogDebug("Waiting for {IntervalSeconds}, _appIDs.Count = {Count}",
+                            GlobalContext.SystemConfig.PullSteamIntervalSeconds, _appIDs.Count);
+                        await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.PullSteamIntervalSeconds * 1000), token);
+                    }
+                    _steamProviderEvent.Reset();
                 }
             }
             catch(OperationCanceledException ex)
             {
                 _logger.LogDebug(ex, "OperationCanceledException caught, exiting");
             }
+        }
+
+        public void AddPullApp(AppID appID)
+        {
+            _appIDs.Enqueue(appID);
+            _steamProviderEvent.Set();
         }
     }
 }

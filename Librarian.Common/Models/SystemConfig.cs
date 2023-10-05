@@ -12,6 +12,8 @@
         public string MinioBucket { get; set; } = null!;
         public long BinahChunkBytes { get; set; }
         public string SteamAPIKey { get; set; } = null!;
+        public double PullSteamIntervalSeconds { get; set; }
+        public double MetadataServiceRetrySeconds { get; set; }
     }
     public enum ApplicationDbType
     {
