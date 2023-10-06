@@ -1,8 +1,11 @@
 using Librarian.Angela;
+using Librarian.Angela.Interfaces;
+using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
 using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -20,6 +23,7 @@ builder.Services.AddGrpcReflection();
 
 // Add services
 builder.Services.AddSingleton<PullMetadataService>();
+builder.Services.AddScoped<ISteamProvider, SteamProvider>();
 
 // Get Configuration
 GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();

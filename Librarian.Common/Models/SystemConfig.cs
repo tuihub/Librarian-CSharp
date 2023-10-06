@@ -14,6 +14,7 @@
         public string SteamAPIKey { get; set; } = null!;
         public double PullSteamIntervalSeconds { get; set; }
         public double MetadataServiceRetrySeconds { get; set; }
+        public int MetadataServiceMaxRetries { get; set; }
     }
     public enum ApplicationDbType
     {

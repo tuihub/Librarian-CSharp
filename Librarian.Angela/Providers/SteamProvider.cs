@@ -1,6 +1,7 @@
 ﻿using Librarian.Angela.Interfaces;
 using Librarian.Common.Utils;
 using Librarian.ThirdParty.Steam;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,27 +13,29 @@ namespace Librarian.Angela.Providers
 {
     public class SteamProvider : ISteamProvider
     {
-        private readonly string _steamAPIKey;
         private readonly SteamAPIService _steamAPIService;
         private readonly ApplicationDbContext _dbContext;
 
-        public SteamProvider(string steamAPIKey, ApplicationDbContext dbContext)
+        private readonly string _steamAPIKey = GlobalContext.SystemConfig.SteamAPIKey;
+
+        public SteamProvider(ApplicationDbContext dbContext)
         {
-            _steamAPIKey = steamAPIKey;
             _steamAPIService = new SteamAPIService(_steamAPIKey);
             _dbContext = dbContext;
         }
 
         public async Task PullAppAsync(long internalID)
         {
-            var app = _dbContext.Apps.Single(x => x.Id == internalID);
+            var app = _dbContext.Apps
+                      .Include(x => x.AppDetails)
+                      .Single(x => x.Id == internalID);
             if (app.Source != TuiHub.Protos.Librarian.V1.AppSource.Steam)
             {
                 throw new NotImplementedException();
             }
             else
             {
-                app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId)));
+                app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId), "cn", "schinese"));
             }
             await _dbContext.SaveChangesAsync();
         }

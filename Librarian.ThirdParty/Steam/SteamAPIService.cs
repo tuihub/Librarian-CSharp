@@ -24,7 +24,7 @@ namespace Librarian.ThirdParty.Steam
 
         public async Task<App> GetAppAsync(uint appId, string currencyCode = "", string language = "")
         {
-            var webInterface = _webInterfaceFactory.CreateSteamWebInterface<SteamStore>(new HttpClient());
+            var webInterface = _webInterfaceFactory.CreateSteamStoreInterface(new HttpClient());
             var appDetails = await webInterface.GetStoreAppDetailsAsync(appId, currencyCode, language);
             if (DateTime.TryParse(appDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
                 appReleaseDate = DateTime.MinValue;
