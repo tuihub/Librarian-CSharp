@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
@@ -19,7 +20,11 @@ namespace Librarian.Sephirah.Services
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter apps
-            var apps = _dbContext.Apps.AsQueryable();
+            IQueryable<Common.Models.App> apps;
+            if (containDetails == false)
+                apps = _dbContext.Apps.AsQueryable();
+            else
+                apps = _dbContext.Apps.Include(x => x.AppDetails).AsQueryable();
             if (idFilters.Count > 0)
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
             if (typeFilters.Count > 0)
