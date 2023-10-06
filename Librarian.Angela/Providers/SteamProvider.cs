@@ -1,4 +1,5 @@
 ﻿using Librarian.Angela.Interfaces;
+using Librarian.Common.Utils;
 using Librarian.ThirdParty.Steam;
 using System;
 using System.Collections.Generic;
@@ -13,16 +14,26 @@ namespace Librarian.Angela.Providers
     {
         private readonly string _steamAPIKey;
         private readonly SteamAPIService _steamAPIService;
+        private readonly ApplicationDbContext _dbContext;
 
-        public SteamProvider(string steamAPIKey)
+        public SteamProvider(string steamAPIKey, ApplicationDbContext dbContext)
         {
             _steamAPIKey = steamAPIKey;
             _steamAPIService = new SteamAPIService(_steamAPIKey);
+            _dbContext = dbContext;
         }
 
-        public Task PullAppAsync(AppID appID)
+        public async Task PullAppAsync(long internalID)
         {
-            throw new NotImplementedException();
+            var app = _dbContext.Apps.Single(x => x.Id == internalID);
+            if (app.Source != TuiHub.Protos.Librarian.V1.AppSource.Steam)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId)));
+            }
         }
     }
 }

@@ -9,6 +9,6 @@ namespace Librarian.Angela.Interfaces
 {
     public interface ISteamProvider
     {
-        public Task PullAppAsync(AppID appID);
+        public Task PullAppAsync(long internalID);
     }
 }

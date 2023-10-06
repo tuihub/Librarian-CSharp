@@ -62,5 +62,14 @@ namespace Librarian.Common.Models
             this.Publisher = string.IsNullOrEmpty(appDetails.Publisher) ? null : appDetails.Publisher;
             this.Version = string.IsNullOrEmpty(appDetails.Version) ? null : appDetails.Version;
         }
+
+        public void UpdateFromAppDetails(AppDetails appDetails)
+        {
+            this.Description = appDetails.Description;
+            this.ReleaseDate = appDetails.ReleaseDate;
+            this.Developer = appDetails.Developer;
+            this.Publisher = appDetails.Publisher;
+            this.Version = appDetails.Version;
+        }
     }
 }

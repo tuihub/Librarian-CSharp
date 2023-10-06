@@ -95,5 +95,42 @@ namespace Librarian.Common.Models
                 Details = (this.AppDetails ?? new AppDetails()).ToProtoAppDetails()
             };
         }
+        public void UpdateFromProtoApp(TuiHub.Protos.Librarian.V1.App app)
+        {
+            this.Source = app.Source;
+            this.SourceAppId = app.SourceAppId;
+            this.SourceUrl = app.SourceUrl;
+            this.Name = app.Name;
+            this.Type = app.Type;
+            this.ShortDescription = app.ShortDescription;
+            this.IconImageUrl = app.IconImageUrl;
+            this.HeroImageUrl = app.HeroImageUrl;
+            this.UpdatedAt = DateTime.Now;
+            if (app.Details != null)
+            {
+                this.AppDetails ??= new AppDetails();
+                this.AppDetails.App ??= this;
+                this.AppDetails.UpdateFromProtoAppDetails(app.Details);
+            }
+        }
+
+        public void UpdateFromApp(App app)
+        {
+            this.Source = app.Source;
+            this.SourceAppId = app.SourceAppId;
+            this.SourceUrl = app.SourceUrl;
+            this.Name = app.Name;
+            this.Type = app.Type;
+            this.ShortDescription = app.ShortDescription;
+            this.IconImageUrl = app.IconImageUrl;
+            this.HeroImageUrl = app.HeroImageUrl;
+            this.UpdatedAt = DateTime.Now;
+            if (app.AppDetails != null)
+            {
+                this.AppDetails ??= new AppDetails();
+                this.AppDetails.App ??= this;
+                this.AppDetails.UpdateFromAppDetails(app.AppDetails);
+            }
+        }
     }
 }
