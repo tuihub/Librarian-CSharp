@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Librarian.Angela\Librarian.Angela.csproj" />
     <ProjectReference Include="..\Librarian.Sephirah\Librarian.Sephirah.csproj" />
   </ItemGroup>
 

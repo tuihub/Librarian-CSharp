@@ -34,6 +34,7 @@ namespace Librarian.Angela.Providers
             {
                 app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId)));
             }
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

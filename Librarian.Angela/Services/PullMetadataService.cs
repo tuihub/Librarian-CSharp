@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.V1;
 
-namespace Librarian.Angela
+namespace Librarian.Angela.Services
 {
     public class PullMetadataService
     {
@@ -66,7 +66,7 @@ namespace Librarian.Angela
                     _steamProviderEvent.Reset();
                 }
             }
-            catch(OperationCanceledException ex)
+            catch (OperationCanceledException ex)
             {
                 _logger.LogDebug(ex, "OperationCanceledException caught, exiting");
             }

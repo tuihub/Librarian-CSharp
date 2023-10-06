@@ -1,3 +1,5 @@
+using Librarian.Angela;
+using Librarian.Angela.Services;
 using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +17,9 @@ builder.Services.AddDbContext<ApplicationDbContext>();
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
+
+// Add services
+builder.Services.AddSingleton<PullMetadataService>();
 
 // Get Configuration
 GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
