@@ -7,12 +7,17 @@ using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Minio;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
+
+// Get Configuration
+GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
+GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -25,9 +30,13 @@ builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<PullMetadataService>();
 builder.Services.AddScoped<ISteamProvider, SteamProvider>();
 
-// Get Configuration
-GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
-GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+// Add Minio DI
+builder.Services.AddMinio(c => c
+    .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)
+    .WithCredentials(
+        GlobalContext.SystemConfig.MinioAccessKey,
+        GlobalContext.SystemConfig.MinioSecretKey)
+    .WithSSL(GlobalContext.SystemConfig.MinioWithSSL));
 
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

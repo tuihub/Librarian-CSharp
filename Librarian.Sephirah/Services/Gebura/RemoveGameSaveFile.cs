@@ -4,6 +4,7 @@ using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Minio;
+using Minio.DataModel.Args;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 
@@ -21,11 +22,10 @@ namespace Librarian.Sephirah.Services
             // only remove in minio when status is Stored
             if (gameSaveFile.Status == GameSaveFileStatus.Stored)
             {
-                var minioClient = MinioClientUtil.GetMinioClient();
                 var rmArgs = new RemoveObjectArgs()
                                  .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                  .WithObject(id.ToString());
-                await minioClient.RemoveObjectAsync(rmArgs);
+                await _minioClient.RemoveObjectAsync(rmArgs);
                 var user = _dbContext.Users.Single(x => x.Id == userId);
                 user.GameSaveFileUsedCapacityBytes -= fileMetadata?.SizeBytes ?? 0;
             }

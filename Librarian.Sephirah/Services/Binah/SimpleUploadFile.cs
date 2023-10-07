@@ -3,6 +3,7 @@ using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Minio;
+using Minio.DataModel.Args;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Security.Cryptography;
@@ -69,7 +70,6 @@ namespace Librarian.Sephirah.Services
                 }
             }, writeTaskCancellationTokenSource.Token);
             // upload to minio
-            var minioClient = MinioClientUtil.GetMinioClient();
             var putObjectArgs = new PutObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
@@ -77,7 +77,7 @@ namespace Librarian.Sephirah.Services
                                     // https://youtu.be/V_T8x1n358U?t=348, set size = -1, take all
                                     .WithObjectSize(-1);
             Debug.WriteLine($"SimpleUploadFile: Starting minioPutTask");
-            var minioPutTask = minioClient.PutObjectAsync(putObjectArgs);
+            var minioPutTask = _minioClient.PutObjectAsync(putObjectArgs);
             // calc Sha256
             using var sha256 = SHA256.Create();
             Debug.WriteLine($"SimpleUploadFile: Starting sha256Task");
@@ -91,7 +91,7 @@ namespace Librarian.Sephirah.Services
                 var removeObjectArgs = new RemoveObjectArgs()
                                            .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                            .WithObject(internalId.ToString());
-                await minioClient.RemoveObjectAsync(removeObjectArgs);
+                await _minioClient.RemoveObjectAsync(removeObjectArgs);
                 // update db
                 gameSaveFile.Status = GameSaveFileStatus.Sha256Mismatch;
                 // throw rpcex
