@@ -15,10 +15,10 @@ namespace Librarian.Angela.Services
     public class PullMetadataService
     {
         private readonly ILogger _logger;
-
         private readonly IServiceProvider _serviceProvider;
+
         private readonly CancellationTokenSource _cts = new();
-        private readonly ManualResetEventSlim _steamProviderEvent = new(false);
+        private readonly ManualResetEventSlim _mres = new(false);
 
         private readonly Queue<long> _internalIDs = new();
 
@@ -41,25 +41,47 @@ namespace Librarian.Angela.Services
             {
                 while (true)
                 {
-                    _steamProviderEvent.Wait(token);
+                    _mres.Wait(token);
                     while (_internalIDs.Count > 0)
                     {
                         var internalID = _internalIDs.Dequeue();
-                        _logger.LogDebug("Pulling steam app {Id}, _internalIDs.Count = {Count}", internalID, _internalIDs.Count);
+                        _logger.LogDebug("Pulling app {Id}, _internalIDs.Count = {Count}", internalID, _internalIDs.Count);
+                        AppSource appSource;
+                        using (var scpoe = _serviceProvider.CreateScope())
+                        {
+                            using (var dbContext = scpoe.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+                            {
+                                appSource = dbContext.Apps.Single(x => x.Id == internalID).Source;
+                            }
+                        }
                         var retries = 0;
                         while (retries < GlobalContext.SystemConfig.MetadataServiceMaxRetries)
                         {
                             try
                             {
-                                using var scope = _serviceProvider.CreateScope();
-                                var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
-                                await steamProvider.PullAppAsync(internalID);
-                                break;
+                                if (appSource == AppSource.Steam)
+                                {
+                                    using var scope = _serviceProvider.CreateScope();
+                                    var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
+                                    await steamProvider.PullAppAsync(internalID);
+                                    break;
+                                }
+                                else if (appSource == AppSource.Vndb)
+                                {
+                                    using var scope = _serviceProvider.CreateScope();
+                                    var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
+                                    await vndbProvider.PullAppAsync(internalID);
+                                    break;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException();
+                                }
                             }
                             catch (Exception ex)
                             {
                                 retries++;
-                                _logger.LogWarning(ex, "Failed to pull steam app {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
+                                _logger.LogWarning(ex, "Failed to pull app {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
                                     internalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
                                 await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.MetadataServiceRetrySeconds * 1000), token);
                             }
@@ -67,11 +89,16 @@ namespace Librarian.Angela.Services
 
                         if (token.IsCancellationRequested)
                             throw new OperationCanceledException(token);
-                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _internalIDs.Count = {Count}",
-                            GlobalContext.SystemConfig.PullSteamIntervalSeconds, _internalIDs.Count);
-                        await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.PullSteamIntervalSeconds * 1000), token);
+                        var pullIntervalSeconds = appSource switch
+                        {
+                            AppSource.Steam => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
+                            AppSource.Vndb => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
+                            _ => throw new NotImplementedException()
+                        };
+                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _internalIDs.Count = {Count}", pullIntervalSeconds, _internalIDs.Count);
+                        await Task.Delay(Convert.ToInt32(pullIntervalSeconds * 1000), token);
                     }
-                    _steamProviderEvent.Reset();
+                    _mres.Reset();
                 }
             }
             catch (OperationCanceledException ex)
@@ -83,7 +110,7 @@ namespace Librarian.Angela.Services
         public void AddPullApp(long internalID)
         {
             _internalIDs.Enqueue(internalID);
-            _steamProviderEvent.Set();
+            _mres.Set();
         }
     }
 }
