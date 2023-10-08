@@ -6,14 +6,31 @@ using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using Xunit;
 using Grpc.Core;
+using LibrarianTests.IntegrationTests.Services.Sephirah;
+using Microsoft.Extensions.DependencyInjection;
+using Librarian.Common.Utils;
 
-namespace LibrarianTests.IntegrationTests.Services.Sephirah
+namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
 {
     public partial class SephirahTest : SephirahTestBase
     {
         [Fact]
-        public async Task Test_UsernameOrPasswordError()
+        public void Test_UsernameOrPasswordError()
         {
+            // Add user
+            using (var scope = App.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                dbContext.Users.Add(new Common.Models.User
+                {
+                    Name = "test",
+                    Password = PasswordHasher.HashPassword("test"),
+                    Status = UserStatus.Active,
+                });
+                dbContext.SaveChanges();
+            }
+
+            // Do tests
             var client = new LibrarianSephirahService.LibrarianSephirahServiceClient(Channel);
 
             var usernames = new[] { "test1", "test", "test1" };
