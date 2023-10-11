@@ -47,6 +47,8 @@ namespace Librarian.ThirdParty.Bangumi
                 throw new Exception("Bangumi API response deserialization returned null object.");
             if (DateTime.TryParse(respObj.date.ToString(), out DateTime releaseDate) == false)
                 releaseDate = DateTime.MinValue;
+            var shortDescription = ((string?)respObj.summary?.ToString())?.Length > 97 ?
+                ((string?)respObj.summary?.ToString())?[..97] + "..." : respObj.summary?.ToString();
             return new App
             {
                 Source = TuiHub.Protos.Librarian.V1.AppSource.Bangumi,
@@ -54,7 +56,7 @@ namespace Librarian.ThirdParty.Bangumi
                 SourceUrl = "https://bgm.tv/subject/" + respObj.id.ToString(),
                 Name = string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString(),
                 Type = respObj.type.ToString().Equals("4") ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
-                ShortDescription = ((string?)respObj.summary?.ToString())?[..97] + "...",
+                ShortDescription = shortDescription,
                 IconImageUrl = respObj.images?.small?.ToString(),
                 HeroImageUrl = respObj.images?.large?.ToString(),
                 AppDetails = new AppDetails

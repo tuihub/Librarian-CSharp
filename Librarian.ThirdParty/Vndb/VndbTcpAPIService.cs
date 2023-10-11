@@ -33,6 +33,8 @@ namespace Librarian.ThirdParty.Vndb
             else
             {
                 var vn = vns.First();
+                var shortDescription = vn.Description.Length > 97 ?
+                    vn.Description[..97] + "..." : vn.Description;
                 return new App
                 {
                     Source = TuiHub.Protos.Librarian.V1.AppSource.Vndb,
@@ -40,7 +42,7 @@ namespace Librarian.ThirdParty.Vndb
                     SourceUrl = "https://vndb.org/v" + vn.Id.ToString(),
                     Name = vn.OriginalName,
                     Type = TuiHub.Protos.Librarian.V1.AppType.Game,
-                    ShortDescription = vn.Description[..97] + "...",
+                    ShortDescription = shortDescription,
                     IconImageUrl = null,
                     HeroImageUrl = vn.Image,
                     AppDetails = new AppDetails
