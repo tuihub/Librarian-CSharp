@@ -73,6 +73,13 @@ namespace Librarian.Angela.Services
                                     await vndbProvider.PullAppAsync(internalID);
                                     break;
                                 }
+                                else if (appSource == AppSource.Bangumi)
+                                {
+                                    using var scope = _serviceProvider.CreateScope();
+                                    var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
+                                    await bangumiProvider.PullAppAsync(internalID);
+                                    break;
+                                }
                                 else
                                 {
                                     throw new NotImplementedException();
@@ -93,6 +100,7 @@ namespace Librarian.Angela.Services
                         {
                             AppSource.Steam => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
                             AppSource.Vndb => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
+                            AppSource.Bangumi => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
                             _ => throw new NotImplementedException()
                         };
                         _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _internalIDs.Count = {Count}", pullIntervalSeconds, _internalIDs.Count);

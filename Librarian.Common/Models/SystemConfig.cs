@@ -12,8 +12,10 @@
         public string MinioBucket { get; set; } = null!;
         public long BinahChunkBytes { get; set; }
         public string SteamAPIKey { get; set; } = null!;
+        public string BangumiAPIKey { get; set; } = null!;
         public double PullSteamIntervalSeconds { get; set; }
         public double PullVndbIntervalSeconds { get; set; }
+        public double PullBangumiIntervalSeconds { get; set; }
         public double MetadataServiceRetrySeconds { get; set; }
         public int MetadataServiceMaxRetries { get; set; }
     }

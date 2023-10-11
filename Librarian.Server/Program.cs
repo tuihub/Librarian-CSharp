@@ -30,6 +30,7 @@ builder.Services.AddGrpcReflection();
 builder.Services.AddSingleton<PullMetadataService>();
 builder.Services.AddScoped<ISteamProvider, SteamProvider>();
 builder.Services.AddScoped<IVndbProvider, VndbProvider>();
+builder.Services.AddScoped<IBangumiProvider, BangumiProvider>();
 
 // Add Minio DI
 builder.Services.AddMinio(c => c
