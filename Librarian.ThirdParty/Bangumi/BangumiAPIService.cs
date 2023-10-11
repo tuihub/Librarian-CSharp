@@ -5,6 +5,7 @@ using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,6 +50,13 @@ namespace Librarian.ThirdParty.Bangumi
                 releaseDate = DateTime.MinValue;
             var shortDescription = ((string?)respObj.summary?.ToString())?.Length > 97 ?
                 ((string?)respObj.summary?.ToString())?[..97] + "..." : respObj.summary?.ToString();
+            var infobox = respObj.infobox as JArray;
+            string? developer = null;
+            if (infobox != null)
+                foreach (JObject parsedObject in infobox.Children<JObject>())
+                    foreach (JProperty parsedProperty in parsedObject.Properties())
+                        if (parsedProperty.Value.ToString().Equals("开发"))
+                            developer = parsedProperty?.Parent?.Last?.First?.ToString();
             return new App
             {
                 Source = TuiHub.Protos.Librarian.V1.AppSource.Bangumi,
@@ -63,7 +71,7 @@ namespace Librarian.ThirdParty.Bangumi
                 {
                     Description = respObj.summary?.ToString(),
                     ReleaseDate = releaseDate,
-                    Developer = respObj.infobox?.GetType().GetProperty("开发")?.GetValue(respObj.infobox, null)?.ToString(),
+                    Developer = developer,
                     Publisher = null,
                     Version = null
                 }
