@@ -1,13 +1,12 @@
 ﻿using Librarian.Common.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Librarian.ThirdParty.Bangumi
@@ -36,31 +35,33 @@ namespace Librarian.ThirdParty.Bangumi
             var client = new RestClient(options);
             var request = new RestRequest("/v0/subjects/{subject_id}")
                                 .AddUrlSegment("subject_id", appId);
-            var args = new { subject_id = appId };
-            var respObj = await client.GetJsonAsync<dynamic>("/v0/subjects/{subject_id}", args);
-            if (respObj is null)
+            var response = await client.ExecuteGetAsync(request);
+            if (response == null)
                 throw new Exception("Bangumi API returned null response.");
-            var respJsonObj = respObj as JsonObject;
-            if (respJsonObj == null)
-                throw new Exception("Bangumi API response is not a JsonObject.");
-            if (DateTime.TryParse((string?)respJsonObj["date"], out DateTime releaseDate) == false)
+            if (response.IsSuccessStatusCode == false)
+                throw new Exception("Bangumi API returned non-success status code: " + response.StatusCode.ToString());
+            if (response.Content == null)
+                throw new Exception("Bangumi API returned null content.");
+            dynamic respObj = JObject.Parse(response.Content);
+            if (respObj is null)
+                throw new Exception("Bangumi API response deserialization returned null object.");
+            if (DateTime.TryParse(respObj.date.ToString(), out DateTime releaseDate) == false)
                 releaseDate = DateTime.MinValue;
             return new App
             {
                 Source = TuiHub.Protos.Librarian.V1.AppSource.Bangumi,
-                SourceAppId = respJsonObj["id"]?.ToString(),
-                SourceUrl = "https://bgm.tv/subject/" + respJsonObj["id"]?.ToString(),
-                Name = (string.IsNullOrWhiteSpace((string?)respJsonObj["name_cn"]) ? respJsonObj["name"]?.ToString()
-                            : respJsonObj["name_cn"]?.ToString()) ?? string.Empty,
-                Type = (int?)respJsonObj["type"] == 4 ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
-                ShortDescription = (string?)respJsonObj["summary"] != null ? ((string?)respJsonObj["summary"])![..97] + "..." : null,
-                IconImageUrl = (string?)((respJsonObj["images"] as JsonObject)?["small"]),
-                HeroImageUrl = (string?)((respJsonObj["images"] as JsonObject)?["large"]),
+                SourceAppId = respObj.id.ToString(),
+                SourceUrl = "https://bgm.tv/subject/" + respObj.id.ToString(),
+                Name = string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString(),
+                Type = respObj.type.ToString().Equals("4") ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
+                ShortDescription = ((string?)respObj.summary?.ToString())?[..97] + "...",
+                IconImageUrl = respObj.images?.small?.ToString(),
+                HeroImageUrl = respObj.images?.large?.ToString(),
                 AppDetails = new AppDetails
                 {
-                    Description = (string?)respJsonObj["summary"],
+                    Description = respObj.summary?.ToString(),
                     ReleaseDate = releaseDate,
-                    Developer = (string?)((respJsonObj["infobox"] as JsonObject)?["开发"]),
+                    Developer = respObj.infobox?.GetType().GetProperty("开发")?.GetValue(respObj.infobox, null)?.ToString(),
                     Publisher = null,
                     Version = null
                 }
