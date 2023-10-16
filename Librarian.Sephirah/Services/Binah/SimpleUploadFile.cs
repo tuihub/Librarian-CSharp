@@ -71,6 +71,7 @@ namespace Librarian.Sephirah.Services
                 }
             }, writeTaskCancellationTokenSource.Token);
             // upload to minio
+            var minioClient = MinioClientUtil.GetMinioClient();
             var putObjectArgs = new PutObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
@@ -78,7 +79,7 @@ namespace Librarian.Sephirah.Services
                                     // https://youtu.be/V_T8x1n358U?t=348, set size = -1, take all
                                     .WithObjectSize(-1);
             _logger.LogDebug($"SimpleUploadFile: Starting minioPutTask");
-            var minioPutTask = _minioClient.PutObjectAsync(putObjectArgs);
+            var minioPutTask = minioClient.PutObjectAsync(putObjectArgs);
             // calc Sha256
             using var sha256 = SHA256.Create();
             _logger.LogDebug($"SimpleUploadFile: Starting sha256Task");
@@ -92,7 +93,7 @@ namespace Librarian.Sephirah.Services
                 var removeObjectArgs = new RemoveObjectArgs()
                                            .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                            .WithObject(internalId.ToString());
-                await _minioClient.RemoveObjectAsync(removeObjectArgs);
+                await minioClient.RemoveObjectAsync(removeObjectArgs);
                 // update db
                 gameSaveFile.Status = GameSaveFileStatus.Sha256Mismatch;
                 // throw rpcex

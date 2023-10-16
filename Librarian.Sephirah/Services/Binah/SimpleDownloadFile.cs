@@ -24,6 +24,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // get object from minio
+            var minioClient = MinioClientUtil.GetMinioClient();
             var getObjectArgs = new GetObjectArgs()
                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                     .WithObject(internalId.ToString())
@@ -48,7 +49,7 @@ namespace Librarian.Sephirah.Services
                                             }
                                         }).Wait();
                                     });
-            await _minioClient.GetObjectAsync(getObjectArgs);
+            await minioClient.GetObjectAsync(getObjectArgs);
             Debug.WriteLine($"SimpleDownloadFile: GetObject finished");
         }
     }

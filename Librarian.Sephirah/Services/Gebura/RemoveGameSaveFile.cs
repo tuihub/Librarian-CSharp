@@ -22,10 +22,11 @@ namespace Librarian.Sephirah.Services
             // only remove in minio when status is Stored
             if (gameSaveFile.Status == GameSaveFileStatus.Stored)
             {
+                var minioClient = MinioClientUtil.GetMinioClient();
                 var rmArgs = new RemoveObjectArgs()
                                  .WithBucket(GlobalContext.SystemConfig.MinioBucket)
                                  .WithObject(id.ToString());
-                await _minioClient.RemoveObjectAsync(rmArgs);
+                await minioClient.RemoveObjectAsync(rmArgs);
                 var user = _dbContext.Users.Single(x => x.Id == userId);
                 user.GameSaveFileUsedCapacityBytes -= fileMetadata?.SizeBytes ?? 0;
             }

@@ -32,14 +32,6 @@ builder.Services.AddScoped<ISteamProvider, SteamProvider>();
 builder.Services.AddScoped<IVndbProvider, VndbProvider>();
 builder.Services.AddScoped<IBangumiProvider, BangumiProvider>();
 
-// Add Minio DI
-builder.Services.AddMinio(c => c
-    .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)
-    .WithCredentials(
-        GlobalContext.SystemConfig.MinioAccessKey,
-        GlobalContext.SystemConfig.MinioSecretKey)
-    .WithSSL(GlobalContext.SystemConfig.MinioWithSSL));
-
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     // AccessToken Auth (Default)

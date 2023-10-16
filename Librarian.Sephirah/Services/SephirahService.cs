@@ -13,13 +13,11 @@ namespace Librarian.Sephirah.Services
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly PullMetadataService _pullMetadataService;
-        private readonly IMinioClient _minioClient;
-        public SephirahService(ILogger<SephirahService> logger ,ApplicationDbContext dbContext, PullMetadataService pullMetadataService, IMinioClient minioClient)
+        public SephirahService(ILogger<SephirahService> logger ,ApplicationDbContext dbContext, PullMetadataService pullMetadataService)
         {
             _logger = logger;
             _dbContext = dbContext;
             _pullMetadataService = pullMetadataService;
-            _minioClient = minioClient;
         }
     }
 }
