@@ -128,6 +128,7 @@ namespace Librarian.Common.Models
             if (app.AppDetails != null)
             {
                 this.AppDetails ??= new AppDetails();
+                this.AppDetails.Id = this.Id;
                 this.AppDetails.App ??= this;
                 this.AppDetails.UpdateFromAppDetails(app.AppDetails);
             }
