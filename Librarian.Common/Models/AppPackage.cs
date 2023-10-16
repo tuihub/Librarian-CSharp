@@ -38,7 +38,7 @@ namespace Librarian.Common.Models
         {
             Id = internalId;
             Source = appPackage.Source;
-            SourceAppId = appPackage.Id.Id;
+            SourceAppId = appPackage.SourceId.Id;
             Name = appPackage.Name;
             Description = string.IsNullOrEmpty(appPackage.Description) ? null : appPackage.Description;
             IsPublic = appPackage.Public;
