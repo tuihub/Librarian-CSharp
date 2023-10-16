@@ -2,6 +2,7 @@
 using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 using System.Diagnostics;
@@ -30,14 +31,14 @@ namespace Librarian.Sephirah.Services
             var pipeStreamClient4Minio = new AnonymousPipeClientStream(pipeStreamServer4Minio.GetClientHandleAsString());
             //using var memoryStream = new MemoryStream();
             //long receivedBytes = 0;
-            Debug.WriteLine($"SimpleUploadFile: Starting readTask");
+            _logger.LogDebug($"SimpleUploadFile: Starting readTask");
             var readTask = Task.Run(async () =>
             {
                 gameSaveFile.Status = GameSaveFileStatus.InProgress;
                 await _dbContext.SaveChangesAsync();
                 await foreach (var message in requestStream.ReadAllAsync())
                 {
-                    Debug.WriteLine($"SimpleUploadFile: readTask message.Data.Length = {message.Data?.Length}");
+                    _logger.LogDebug($"SimpleUploadFile: readTask message.Data.Length = {message.Data?.Length}");
                     if (message.Data != null)
                     {
                         //await memoryStream.WriteAsync(message.Data.Memory);
@@ -51,7 +52,7 @@ namespace Librarian.Sephirah.Services
                 pipeStreamServer4Minio.Close();
             });
             var writeTaskCancellationTokenSource = new CancellationTokenSource();
-            Debug.WriteLine($"SimpleUploadFile: Starting writeTask");
+            _logger.LogDebug($"SimpleUploadFile: Starting writeTask");
             var writeTask = Task.Run(async () =>
             {
                 long executionNum = 0;
@@ -76,11 +77,11 @@ namespace Librarian.Sephirah.Services
                                     .WithStreamData(pipeStreamClient4Minio)
                                     // https://youtu.be/V_T8x1n358U?t=348, set size = -1, take all
                                     .WithObjectSize(-1);
-            Debug.WriteLine($"SimpleUploadFile: Starting minioPutTask");
+            _logger.LogDebug($"SimpleUploadFile: Starting minioPutTask");
             var minioPutTask = _minioClient.PutObjectAsync(putObjectArgs);
             // calc Sha256
             using var sha256 = SHA256.Create();
-            Debug.WriteLine($"SimpleUploadFile: Starting sha256Task");
+            _logger.LogDebug($"SimpleUploadFile: Starting sha256Task");
             var sha256Task = sha256.ComputeHashAsync(pipeStreamClient4Sha256);
             // wait for readTask, minioPutTask, sha256Task
             Task.WaitAll(readTask, minioPutTask, sha256Task);
