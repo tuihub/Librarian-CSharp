@@ -132,5 +132,37 @@ namespace Librarian.Common.Models
                 this.AppDetails.UpdateFromAppDetails(app.AppDetails);
             }
         }
+
+        public App Flatten()
+        {
+            List<AppSource> sourcePriorities = new List<AppSource>
+            {
+                AppSource.Steam,
+                AppSource.Bangumi,
+                AppSource.Vndb
+            };
+            var app = this;
+            foreach (var source in sourcePriorities)
+                if (app.ChildApps.Where(x => x.Source == source).Any())
+                {
+                    var fapp = app.ChildApps.Where(x => x.Source == source).First();
+                    app.SourceUrl = fapp.SourceUrl;
+                    if (string.IsNullOrWhiteSpace(app.Name)) app.Name = fapp.Name;
+                    if (string.IsNullOrWhiteSpace(app.ShortDescription)) app.ShortDescription = fapp.ShortDescription;
+                    if (string.IsNullOrWhiteSpace(app.IconImageUrl)) app.IconImageUrl = fapp.IconImageUrl;
+                    if (string.IsNullOrWhiteSpace(app.HeroImageUrl)) app.HeroImageUrl = fapp.HeroImageUrl;
+                    if (app.AppDetails == null) app.AppDetails = fapp.AppDetails;
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(app.AppDetails.Description)) app.AppDetails.Description = fapp.AppDetails?.Description;
+                        if (app.AppDetails.ReleaseDate == null) app.AppDetails.ReleaseDate = fapp.AppDetails?.ReleaseDate;
+                        if (string.IsNullOrWhiteSpace(app.AppDetails.Developer)) app.AppDetails.Developer = fapp.AppDetails?.Developer;
+                        if (string.IsNullOrWhiteSpace(app.AppDetails.Publisher)) app.AppDetails.Publisher = fapp.AppDetails?.Publisher;
+                        if (string.IsNullOrWhiteSpace(app.AppDetails.Version)) app.AppDetails.Version = fapp.AppDetails?.Version;
+                    }
+                    break;
+                }
+            return app;
+        }
     }
 }
