@@ -26,10 +26,31 @@ jobs:
       run: dotnet build --no-restore
     # - name: Test
     #   run: dotnet test --no-build --verbosity normal
-    - name: Publish
-      run: dotnet publish Librarian.Server/Librarian.Server.csproj -c Release -o publish
-    - name: Upload Build Artifact
+    - name: Publish win-x64
+      run: dotnet publish Librarian.Server/Librarian.Server.csproj -c Release -o publish-win-x64 --os win -a x64
+    - name: Upload win-x64 Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Librarian-CSharp
-        path: publish
+        name: Librarian-win-x64
+        path: publish-win-x64
+    - name: Publish linux-x64
+      run: dotnet publish Librarian.Server/Librarian.Server.csproj -c Release -o publish-linux-x64 --os linux -a x64
+    - name: Upload linux-x64 Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Librarian-linux-x64
+        path: publish-linux-x64
+    - name: Publish linux-musl-x64
+      run: dotnet publish Librarian.Server/Librarian.Server.csproj -c Release -o publish-linux-musl-x64 --os linux -a musl-x64
+    - name: Upload linux-musl-x64 Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Librarian-linux-musl-x64
+        path: publish-linux-musl-x64
+    - name: Publish linux-arm64
+      run: dotnet publish Librarian.Server/Librarian.Server.csproj -c Release -o publish-linux-arm64 --os linux -a arm64
+    - name: Upload linux-arm64 Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Librarian-linux-arm64
+        path: publish-linux-arm64
