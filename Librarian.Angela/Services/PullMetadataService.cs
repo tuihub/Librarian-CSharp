@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.V1;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Librarian.Angela.Services
 {
@@ -20,7 +21,7 @@ namespace Librarian.Angela.Services
         private readonly CancellationTokenSource _cts = new();
         private readonly ManualResetEventSlim _mres = new(false);
 
-        private readonly Queue<long> _internalIDs = new();
+        private readonly Queue<ExternalApp> _externalApps = new();
 
         public PullMetadataService(ILogger<PullMetadataService> logger, IServiceProvider serviceProvider)
         {
@@ -42,16 +43,19 @@ namespace Librarian.Angela.Services
                 while (true)
                 {
                     _mres.Wait(token);
-                    while (_internalIDs.Count > 0)
+                    while (_externalApps.Count > 0)
                     {
-                        var internalID = _internalIDs.Dequeue();
-                        _logger.LogDebug("Pulling app {Id}, _internalIDs.Count = {Count}", internalID, _internalIDs.Count);
+                        var externalApp = _externalApps.Dequeue();
+                        _logger.LogDebug("Pulling app {Id}, _externalApps.Count = {Count}", externalApp.InternalID, _externalApps.Count);
                         AppSource appSource;
-                        using (var scpoe = _serviceProvider.CreateScope())
+                        long? parentAppId;
+                        using (var scope = _serviceProvider.CreateScope())
                         {
-                            using (var dbContext = scpoe.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+                            using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
                             {
-                                appSource = dbContext.Apps.Single(x => x.Id == internalID).Source;
+                                var app = dbContext.Apps.Single(x => x.Id == externalApp.InternalID);
+                                appSource = app.Source;
+                                parentAppId = app.ParentAppId;
                             }
                         }
                         var retries = 0;
@@ -59,37 +63,61 @@ namespace Librarian.Angela.Services
                         {
                             try
                             {
+                                bool isSupported = true;
                                 if (appSource == AppSource.Steam)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
-                                    await steamProvider.PullAppAsync(internalID);
+                                    await steamProvider.PullAppAsync(externalApp.InternalID);
                                     break;
                                 }
                                 else if (appSource == AppSource.Vndb)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
-                                    await vndbProvider.PullAppAsync(internalID);
+                                    await vndbProvider.PullAppAsync(externalApp.InternalID);
                                     break;
                                 }
                                 else if (appSource == AppSource.Bangumi)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
-                                    await bangumiProvider.PullAppAsync(internalID);
+                                    await bangumiProvider.PullAppAsync(externalApp.InternalID);
                                     break;
                                 }
                                 else
                                 {
-                                    throw new NotImplementedException();
+                                    isSupported = false;
+                                    _logger.LogWarning("Unsupported app Id = {Id}, appSource {AppSource}", externalApp.InternalID, appSource);
+                                }
+
+                                // update parent app name
+                                if (isSupported = true && externalApp.UpdateParentAppName == true)
+                                {
+                                    if (parentAppId == null)
+                                    {
+                                        _logger.LogWarning("Parent app Id is null, skipping");
+                                    }
+                                    else
+                                    {
+                                        _logger.LogDebug("Updating internal app(Id = {Id}) using external app(Id = {ExtId})}", parentAppId, externalApp.InternalID);
+                                        using (var scope = _serviceProvider.CreateScope())
+                                        {
+                                            using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+                                            {
+                                                var app = dbContext.Apps.Single(x => x.Id == parentAppId);
+                                                app.Name = dbContext.Apps.Single(x => x.Id == externalApp.InternalID).Name;
+                                                await dbContext.SaveChangesAsync();
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             catch (Exception ex)
                             {
                                 retries++;
                                 _logger.LogWarning(ex, "Failed to pull app {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
-                                    internalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
+                                    externalApp.InternalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
                                 await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.MetadataServiceRetrySeconds * 1000), token);
                             }
                         }
@@ -103,7 +131,7 @@ namespace Librarian.Angela.Services
                             AppSource.Bangumi => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
                             _ => throw new NotImplementedException()
                         };
-                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _internalIDs.Count = {Count}", pullIntervalSeconds, _internalIDs.Count);
+                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _externalApps.Count = {Count}", pullIntervalSeconds, _externalApps.Count);
                         await Task.Delay(Convert.ToInt32(pullIntervalSeconds * 1000), token);
                     }
                     _mres.Reset();
@@ -115,10 +143,20 @@ namespace Librarian.Angela.Services
             }
         }
 
-        public void AddPullApp(long internalID)
+        public void AddPullApp(long internalID, bool updateParentAppName = false)
         {
-            _internalIDs.Enqueue(internalID);
+            _externalApps.Enqueue(new ExternalApp
+            {
+                InternalID = internalID,
+                UpdateParentAppName = updateParentAppName
+            });
             _mres.Set();
+        }
+
+        private class ExternalApp
+        {
+            public long InternalID { get; set; }
+            public bool UpdateParentAppName { get; set; }
         }
     }
 }

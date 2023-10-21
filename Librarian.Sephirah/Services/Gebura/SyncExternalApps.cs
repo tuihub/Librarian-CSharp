@@ -48,7 +48,7 @@ namespace Librarian.Sephirah.Services
                     _dbContext.Apps.Add(newInternalApp);
                     _dbContext.Apps.Add(newExternalApp);
                     await _dbContext.SaveChangesAsync();
-                    _pullMetadataService.AddPullApp(newExternalApp.Id);
+                    _pullMetadataService.AddPullApp(newExternalApp.Id, true);
                 }
                 // external app exists
                 else
