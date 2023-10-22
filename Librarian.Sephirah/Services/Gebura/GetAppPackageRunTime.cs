@@ -13,9 +13,11 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<GetAppPackageRunTimeResponse> GetAppPackageRunTime(GetAppPackageRunTimeRequest request, ServerCallContext context)
         {
+            var userId = JwtUtil.GetInternalIdFromJwt(context);
             var appPackageId = request.AppPackageId.Id;
-            var totalRunTime = _dbContext.AppPackages
-                                         .Single(x => x.Id == appPackageId)
+            var totalRunTime = _dbContext.UserAppPackages
+                                         .Single(x => x.UserId == userId &&
+                                                      x.AppPackageId == appPackageId)
                                          .TotalRunTime;
             return Task.FromResult(new GetAppPackageRunTimeResponse
             {
