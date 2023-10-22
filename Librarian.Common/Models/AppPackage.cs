@@ -25,7 +25,6 @@ namespace Librarian.Common.Models
         // one-to-one relation(required, to child)
         public AppPackageBinary? AppPackageBinary { get; set; }
         public bool IsPublic { get; set; }
-        public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
         // one-to-many relation(required, to child)
         public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
         // one-to-many relation(required, to child)

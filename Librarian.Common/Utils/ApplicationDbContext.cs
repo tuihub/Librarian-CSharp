@@ -21,6 +21,7 @@ namespace Librarian.Common.Utils
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<AppCategory> AppCategories { get; set; } = null!;
         public DbSet<UserAppAppCategory> UserAppAppCategories { get; set; } = null!;
+        public DbSet<UserAppPackage> UserAppPackages { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var dbType = GlobalContext.SystemConfig.DbType;
