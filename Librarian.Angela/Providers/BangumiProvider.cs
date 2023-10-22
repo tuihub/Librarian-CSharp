@@ -37,7 +37,11 @@ namespace Librarian.Angela.Providers
             }
             else
             {
-                app.UpdateFromApp(await _bangumiAPIService.GetAppAsync(Convert.ToInt32(app.SourceAppId)));
+                var bangumiApp = await _bangumiAPIService.GetAppAsync(Convert.ToInt32(app.SourceAppId));
+                bangumiApp.AppDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                     bangumiApp.AppDetails!.Description +
+                                                     "</div>";
+                app.UpdateFromApp(bangumiApp);
             }
             await _dbContext.SaveChangesAsync();
         }

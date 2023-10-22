@@ -34,7 +34,11 @@ namespace Librarian.Angela.Providers
             }
             else
             {
-                app.UpdateFromApp(await _vndbTcpAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId)));
+                var vndbApp = await _vndbTcpAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId));
+                vndbApp.AppDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                  vndbApp.AppDetails!.Description +
+                                                  "</div>";
+                app.UpdateFromApp(vndbApp);
             }
             await _dbContext.SaveChangesAsync();
         }
