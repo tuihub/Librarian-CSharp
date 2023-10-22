@@ -25,10 +25,11 @@ namespace Librarian.Sephirah.Services
             // foreach for IEnumerable is not by reference
             // https://stackoverflow.com/questions/43055464/c-sharp-foreach-not-reference-to-original-objects-but-copies
             var apps = _dbContext.Users.Include(x => x.Apps)
-                               .Single(x => x.Id == userId)
-                               .Apps
-                               .Select(x => x.GetAppWithoutDetails().ToProtoApp())
-                               .ToList();
+                                       .ThenInclude(x => x.ChildApps)
+                                       .Single(x => x.Id == userId)
+                                       .Apps
+                                       .Select(x => x.Flatten().GetAppWithoutDetails().ToProtoApp())
+                                       .ToList();
             // add user-app-appCategoryIds
             var appAppCategories = _dbContext.UserAppAppCategories.Where(x => x.UserId == userId);
             foreach (var app in apps)
