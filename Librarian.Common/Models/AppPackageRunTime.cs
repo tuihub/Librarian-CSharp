@@ -16,7 +16,10 @@ namespace Librarian.Common.Models
         //public long AppPackageId { get; set; }
         public DateTime StartDateTime { get; set; }
         public TimeSpan Duration { get; set; }
-        // one-to-one relation(required, to parent)
+        // one-to-many relation(required, to parent)
+        public long UserId { get; set; }
+        public User User { get; set; } = null!;
+        // one-to-many relation(required, to parent)
         public long AppPackageId { get; set; }
         public AppPackage AppPackage { get; set; } = null!;
     }
