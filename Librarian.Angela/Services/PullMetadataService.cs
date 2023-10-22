@@ -46,7 +46,9 @@ namespace Librarian.Angela.Services
                     while (_externalApps.Count > 0)
                     {
                         var externalApp = _externalApps.Dequeue();
-                        _logger.LogDebug("Pulling app {Id}, _externalApps.Count = {Count}", externalApp.InternalID, _externalApps.Count);
+                        _logger.LogDebug("Pulling app {Id}, UpdateParentAppName = {UpdateParentAppName}," +
+                            " _externalApps.Count = {Count}", 
+                            externalApp.InternalID, externalApp.UpdateParentAppName.ToString(), _externalApps.Count);
                         AppSource appSource;
                         long? parentAppId;
                         using (var scope = _serviceProvider.CreateScope())
@@ -63,36 +65,32 @@ namespace Librarian.Angela.Services
                         {
                             try
                             {
-                                bool isSupported = true;
                                 if (appSource == AppSource.Steam)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
                                     await steamProvider.PullAppAsync(externalApp.InternalID);
-                                    break;
                                 }
                                 else if (appSource == AppSource.Vndb)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
                                     await vndbProvider.PullAppAsync(externalApp.InternalID);
-                                    break;
                                 }
                                 else if (appSource == AppSource.Bangumi)
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
                                     await bangumiProvider.PullAppAsync(externalApp.InternalID);
-                                    break;
                                 }
                                 else
                                 {
-                                    isSupported = false;
                                     _logger.LogWarning("Unsupported app Id = {Id}, appSource {AppSource}", externalApp.InternalID, appSource);
+                                    break;
                                 }
 
                                 // update parent app name
-                                if (isSupported = true && externalApp.UpdateParentAppName == true)
+                                if (externalApp.UpdateParentAppName == true)
                                 {
                                     if (parentAppId == null)
                                     {
@@ -100,7 +98,7 @@ namespace Librarian.Angela.Services
                                     }
                                     else
                                     {
-                                        _logger.LogDebug("Updating internal app(Id = {Id}) using external app(Id = {ExtId})}", parentAppId, externalApp.InternalID);
+                                        _logger.LogDebug("Updating internal app(Id = {Id}) using external app(Id = {ExtId})", parentAppId, externalApp.InternalID);
                                         using (var scope = _serviceProvider.CreateScope())
                                         {
                                             using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
@@ -112,6 +110,9 @@ namespace Librarian.Angela.Services
                                         }
                                     }
                                 }
+
+                                // break out of retry loop
+                                break;
                             }
                             catch (Exception ex)
                             {
