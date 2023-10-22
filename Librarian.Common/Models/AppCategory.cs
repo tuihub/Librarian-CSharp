@@ -21,8 +21,6 @@ namespace Librarian.Common.Models
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
-        // one-to-many relation(required, to child)
-        public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
         public AppCategory() { }
         public AppCategory(long id, long userId, TuiHub.Protos.Librarian.V1.AppCategory appCategory)
         {

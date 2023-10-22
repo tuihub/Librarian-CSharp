@@ -40,10 +40,6 @@ namespace Librarian.Common.Models
         public AppDetails? AppDetails { get; set; }
         // one-to-many relation(required, to child)
         public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
-        // one-to-many relation(required, to child)
-        public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
-        // one-to-many relation(required, to child)
-        public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
         // many-to-many relation(wihtout entity, to other parent)
         public ICollection<User> Users { get; } = new List<User>();
         // func

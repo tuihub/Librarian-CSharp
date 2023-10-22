@@ -26,14 +26,8 @@ namespace Librarian.Common.Models
         public DateTime? UpdatedAt { get; set; }
         // one-to-many relation(required, to child)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
-        // one-to-many relation(required, to child)
-        public ICollection<UserAppAppCategory> UserAppAppCategories { get; } = new List<UserAppAppCategory>();
         // many-to-many relation(wihtout entity, to other parent)
         public ICollection<App> Apps { get; } = new List<App>();
-        // one-to-many relation(required, to child)
-        public ICollection<GameSaveFile> GameSaveFiles = new List<GameSaveFile>();
-        // one-to-many relation(required, to child)
-        public ICollection<AppPackageRunTime> AppPackageRunTimes = new List<AppPackageRunTime>();
         // one-to-many relation(required, to child)
         public ICollection<GameSaveFileRotation> GameSaveFileRotations = new List<GameSaveFileRotation>();
 

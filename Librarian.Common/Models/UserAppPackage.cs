@@ -12,10 +12,10 @@ namespace Librarian.Common.Models
     [PrimaryKey(nameof(UserId), nameof(AppPackageId))]
     public class UserAppPackage
     {
-        // one-to-one relation(required, to parent)
+        // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
-        // one-to-one relation(required, to parent)
+        // one-to-many relation(required, to parent)
         public long AppPackageId { get; set; }
         public AppPackage AppPackage { get; set; } = null!;
         public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;

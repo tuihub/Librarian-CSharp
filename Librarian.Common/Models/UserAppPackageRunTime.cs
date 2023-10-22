@@ -7,7 +7,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
-    public class AppPackageRunTime
+    public class UserAppPackageRunTime
     {
         // not InternalId
         [Key]
