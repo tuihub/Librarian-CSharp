@@ -15,9 +15,10 @@ namespace Librarian.Sephirah.Services
             // check rotation count
             var userInternalId = JwtUtil.GetInternalIdFromJwt(context);
             var appPackageInternalId = request.AppPackageId.Id;
-            var appPackageSaveFileCount = _dbContext.GameSaveFiles.Count(x => x.AppPackageId == appPackageInternalId);
+            var appPackageSaveFileCount = _dbContext.GameSaveFiles.Count(x => x.UserId == userInternalId &&
+                                                                              x.AppPackageId == appPackageInternalId);
             var saveFileRotationCount = GameSaveFileRotationUtil.GetGameSaveFileRotation(_dbContext, userInternalId, appPackageInternalId);
-            if (appPackageSaveFileCount >= saveFileRotationCount)
+            if (saveFileRotationCount != null && appPackageSaveFileCount >= saveFileRotationCount)
                 throw new RpcException(new Status(StatusCode.ResourceExhausted,
                     $"Rotation limit reached or exceeded({appPackageSaveFileCount} used / {saveFileRotationCount} limit)."));
             // check capacity
