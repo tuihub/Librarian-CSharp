@@ -16,12 +16,23 @@ namespace Librarian.Sephirah.Services
             var userId = JwtUtil.GetInternalIdFromJwt(context);
             var appPackageId = request.AppPackageId.Id;
             var totalRunTime = _dbContext.UserAppPackages
-                                         .Single(x => x.UserId == userId &&
+                                         .SingleOrDefault(x => x.UserId == userId &&
                                                       x.AppPackageId == appPackageId)
-                                         .TotalRunTime;
+                                         ?.TotalRunTime;
+            if (totalRunTime == null)
+            {
+                _dbContext.UserAppPackages.Add(new UserAppPackage
+                {
+                    UserId = userId,
+                    AppPackageId = appPackageId,
+                    TotalRunTime = TimeSpan.Zero
+                });
+                _dbContext.SaveChanges();
+                totalRunTime = TimeSpan.Zero;
+            }
             return Task.FromResult(new GetAppPackageRunTimeResponse
             {
-                Duration = Duration.FromTimeSpan(totalRunTime)
+                Duration = Duration.FromTimeSpan((TimeSpan)totalRunTime)
             });
         }
     }
