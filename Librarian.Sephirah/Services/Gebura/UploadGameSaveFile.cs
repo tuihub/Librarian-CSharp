@@ -28,7 +28,7 @@ namespace Librarian.Sephirah.Services
                         $"User game save file capacity exceeded({HumanizeUtil.BytesToString(user.GameSaveFileUsedCapacityBytes)} used" +
                         $" + {HumanizeUtil.BytesToString(request.FileMetadata.SizeBytes)} file" +
                         $" > {HumanizeUtil.BytesToString((long)user.GameSaveFileCapacityBytes)} limit)."));
-            var internalId = IdUtil.NewId();
+            var internalId = _idGenerator.CreateId();
             var fileMetadata = new Common.Models.FileMetadata(internalId, request.FileMetadata);
             var gameSaveFile = new GameSaveFile
             {

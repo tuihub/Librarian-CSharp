@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // create app
-            var internalId = IdUtil.NewId();
+            var internalId = _idGenerator.CreateId();
             if (request.App.Source != AppSource.Internal)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
             var app = new Common.Models.App(internalId, request.App);

@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // create user
-            internalId = IdUtil.NewId();
+            internalId = _idGenerator.CreateId();
             var user = new Common.Models.User()
             {
                 Id = internalId,

@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         public override Task<CreateAppPackageResponse> CreateAppPackage(CreateAppPackageRequest request, ServerCallContext context)
         {
             // create app package
-            var internalId = IdUtil.NewId();
+            var internalId = _idGenerator.CreateId();
             var appPackage = new Common.Models.AppPackage(internalId, request.AppPackage);
             var app = _dbContext.Apps.Single(x => x.Id == appPackage.SourceAppId);
             app.AppPackages.Add(appPackage);

@@ -1,3 +1,4 @@
+using IdGen.DependencyInjection;
 using Librarian.Angela;
 using Librarian.Angela.Interfaces;
 using Librarian.Angela.Providers;
@@ -21,6 +22,9 @@ GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtC
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
+
+// Add IdGen DI
+builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
 // Add services to the container.
 builder.Services.AddGrpc();

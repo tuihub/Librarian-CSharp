@@ -31,14 +31,14 @@ namespace Librarian.Sephirah.Services
                 {
                     var newInternalApp = new Common.Models.App
                     {
-                        Id = IdUtil.NewId(),
+                        Id = _idGenerator.CreateId(),
                         Source = TuiHub.Protos.Librarian.V1.AppSource.Internal,
                         Name = externalApp.Source.ToString() + " " + externalApp.SourceAppId,
                         Type = TuiHub.Protos.Librarian.V1.AppType.Game
                     };
                     var newExternalApp = new Common.Models.App
                     {
-                        Id = IdUtil.NewId(),
+                        Id = _idGenerator.CreateId(),
                         Source = appSource,
                         SourceAppId = appId,
                         Name = string.Empty,
