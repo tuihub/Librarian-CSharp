@@ -14,7 +14,7 @@ namespace Librarian.Common.Utils
         public DbSet<AppDetails> AppDetails { get; set; } = null!;
         public DbSet<AppPackage> AppPackages { get; set; } = null!;
         public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
-        public DbSet<UserAppPackageRunTime> UserAppPackageRunTime { get; set; } = null!;
+        public DbSet<UserAppPackageRunTime> UserAppPackageRunTimes { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<GameSaveFile> GameSaveFiles { get; set; } = null!;
         public DbSet<GameSaveFileRotation> GameSaveFileRotations { get; set; } = null!;
