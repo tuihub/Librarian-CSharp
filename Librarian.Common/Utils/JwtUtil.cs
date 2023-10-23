@@ -26,14 +26,14 @@ namespace Librarian.Common.Utils
         }
         public static string GenerateUploadToken(long internalId)
         {
-            var expireMinutes = GlobalContext.JwtConfig.RefreshTokenExpireMinutes;
+            var expireMinutes = GlobalContext.JwtConfig.AccessTokenExpireMinutes;
             var audience = GlobalContext.JwtConfig.UploadTokenAudience;
             var issuer = GlobalContext.JwtConfig.Issuer;
             return GenerateToken(issuer, audience, expireMinutes, internalId);
         }
         public static string GenerateDownloadToken(long internalId)
         {
-            var expireMinutes = GlobalContext.JwtConfig.RefreshTokenExpireMinutes;
+            var expireMinutes = GlobalContext.JwtConfig.AccessTokenExpireMinutes;
             var audience = GlobalContext.JwtConfig.DownloadTokenAudience;
             var issuer = GlobalContext.JwtConfig.Issuer;
             return GenerateToken(issuer, audience, expireMinutes, internalId);
