@@ -1,4 +1,5 @@
 ﻿using Grpc.Net.Client;
+using IdGen.DependencyInjection;
 using Librarian.Angela.Interfaces;
 using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
@@ -68,6 +69,8 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                     dbContext.Database.EnsureDeleted();
                     dbContext.Database.EnsureCreated();
                 }
+                // Add IdGen DI
+                builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
                 // Add services to the container.
                 builder.Services.AddGrpc();
                 builder.Services.AddGrpcReflection();
