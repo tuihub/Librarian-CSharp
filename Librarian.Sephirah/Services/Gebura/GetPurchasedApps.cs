@@ -28,7 +28,7 @@ namespace Librarian.Sephirah.Services
                                        .ThenInclude(x => x.ChildApps)
                                        .Single(x => x.Id == userId)
                                        .Apps
-                                       .Select(x => x.Flatten().GetAppWithoutDetails().ToProtoApp())
+                                       .Select(x => x.Flatten().ToProtoApp())
                                        .ToList();
             // add user-app-appCategoryIds
             var appAppCategories = _dbContext.UserAppAppCategories.Where(x => x.UserId == userId);
