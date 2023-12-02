@@ -30,11 +30,6 @@ namespace Librarian.Sephirah.Services
                                        .Apps
                                        .Select(x => x.Flatten().ToProtoApp())
                                        .ToList();
-            // add user-app-appCategoryIds
-            var appAppCategories = _dbContext.UserAppAppCategories.Where(x => x.UserId == userId);
-            foreach (var app in apps)
-                app.AppCategoryIds.Add(appAppCategories.Where(x => x.AppId == app.Id.Id)
-                                                       .Select(x => new InternalID { Id = x.AppCategoryId }));
             // construct return value
             var ret = new GetPurchasedAppsResponse();
             ret.Apps.Add(apps);
