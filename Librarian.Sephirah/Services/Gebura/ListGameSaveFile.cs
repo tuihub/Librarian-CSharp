@@ -24,12 +24,8 @@ namespace Librarian.Sephirah.Services
                                         {
                                             FileMetadata = fileMetadata,
                                             IsPinned = gameSaveFile.IsPinned
-                                        })
-                                  .ApplyPagingRequest(request.Paging);
-            var ret = new ListGameSaveFilesResponse
-            {
-                Paging = new PagingResponse { TotalSize = fileMetadatas.Count() }
-            };
+                                        });
+            var ret = new ListGameSaveFilesResponse();
             ret.Results.Add(fileMetadatas.Select(x => new ListGameSaveFilesResponse.Types.Result
             {
                 File = x.FileMetadata.ToProtoFileMetadata(),
