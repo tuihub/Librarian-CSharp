@@ -60,15 +60,12 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                 GlobalContext.SystemConfig.DbType = ApplicationDbType.MySQL;
                 GlobalContext.SystemConfig.DbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR") ??
                     "server=librarian_test;port=3306;Database=librarian_test;Uid=librarian_test;Pwd=librarian_test;";
+                // Apply migration
+                using var dbContext = new ApplicationDbContext();
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
                 // Add ApplicationDbContext DI
                 builder.Services.AddDbContext<ApplicationDbContext>();
-                // Apply migration
-                using (var scope = builder.Services.BuildServiceProvider().CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    dbContext.Database.EnsureDeleted();
-                    dbContext.Database.EnsureCreated();
-                }
                 // Add IdGen DI
                 builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
                 // Add services to the container.
