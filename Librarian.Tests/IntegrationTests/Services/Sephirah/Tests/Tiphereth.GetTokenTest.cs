@@ -36,9 +36,9 @@ namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
             var usernames = new[] { "test1", "test", "test1" };
             var passwords = new[] { "test", "test1", "test1" };
             var statuses = new[] {
-                new Status(StatusCode.PermissionDenied, "User not exists."),
-                new Status(StatusCode.PermissionDenied, "Username and password not match."),
-                new Status(StatusCode.PermissionDenied, "User not exists."),
+                new Status(StatusCode.Unauthenticated, "User not exists."),
+                new Status(StatusCode.Unauthenticated, "Username and password not match."),
+                new Status(StatusCode.Unauthenticated, "User not exists."),
             };
 
             for (int i = 0; i < usernames.Length; i++)
