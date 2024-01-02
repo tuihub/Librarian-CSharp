@@ -14,7 +14,7 @@ namespace Librarian.Sephirah.Services
             // get user
             var user = _dbContext.Users.SingleOrDefault(u => u.Name == username);
             if (user == null)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User not exists."));
             if (user.Status != UserStatus.Active)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
             if (PasswordHasher.VerifyHashedPassword(user.Password, password))
@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
             }
             else
             {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Username and password not match."));
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Username and password not match."));
             }
             return Task.FromResult(new GetTokenResponse
             {
