@@ -15,12 +15,12 @@ namespace Librarian.Sephirah.Services
                 ServerBinarySummary = new ServerBinarySummary
                 {
                     SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
-                    BuildVersion = Assembly.GetExecutingAssembly()?.GetName()?.Version?.ToString() ?? "Unknown",
-                    BuildDate = LinkerTimestampUtil.GetLinkerTimestamp(Assembly.GetExecutingAssembly()).ToISO8601String()
+                    BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
+                    BuildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToISO8601String()
                 },
                 ProtocolSummary = new ServerProtocolSummary
                 {
-                    Version = Assembly.GetExecutingAssembly()?.GetName()?.Version?.ToString() ?? "Unknown",
+                    Version = Assembly.GetAssembly(typeof(TuiHub.Protos.Librarian.V1.InternalID))?.GetName().Version?.ToString() ?? "Unknown",
                 },
                 CurrentTime = DateTime.UtcNow.ToTimestamp()
             });
