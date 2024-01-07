@@ -6,6 +6,7 @@ using Librarian.Angela.Services;
 using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
@@ -50,8 +51,15 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
+// Migrate DB
+using (var scope = app.Services.CreateScope())
+{
+    using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
+    // Configure the HTTP request pipeline.
+    app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
 
 // add server reflection when env is dev
 IWebHostEnvironment env = app.Environment;

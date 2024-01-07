@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -63,7 +64,7 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                 // Apply migration
                 using var dbContext = new ApplicationDbContext();
                 dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
+                dbContext.Database.Migrate();
                 // Add ApplicationDbContext DI
                 builder.Services.AddDbContext<ApplicationDbContext>();
                 // Add IdGen DI
