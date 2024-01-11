@@ -41,6 +41,7 @@ jobs:
     - name: Test
       run: >
         dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        /p:ExcludeByFile="**/*Migrations/*.cs"
         -e DB_CONN_STR="server=localhost;port=3306;Database=dev_db;Uid=dev_user;Pwd=dev_pass;SslMode=None;"
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
