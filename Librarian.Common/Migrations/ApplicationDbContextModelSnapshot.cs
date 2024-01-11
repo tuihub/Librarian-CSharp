@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Librarian.Sephirah.Migrations
+namespace Librarian.Common.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AppUser", b =>
@@ -62,8 +62,10 @@ namespace Librarian.Sephirah.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("varchar(1024)");
 
-                    b.Property<int>("Source")
-                        .HasColumnType("int");
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("SourceAppId")
                         .HasMaxLength(64)

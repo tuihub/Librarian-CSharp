@@ -8,18 +8,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Librarian.Sephirah.Migrations
+namespace Librarian.Common.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230515084113_Initial")]
-    partial class Initial
+    [Migration("20240111161058_V0_2_Initial")]
+    partial class V0_2_Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AppUser", b =>
@@ -37,7 +37,7 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("AppUser");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.App", b =>
+            modelBuilder.Entity("Librarian.Common.Models.App", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -45,7 +45,11 @@ namespace Librarian.Sephirah.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("HeroImageUrl")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("IconImageUrl")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
@@ -54,12 +58,17 @@ namespace Librarian.Sephirah.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("varchar(128)");
 
+                    b.Property<long?>("ParentAppId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ShortDescription")
                         .HasMaxLength(1024)
                         .HasColumnType("varchar(1024)");
 
-                    b.Property<int>("Source")
-                        .HasColumnType("int");
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("SourceAppId")
                         .HasMaxLength(64)
@@ -81,6 +90,8 @@ namespace Librarian.Sephirah.Migrations
 
                     b.HasIndex("Name");
 
+                    b.HasIndex("ParentAppId");
+
                     b.HasIndex("Source");
 
                     b.HasIndex("SourceAppId");
@@ -92,7 +103,37 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("Apps");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppDetails", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("UpdatedAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AppCategories");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.AppDetails", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -126,7 +167,7 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("AppDetails");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppPackage", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppPackage", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -173,7 +214,7 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("AppPackages");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppPackageBinary", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppPackageBinary", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -199,7 +240,7 @@ namespace Librarian.Sephirah.Migrations
                         .HasColumnType("binary(32)")
                         .IsFixedLength();
 
-                    b.Property<long>("SizeByte")
+                    b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -217,7 +258,7 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("AppPackagesBinaries");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.FileMetadata", b =>
+            modelBuilder.Entity("Librarian.Common.Models.FileMetadata", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -235,7 +276,7 @@ namespace Librarian.Sephirah.Migrations
                         .HasColumnType("binary(32)")
                         .IsFixedLength();
 
-                    b.Property<long>("Size")
+                    b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Type")
@@ -253,7 +294,7 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("FileMetadatas");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.GameSaveFile", b =>
+            modelBuilder.Entity("Librarian.Common.Models.GameSaveFile", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
@@ -266,6 +307,9 @@ namespace Librarian.Sephirah.Migrations
 
                     b.Property<long>("FileMetadataId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -292,13 +336,46 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("GameSaveFiles");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.User", b =>
+            modelBuilder.Entity("Librarian.Common.Models.GameSaveFileRotation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("EntityInternalId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("VaildScope")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityInternalId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GameSaveFileRotations");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.User", b =>
                 {
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("GameSaveFileCapacityBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GameSaveFileUsedCapacityBytes")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -328,35 +405,120 @@ namespace Librarian.Sephirah.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Librarian.Common.Models.UserAppAppCategory", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AppId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AppCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserId", "AppId", "AppCategoryId");
+
+                    b.HasIndex("AppCategoryId");
+
+                    b.HasIndex("AppId");
+
+                    b.ToTable("UserAppAppCategories");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.UserAppPackage", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AppPackageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeSpan>("TotalRunTime")
+                        .HasColumnType("time(6)");
+
+                    b.HasKey("UserId", "AppPackageId");
+
+                    b.HasIndex("AppPackageId");
+
+                    b.ToTable("UserAppPackages");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.UserAppPackageRunTime", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AppPackageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time(6)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppPackageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAppPackageRunTimes");
+                });
+
             modelBuilder.Entity("AppUser", b =>
                 {
-                    b.HasOne("Librarian.Sephirah.Models.App", null)
+                    b.HasOne("Librarian.Common.Models.App", null)
                         .WithMany()
                         .HasForeignKey("AppsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Librarian.Sephirah.Models.User", null)
+                    b.HasOne("Librarian.Common.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppDetails", b =>
+            modelBuilder.Entity("Librarian.Common.Models.App", b =>
                 {
-                    b.HasOne("Librarian.Sephirah.Models.App", "App")
+                    b.HasOne("Librarian.Common.Models.App", "ParentApp")
+                        .WithMany("ChildApps")
+                        .HasForeignKey("ParentAppId");
+
+                    b.Navigation("ParentApp");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.AppCategory", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.User", "User")
+                        .WithMany("AppCategories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.AppDetails", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.App", "App")
                         .WithOne("AppDetails")
-                        .HasForeignKey("Librarian.Sephirah.Models.AppDetails", "AppId")
+                        .HasForeignKey("Librarian.Common.Models.AppDetails", "AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("App");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppPackage", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppPackage", b =>
                 {
-                    b.HasOne("Librarian.Sephirah.Models.App", "App")
+                    b.HasOne("Librarian.Common.Models.App", "App")
                         .WithMany("AppPackages")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -365,32 +527,32 @@ namespace Librarian.Sephirah.Migrations
                     b.Navigation("App");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppPackageBinary", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppPackageBinary", b =>
                 {
-                    b.HasOne("Librarian.Sephirah.Models.AppPackage", "AppPackage")
+                    b.HasOne("Librarian.Common.Models.AppPackage", "AppPackage")
                         .WithOne("AppPackageBinary")
-                        .HasForeignKey("Librarian.Sephirah.Models.AppPackageBinary", "AppPackageId")
+                        .HasForeignKey("Librarian.Common.Models.AppPackageBinary", "AppPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AppPackage");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.GameSaveFile", b =>
+            modelBuilder.Entity("Librarian.Common.Models.GameSaveFile", b =>
                 {
-                    b.HasOne("Librarian.Sephirah.Models.AppPackage", "AppPackage")
+                    b.HasOne("Librarian.Common.Models.AppPackage", "AppPackage")
                         .WithMany()
                         .HasForeignKey("AppPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Librarian.Sephirah.Models.FileMetadata", "FileMetadata")
+                    b.HasOne("Librarian.Common.Models.FileMetadata", "FileMetadata")
                         .WithOne("GameSaveFile")
-                        .HasForeignKey("Librarian.Sephirah.Models.GameSaveFile", "FileMetadataId")
+                        .HasForeignKey("Librarian.Common.Models.GameSaveFile", "FileMetadataId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Librarian.Sephirah.Models.User", "User")
+                    b.HasOne("Librarian.Common.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -403,21 +565,104 @@ namespace Librarian.Sephirah.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.App", b =>
+            modelBuilder.Entity("Librarian.Common.Models.GameSaveFileRotation", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.UserAppAppCategory", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.AppCategory", "AppCategory")
+                        .WithMany()
+                        .HasForeignKey("AppCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Librarian.Common.Models.App", "App")
+                        .WithMany()
+                        .HasForeignKey("AppId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Librarian.Common.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("App");
+
+                    b.Navigation("AppCategory");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.UserAppPackage", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.AppPackage", "AppPackage")
+                        .WithMany()
+                        .HasForeignKey("AppPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Librarian.Common.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppPackage");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.UserAppPackageRunTime", b =>
+                {
+                    b.HasOne("Librarian.Common.Models.AppPackage", "AppPackage")
+                        .WithMany()
+                        .HasForeignKey("AppPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Librarian.Common.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppPackage");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.App", b =>
                 {
                     b.Navigation("AppDetails");
 
                     b.Navigation("AppPackages");
+
+                    b.Navigation("ChildApps");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.AppPackage", b =>
+            modelBuilder.Entity("Librarian.Common.Models.AppPackage", b =>
                 {
                     b.Navigation("AppPackageBinary");
                 });
 
-            modelBuilder.Entity("Librarian.Sephirah.Models.FileMetadata", b =>
+            modelBuilder.Entity("Librarian.Common.Models.FileMetadata", b =>
                 {
                     b.Navigation("GameSaveFile");
+                });
+
+            modelBuilder.Entity("Librarian.Common.Models.User", b =>
+                {
+                    b.Navigation("AppCategories");
                 });
 #pragma warning restore 612, 618
         }
