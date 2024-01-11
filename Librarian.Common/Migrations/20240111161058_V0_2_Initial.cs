@@ -202,7 +202,7 @@ namespace Librarian.Common.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EntityInternalId = table.Column<long>(type: "bigint", nullable: true),
-                    VaildScope = table.Column<int>(type: "int", nullable: false),
+                    ValidScope = table.Column<int>(type: "int", nullable: false),
                     Count = table.Column<long>(type: "bigint", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false)
                 },

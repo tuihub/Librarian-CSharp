@@ -348,7 +348,7 @@ namespace Librarian.Common.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("VaildScope")
+                    b.Property<int>("ValidScope")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
