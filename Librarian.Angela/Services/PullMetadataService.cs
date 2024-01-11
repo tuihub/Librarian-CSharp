@@ -49,7 +49,7 @@ namespace Librarian.Angela.Services
                         _logger.LogDebug("Pulling app {Id}, UpdateParentAppName = {UpdateParentAppName}," +
                             " _externalApps.Count = {Count}", 
                             externalApp.InternalID, externalApp.UpdateParentAppName.ToString(), _externalApps.Count);
-                        AppSource appSource;
+                        string appSource;
                         long? parentAppId;
                         using (var scope = _serviceProvider.CreateScope())
                         {
@@ -65,19 +65,19 @@ namespace Librarian.Angela.Services
                         {
                             try
                             {
-                                if (appSource == AppSource.Steam)
+                                if (appSource == "steam")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
                                     await steamProvider.PullAppAsync(externalApp.InternalID);
                                 }
-                                else if (appSource == AppSource.Vndb)
+                                else if (appSource == "vndb")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
                                     await vndbProvider.PullAppAsync(externalApp.InternalID);
                                 }
-                                else if (appSource == AppSource.Bangumi)
+                                else if (appSource == "bangumi")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
@@ -127,9 +127,9 @@ namespace Librarian.Angela.Services
                             throw new OperationCanceledException(token);
                         var pullIntervalSeconds = appSource switch
                         {
-                            AppSource.Steam => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
-                            AppSource.Vndb => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
-                            AppSource.Bangumi => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
+                            "steam" => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
+                            "vndb" => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
+                            "bangumi" => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
                             _ => throw new NotImplementedException()
                         };
                         _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _externalApps.Count = {Count}", pullIntervalSeconds, _externalApps.Count);

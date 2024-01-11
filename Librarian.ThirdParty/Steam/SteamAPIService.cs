@@ -30,7 +30,7 @@ namespace Librarian.ThirdParty.Steam
                 appReleaseDate = DateTime.MinValue;
             return new App
             {
-                Source = TuiHub.Protos.Librarian.V1.AppSource.Steam,
+                Source = "steam",
                 SourceAppId = appDetails.SteamAppId.ToString(),
                 SourceUrl = "https://store.steampowered.com/app/" + appDetails.SteamAppId.ToString(),
                 Name = appDetails.Name,

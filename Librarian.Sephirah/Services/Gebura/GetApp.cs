@@ -14,15 +14,14 @@ namespace Librarian.Sephirah.Services
         {
             var appId = request.AppId.Id;
             var app = _dbContext.Apps.Include(x => x.AppDetails)
-                                     .Include(x => x.ChildApps).ThenInclude(x => x.AppDetails)
                                      .SingleOrDefault(x => x.Id == appId);
-            if (app == null) 
+            if (app == null)
+            {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
-            if (app.Source != AppSource.Internal)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be Internal."));
+            }
             return Task.FromResult(new GetAppResponse
             {
-                App = app.Flatten().ToProtoApp()
+                App = app.ToProtoApp()
             });
         }
     }

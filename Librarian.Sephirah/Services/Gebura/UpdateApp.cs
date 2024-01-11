@@ -20,19 +20,23 @@ namespace Librarian.Sephirah.Services
             var app = _dbContext.Apps.Include(x => x.AppDetails)
                                      .SingleOrDefault(x => x.Id == appReq.Id.Id);
             if (app == null)
+            {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
-            // ensure AppSource == APP_SOURCE_INTERNAL
-            if (appReq.Source != AppSource.Internal)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
+            }
+            // ensure AppSource == internal
+            if (!appReq.Internal)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be internal."));
+            }
             // update App
             app.Source = appReq.Source;
-            if (appReq.SourceAppId != null) app.SourceAppId = appReq.SourceAppId;
-            if (appReq.SourceUrl != null) app.SourceUrl = appReq.SourceUrl;
-            if (appReq.Name != null) app.Name = appReq.Name;
+            if (appReq.SourceAppId != null) { app.SourceAppId = appReq.SourceAppId; }
+            if (appReq.SourceUrl != null) { app.SourceUrl = appReq.SourceUrl; }
+            if (appReq.Name != null) { app.Name = appReq.Name; }
             app.Type = appReq.Type;
-            if (appReq.ShortDescription != null) app.ShortDescription = appReq.ShortDescription;
-            if (appReq.IconImageUrl != null) app.IconImageUrl = appReq.IconImageUrl;
-            if (appReq.HeroImageUrl != null) app.HeroImageUrl = appReq.HeroImageUrl;
+            if (appReq.ShortDescription != null) { app.ShortDescription = appReq.ShortDescription; }
+            if (appReq.IconImageUrl != null) { app.IconImageUrl = appReq.IconImageUrl; }
+            if (appReq.HeroImageUrl != null) { app.HeroImageUrl = appReq.HeroImageUrl; }
             if (appReq.Details != null)
             {
                 if (app.AppDetails == null) app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details);

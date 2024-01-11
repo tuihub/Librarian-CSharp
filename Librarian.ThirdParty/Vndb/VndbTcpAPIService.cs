@@ -37,7 +37,7 @@ namespace Librarian.ThirdParty.Vndb
                     vn.Description[..97] + "..." : vn.Description;
                 return new App
                 {
-                    Source = TuiHub.Protos.Librarian.V1.AppSource.Vndb,
+                    Source = "vndb",
                     SourceAppId = vn.Id.ToString(),
                     SourceUrl = "https://vndb.org/v" + vn.Id.ToString(),
                     Name = vn.OriginalName,

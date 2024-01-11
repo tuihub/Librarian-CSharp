@@ -28,7 +28,7 @@ namespace Librarian.Sephirah.Services
                                        .ThenInclude(x => x.ChildApps)
                                        .Single(x => x.Id == userId)
                                        .Apps
-                                       .Select(x => x.Flatten().ToProtoApp())
+                                       .Select(x => x.Flatten().ToProtoAppMixed())
                                        .ToList();
             // construct return value
             var ret = new GetPurchasedAppsResponse();

@@ -28,7 +28,7 @@ namespace Librarian.Angela.Providers
             var app = _dbContext.Apps
                       .Include(x => x.AppDetails)
                       .Single(x => x.Id == internalID);
-            if (app.Source != TuiHub.Protos.Librarian.V1.AppSource.Vndb)
+            if (app.Source != "vndb")
             {
                 throw new NotImplementedException();
             }

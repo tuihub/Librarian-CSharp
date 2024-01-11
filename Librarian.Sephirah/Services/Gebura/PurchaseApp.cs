@@ -14,9 +14,13 @@ namespace Librarian.Sephirah.Services
             var appId = request.AppId.Id;
             var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appId);
             if (app == null)
+            {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
-            if (app.Source != AppSource.Internal)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be APP_SOURCE_INTERNAL."));
+            }
+            if (!app.IsInternal)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be internal."));
+            }
             var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromJwt(context));
             user.Apps.Add(app);
             _dbContext.SaveChanges();

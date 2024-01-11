@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Services
             // filter apps
             var apps = _dbContext.Apps.AsQueryable();
             // TODO: update SearchApps
-            apps = apps.Where(a => a.Source == AppSource.Internal)
+            apps = apps.Where(a => a.Source == Common.Constants.Proto.AppSourceInternal)
                        .Where(a => a.Name.Contains(keyword))
                        .Include(a => a.ChildApps);
             apps = apps.ApplyPagingRequest(request.Paging);
@@ -26,7 +26,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = apps.Count() }
             };
-            response.Apps.Add(apps.Select(x => x.Flatten().ToProtoApp()));
+            response.Apps.Add(apps.Select(x => x.Flatten().ToProtoAppMixed()));
             return Task.FromResult(response);
         }
     }

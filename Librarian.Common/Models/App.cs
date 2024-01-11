@@ -16,7 +16,8 @@ namespace Librarian.Common.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        public AppSource Source { get; set; }
+        [MaxLength(64)]
+        public string Source { get; set; }
         [MaxLength(64)]
         public string? SourceAppId { get; set; }
         [MaxLength(256)]
@@ -42,12 +43,14 @@ namespace Librarian.Common.Models
         public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
         // many-to-many relation(wihtout entity, to other parent)
         public ICollection<User> Users { get; } = new List<User>();
+        // computed
+        public bool IsInternal => Source == Constants.Proto.AppSourceInternal;
         // func
         public App(long internalId, TuiHub.Protos.Librarian.V1.App app)
         {
             Id = internalId;
-            Source = app.Source;
-            SourceAppId = app.Source == AppSource.Internal ? null : app.SourceAppId;
+            Source = app.Internal ? Constants.Proto.AppSourceInternal : app.Source;
+            SourceAppId = app.Internal ? null : app.SourceAppId;
             SourceUrl = string.IsNullOrEmpty(app.SourceUrl) ? null : app.SourceUrl;
             Name = app.Name;
             Type = app.Type;
@@ -80,6 +83,7 @@ namespace Librarian.Common.Models
             return new TuiHub.Protos.Librarian.V1.App
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.Id },
+                Internal = this.IsInternal,
                 Source = this.Source,
                 SourceAppId = this.SourceAppId ?? string.Empty,
                 SourceUrl = this.SourceUrl ?? string.Empty,
@@ -88,9 +92,24 @@ namespace Librarian.Common.Models
                 ShortDescription = this.ShortDescription ?? string.Empty,
                 IconImageUrl = this.IconImageUrl ?? string.Empty,
                 HeroImageUrl = this.HeroImageUrl ?? string.Empty,
-                Details = (this.AppDetails ?? new AppDetails()).ToProtoAppDetails()
+                Details = this.AppDetails?.ToProtoAppDetails()
             };
         }
+
+        public AppMixed ToProtoAppMixed()
+        {
+            return new AppMixed
+            {
+                Id = new InternalID { Id = this.Id },
+                Name = this.Name,
+                Type = this.Type,
+                ShortDescription = this.ShortDescription ?? string.Empty,
+                IconImageUrl = this.IconImageUrl ?? string.Empty,
+                HeroImageUrl = this.HeroImageUrl ?? string.Empty,
+                Details = this.AppDetails?.ToProtoAppDetails()
+            };
+        }
+
         public void UpdateFromProtoApp(TuiHub.Protos.Librarian.V1.App app)
         {
             this.Source = app.Source;
@@ -132,14 +151,15 @@ namespace Librarian.Common.Models
 
         public App Flatten()
         {
-            List<AppSource> sourcePriorities = new List<AppSource>
+            var sourcePriorities = new List<string>
             {
-                AppSource.Steam,
-                AppSource.Bangumi,
-                AppSource.Vndb
+                "steam",
+                "bangumi",
+                "vndb"
             };
             var app = this;
             foreach (var source in sourcePriorities)
+            {
                 if (app.ChildApps.Where(x => x.Source == source).Any())
                 {
                     var fapp = app.ChildApps.Where(x => x.Source == source).First();
@@ -159,6 +179,7 @@ namespace Librarian.Common.Models
                     }
                     break;
                 }
+            }
             return app;
         }
     }

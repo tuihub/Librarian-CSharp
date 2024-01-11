@@ -59,7 +59,7 @@ namespace Librarian.ThirdParty.Bangumi
                             developer = parsedProperty?.Parent?.Last?.First?.ToString();
             return new App
             {
-                Source = TuiHub.Protos.Librarian.V1.AppSource.Bangumi,
+                Source = "bangumi",
                 SourceAppId = respObj.id.ToString(),
                 SourceUrl = "https://bgm.tv/subject/" + respObj.id.ToString(),
                 Name = string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString(),

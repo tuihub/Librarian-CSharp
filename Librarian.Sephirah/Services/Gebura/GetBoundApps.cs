@@ -17,14 +17,14 @@ namespace Librarian.Sephirah.Services
         /// <para>Get the exact App when requested AppSource IS NOT INTERNAL</para>
         /// </returns>
         [Authorize]
-        public override Task<GetBindAppsResponse> GetBindApps(GetBindAppsRequest request, ServerCallContext context)
+        public override Task<GetBoundAppsResponse> GetBoundApps(GetBoundAppsRequest request, ServerCallContext context)
         {
             var appId = request.AppId.Id;
             var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appId);
             if (app == null) 
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
-            var ret = new GetBindAppsResponse();
-            if (app.Source == AppSource.Internal)
+            var ret = new GetBoundAppsResponse();
+            if (app.IsInternal)
             {
                 // TODO: App which AppSource IS NOT INTERNAL bind to App which AppSource is INTERNAL
                 ret.Apps.Add(app.ToProtoApp());
