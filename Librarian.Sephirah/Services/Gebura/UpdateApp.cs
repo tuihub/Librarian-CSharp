@@ -36,10 +36,11 @@ namespace Librarian.Sephirah.Services
             app.Type = appReq.Type;
             if (appReq.ShortDescription != null) { app.ShortDescription = appReq.ShortDescription; }
             if (appReq.IconImageUrl != null) { app.IconImageUrl = appReq.IconImageUrl; }
-            if (appReq.HeroImageUrl != null) { app.HeroImageUrl = appReq.HeroImageUrl; }
+            if (appReq.BackgroundImageUrl != null) { app.BackgroundImageUrl = appReq.BackgroundImageUrl; }
+            if (appReq.CoverImageUrl != null) { app.CoverImageUrl = appReq.CoverImageUrl; }
             if (appReq.Details != null)
             {
-                if (app.AppDetails == null) app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details);
+                if (app.AppDetails == null) { app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details); }
                 else app.AppDetails!.UpdateFromProtoAppDetails(appReq.Details);
             }
             app.UpdatedAt = DateTime.Now;

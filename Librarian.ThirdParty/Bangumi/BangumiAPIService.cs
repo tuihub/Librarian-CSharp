@@ -66,7 +66,7 @@ namespace Librarian.ThirdParty.Bangumi
                 Type = respObj.type.ToString().Equals("4") ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
                 ShortDescription = shortDescription,
                 IconImageUrl = respObj.images?.small?.ToString(),
-                HeroImageUrl = respObj.images?.large?.ToString(),
+                BackgroundImageUrl = respObj.images?.large?.ToString(),
                 AppDetails = new AppDetails
                 {
                     Description = respObj.summary?.ToString(),

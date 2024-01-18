@@ -30,7 +30,9 @@ namespace Librarian.Common.Models
         [MaxLength(256)]
         public string? IconImageUrl { get; set; }
         [MaxLength(256)]
-        public string? HeroImageUrl { get; set; }
+        public string? BackgroundImageUrl { get; set; }
+        [MaxLength(256)]
+        public string? CoverImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // one-to-many relation to self(optional)
@@ -56,7 +58,8 @@ namespace Librarian.Common.Models
             Type = app.Type;
             ShortDescription = string.IsNullOrEmpty(app.ShortDescription) ? null : app.ShortDescription;
             IconImageUrl = string.IsNullOrEmpty(app.IconImageUrl) ? null : app.IconImageUrl;
-            HeroImageUrl = string.IsNullOrEmpty(app.HeroImageUrl) ? null : app.HeroImageUrl;
+            BackgroundImageUrl = string.IsNullOrEmpty(app.BackgroundImageUrl) ? null : app.BackgroundImageUrl;
+            CoverImageUrl = string.IsNullOrEmpty(app.CoverImageUrl) ? null : app.CoverImageUrl;
             AppDetails = new AppDetails(internalId, app.Details);
         }
         public App() : base() { }
@@ -72,7 +75,8 @@ namespace Librarian.Common.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription,
                 IconImageUrl = this.IconImageUrl,
-                HeroImageUrl = this.HeroImageUrl,
+                BackgroundImageUrl = this.BackgroundImageUrl,
+                CoverImageUrl = this.CoverImageUrl,
                 AppDetails = null,
                 CreatedAt = this.CreatedAt,
                 UpdatedAt = this.UpdatedAt
@@ -91,7 +95,8 @@ namespace Librarian.Common.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription ?? string.Empty,
                 IconImageUrl = this.IconImageUrl ?? string.Empty,
-                HeroImageUrl = this.HeroImageUrl ?? string.Empty,
+                BackgroundImageUrl = this.BackgroundImageUrl ?? string.Empty,
+                CoverImageUrl = this.CoverImageUrl ?? string.Empty,
                 Details = this.AppDetails?.ToProtoAppDetails()
             };
         }
@@ -105,7 +110,8 @@ namespace Librarian.Common.Models
                 Type = this.Type,
                 ShortDescription = this.ShortDescription ?? string.Empty,
                 IconImageUrl = this.IconImageUrl ?? string.Empty,
-                HeroImageUrl = this.HeroImageUrl ?? string.Empty,
+                BackgroundImageUrl = this.BackgroundImageUrl ?? string.Empty,
+                CoverImageUrl = this.CoverImageUrl ?? string.Empty,
                 Details = this.AppDetails?.ToProtoAppDetails()
             };
         }
@@ -119,7 +125,8 @@ namespace Librarian.Common.Models
             this.Type = app.Type;
             this.ShortDescription = app.ShortDescription;
             this.IconImageUrl = app.IconImageUrl;
-            this.HeroImageUrl = app.HeroImageUrl;
+            this.BackgroundImageUrl = app.BackgroundImageUrl;
+            this.CoverImageUrl = app.CoverImageUrl;
             this.UpdatedAt = DateTime.Now;
             if (app.Details != null)
             {
@@ -138,7 +145,8 @@ namespace Librarian.Common.Models
             this.Type = app.Type;
             this.ShortDescription = app.ShortDescription;
             this.IconImageUrl = app.IconImageUrl;
-            this.HeroImageUrl = app.HeroImageUrl;
+            this.BackgroundImageUrl = app.BackgroundImageUrl;
+            this.CoverImageUrl = app.CoverImageUrl;
             this.UpdatedAt = DateTime.Now;
             if (app.AppDetails != null)
             {
@@ -167,7 +175,8 @@ namespace Librarian.Common.Models
                     if (string.IsNullOrWhiteSpace(app.Name)) app.Name = fapp.Name;
                     if (string.IsNullOrWhiteSpace(app.ShortDescription)) app.ShortDescription = fapp.ShortDescription;
                     if (string.IsNullOrWhiteSpace(app.IconImageUrl)) app.IconImageUrl = fapp.IconImageUrl;
-                    if (string.IsNullOrWhiteSpace(app.HeroImageUrl)) app.HeroImageUrl = fapp.HeroImageUrl;
+                    if (string.IsNullOrWhiteSpace(app.BackgroundImageUrl)) app.BackgroundImageUrl = fapp.BackgroundImageUrl;
+                    if (string.IsNullOrWhiteSpace(app.CoverImageUrl)) app.CoverImageUrl = fapp.CoverImageUrl;
                     if (app.AppDetails == null) app.AppDetails = fapp.AppDetails;
                     else
                     {

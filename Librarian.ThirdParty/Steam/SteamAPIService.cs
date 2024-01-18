@@ -37,7 +37,7 @@ namespace Librarian.ThirdParty.Steam
                 Type = appDetails.Type == "game" ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
                 ShortDescription = appDetails.ShortDescription,
                 IconImageUrl = null,
-                HeroImageUrl = appDetails.HeaderImage,
+                BackgroundImageUrl = appDetails.HeaderImage,
                 AppDetails = new AppDetails
                 {
                     Description = appDetails.DetailedDescription,

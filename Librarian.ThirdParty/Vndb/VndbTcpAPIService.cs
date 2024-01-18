@@ -44,7 +44,7 @@ namespace Librarian.ThirdParty.Vndb
                     Type = TuiHub.Protos.Librarian.V1.AppType.Game,
                     ShortDescription = shortDescription,
                     IconImageUrl = null,
-                    HeroImageUrl = vn.Image,
+                    BackgroundImageUrl = vn.Image,
                     AppDetails = new AppDetails
                     {
                         Description = vn.Description,
