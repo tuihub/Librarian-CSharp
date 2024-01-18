@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,9 @@ namespace Librarian.Common.Models
 {
     public class AppPackageBinaryChunk
     {
+        // not InternalId
+        [Key]
+        public long Id { get; set; }
         public long Sequence { get; set; }
         public long SizeBytes { get; set; }
         public string PublicUrl { get; set; } = null!;

@@ -17,7 +17,7 @@ namespace Librarian.Common.Models
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         [MaxLength(64)]
-        public string Source { get; set; }
+        public string Source { get; set; } = string.Empty;
         [MaxLength(64)]
         public string? SourceAppId { get; set; }
         [MaxLength(256)]
