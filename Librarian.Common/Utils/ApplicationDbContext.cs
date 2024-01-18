@@ -62,7 +62,7 @@ namespace Librarian.Common.Utils
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
                 foreach (var property in entityType.GetProperties())
                 {
-                    var memberInfo = property.PropertyInfo ?? (MemberInfo)property.FieldInfo;
+                    var memberInfo = property.PropertyInfo ?? (MemberInfo?)property.FieldInfo;
                     var defaultValue = memberInfo?.GetCustomAttribute<IsFixedLengthAttribute>();
                     if (defaultValue == null) continue;
                     if (defaultValue.IsFixedLength == true)

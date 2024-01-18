@@ -55,8 +55,10 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
             {
                 var builder = WebApplication.CreateBuilder();
                 // Get Configuration
-                GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
-                GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+                var systemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>() ?? throw new Exception("SystemConfig parse failed");
+                GlobalContext.SystemConfig = systemConfig;
+                var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? throw new Exception("JwtConfig parse failed");
+                GlobalContext.JwtConfig = jwtConfig;
                 // Change to dev db
                 GlobalContext.SystemConfig.DbType = ApplicationDbType.MySQL;
                 GlobalContext.SystemConfig.DbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR") ??

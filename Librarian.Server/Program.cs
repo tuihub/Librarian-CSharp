@@ -18,8 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Get Configuration
-GlobalContext.SystemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>();
-GlobalContext.JwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+var systemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>() ?? throw new Exception("SystemConfig parse failed");
+GlobalContext.SystemConfig = systemConfig;
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? throw new Exception("JwtConfig parse failed");
+GlobalContext.JwtConfig = jwtConfig;
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -58,8 +60,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-    // Configure the HTTP request pipeline.
-    app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
+// Configure the HTTP request pipeline.
+app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
 
 // add server reflection when env is dev
 IWebHostEnvironment env = app.Environment;
@@ -68,9 +70,6 @@ if (env.IsDevelopment())
     app.MapGrpcReflectionService();
 }
 
-//app.MapGrpcService<GreeterService>();
-//app.MapGrpcService<FileGrpcService>();
-//app.MapGrpcService<UserService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Enable Auth
