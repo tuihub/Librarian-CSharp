@@ -12,10 +12,7 @@ namespace Librarian.Sephirah.Services
         public override Task<CreateAppResponse> CreateApp(CreateAppRequest request, ServerCallContext context)
         {
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-            {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
-            }
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // create app
             var internalId = _idGenerator.CreateId();
             if (!request.App.Internal)

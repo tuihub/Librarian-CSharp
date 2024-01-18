@@ -12,8 +12,7 @@ namespace Librarian.Sephirah.Services
         public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
         {
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // get request param
             var sourceFilters = request.SourceFilter;
             var typeFilters = request.TypeFilter;
@@ -21,19 +20,25 @@ namespace Librarian.Sephirah.Services
             var containDetails = request.ContainDetails;
             // filter apps
             IQueryable<Common.Models.App> apps;
-            if (containDetails == false)
-                apps = _dbContext.Apps.AsQueryable();
-            else
-                apps = _dbContext.Apps.Include(x => x.AppDetails).AsQueryable();
+            if (containDetails == false) { apps = _dbContext.Apps.AsQueryable(); }
+            else { apps = _dbContext.Apps.Include(x => x.AppDetails).AsQueryable(); }
             if (idFilters.Count > 0)
+            {
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
+            }
             if (typeFilters.Count > 0)
+            {
                 apps = apps.Where(x => typeFilters.Contains(x.Type));
+            }
             if (sourceFilters.Count > 0)
+            {
                 apps = apps.Where(x => sourceFilters.Contains(x.Source));
+            }
             apps = apps.ApplyPagingRequest(request.Paging);
             if (containDetails == false)
+            {
                 apps = apps.Select(x => x.GetAppWithoutDetails());
+            }
             // construct response
             var response = new ListAppsResponse
             {

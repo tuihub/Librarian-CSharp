@@ -12,8 +12,7 @@ namespace Librarian.Sephirah.Services
         public override Task<SetUserSaveFileCapacityResponse> SetUserSaveFileCapacity(SetUserSaveFileCapacityRequest request, ServerCallContext context)
         {
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // set capacity
             var userId = request.UserId.Id;
             long? capacityBytes = request.HasCapacityBytes ? request.CapacityBytes : null;

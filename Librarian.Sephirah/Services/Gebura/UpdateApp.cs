@@ -13,8 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<UpdateAppResponse> UpdateApp(UpdateAppRequest request, ServerCallContext context)
         {
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check App exists
             var appReq = request.App;
             var app = _dbContext.Apps.Include(x => x.AppDetails)

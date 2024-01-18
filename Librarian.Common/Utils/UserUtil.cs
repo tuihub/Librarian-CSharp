@@ -12,5 +12,13 @@ namespace Librarian.Common.Utils
             var user = db.Users.Single(x => x.Id == internalId);
             return user.Type;
         }
+
+        public static void VerifyUserAdminAndThrow(ServerCallContext context, ApplicationDbContext db)
+        {
+            if (GetUserTypeFromJwt(context, db) != UserType.Admin)
+            {
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+            }
+        }
     }
 }

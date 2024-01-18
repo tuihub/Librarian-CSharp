@@ -13,14 +13,15 @@ namespace Librarian.Sephirah.Services
             if (request.Id?.Id != null && request.Id.Id != userId)
             {
                 // verify user type(admin)
-                if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+                UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             }
             // get user
             var userIdToGet = request.Id?.Id == null ? userId : request.Id.Id;
             var user = _dbContext.Users.SingleOrDefault(u => u.Id == userIdToGet);
             if (user == null)
+            {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
+            }
             return Task.FromResult(new GetUserResponse
             {
                 User = user.ToProtoUser()

@@ -12,13 +12,14 @@ namespace Librarian.Sephirah.Services
         public override Task<UpdateAppPackageResponse> UpdateAppPackage(UpdateAppPackageRequest request, ServerCallContext context)
         {
             // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check AppPackage exists
             var appPackageReq = request.AppPackage;
             var appPackage = _dbContext.AppPackages.SingleOrDefault(x => x.Id == appPackageReq.Id.Id);
             if (appPackage == null)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppPackage not exists."));
+            }
             // update AppPackage
             appPackage.Source = appPackageReq.Source;
             appPackage.SourceAppId = appPackageReq.SourceId.Id;
