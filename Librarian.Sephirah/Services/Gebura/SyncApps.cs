@@ -8,13 +8,10 @@ namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
-        // TODO: impl WaitData
+        // TODO: impl WaitData, rate limit
         [Authorize]
         public override async Task<SyncAppsResponse> SyncApps(SyncAppsRequest request, ServerCallContext context)
         {
-            // verify user type(admin)
-            if (UserUtil.GetUserTypeFromJwt(context, _dbContext) != UserType.Admin)
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
             // get request param
             var protoAppIds = request.AppIds;
             foreach (var protoAppId in protoAppIds)
