@@ -15,7 +15,7 @@ namespace Librarian.Common.Models
         public User User { get; set; } = null!;
         // one-to-many relation(required, to parent)
         public long AppId { get; set; }
-        public App App { get; set; } = null!;
+        public AppInfo App { get; set; } = null!;
         // one-to-many relation(required, to parent)
         public long AppCategoryId { get; set; }
         public AppCategory AppCategory { get; set; } = null!;

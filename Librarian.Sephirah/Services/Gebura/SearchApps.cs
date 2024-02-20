@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             // TODO: update SearchApps
             apps = apps.Where(a => a.Source == Common.Constants.Proto.AppSourceInternal)
                        .Where(a => a.Name.Contains(keyword))
-                       .Include(a => a.ChildApps);
+                       .Include(a => a.ChildAppInfos);
             apps = apps.ApplyPagingRequest(request.Paging);
             // construct response
             var response = new SearchAppsResponse

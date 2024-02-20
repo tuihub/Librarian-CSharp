@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be internal."));
             }
-            var app = new Common.Models.App(internalId, request.App);
+            var app = new Common.Models.AppInfo(internalId, request.App);
             _dbContext.Apps.Add(app);
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppResponse

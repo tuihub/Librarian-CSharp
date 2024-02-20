@@ -10,8 +10,8 @@ namespace Librarian.Common.Utils
     {
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        public DbSet<App> Apps { get; set; } = null!;
-        public DbSet<AppDetails> AppDetails { get; set; } = null!;
+        public DbSet<AppInfo> Apps { get; set; } = null!;
+        public DbSet<AppInfoDetails> AppDetails { get; set; } = null!;
         public DbSet<AppPackage> AppPackages { get; set; } = null!;
         public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
         public DbSet<AppPackageBinaryChunk> AppPackagesBinariesChunks { get; set; } = null!;
@@ -50,10 +50,10 @@ namespace Librarian.Common.Utils
             //            .Property(x => x.Sha256)
             //            .IsFixedLength(true);
 
-            modelBuilder.Entity<App>()
-                        .HasOne(e => e.ParentApp)
-                        .WithMany(e => e.ChildApps)
-                        .HasForeignKey(e => e.ParentAppId)
+            modelBuilder.Entity<AppInfo>()
+                        .HasOne(e => e.ParentAppInfo)
+                        .WithMany(e => e.ChildAppInfos)
+                        .HasForeignKey(e => e.ParentAppInfoId)
                         .IsRequired(false);
 
             // applying custom attribute

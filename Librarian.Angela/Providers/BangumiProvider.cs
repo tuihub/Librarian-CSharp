@@ -29,7 +29,7 @@ namespace Librarian.Angela.Providers
         public async Task PullAppAsync(long internalID)
         {
             var app = _dbContext.Apps
-                      .Include(x => x.AppDetails)
+                      .Include(x => x.AppInfoDetails)
                       .Single(x => x.Id == internalID);
             if (app.Source != "bangumi")
             {
@@ -38,10 +38,10 @@ namespace Librarian.Angela.Providers
             else
             {
                 var bangumiApp = await _bangumiAPIService.GetAppAsync(Convert.ToInt32(app.SourceAppId));
-                bangumiApp.AppDetails!.Description = "<div style=\"white-space: pre-line\">" +
-                                                     bangumiApp.AppDetails!.Description +
+                bangumiApp.AppInfoDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                     bangumiApp.AppInfoDetails!.Description +
                                                      "</div>";
-                app.UpdateFromApp(bangumiApp);
+                app.UpdateFromAppInfo(bangumiApp);
             }
             await _dbContext.SaveChangesAsync();
         }

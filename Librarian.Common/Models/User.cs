@@ -27,7 +27,7 @@ namespace Librarian.Common.Models
         // one-to-many relation(required, to child)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // many-to-many relation(wihtout entity, to other parent)
-        public ICollection<App> Apps { get; } = new List<App>();
+        public ICollection<AppInfo> Apps { get; } = new List<AppInfo>();
         // one-to-many relation(required, to child)
         public ICollection<GameSaveFileRotation> GameSaveFileRotations = new List<GameSaveFileRotation>();
 

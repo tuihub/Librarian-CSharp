@@ -57,7 +57,7 @@ namespace Librarian.Angela.Services
                             {
                                 var app = dbContext.Apps.Single(x => x.Id == externalApp.InternalID);
                                 appSource = app.Source;
-                                parentAppId = app.ParentAppId;
+                                parentAppId = app.ParentAppInfoId;
                             }
                         }
                         var retries = 0;

@@ -27,7 +27,7 @@ namespace Librarian.Common.Models
         public bool IsPublic { get; set; }
         // one-to-many relation(required, to parent)
         public long AppId { get; set; }
-        public App App { get; set; } = null!;
+        public AppInfo App { get; set; } = null!;
         // func
         public AppPackage(long internalId, TuiHub.Protos.Librarian.V1.AppPackage appPackage)
         {

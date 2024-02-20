@@ -24,13 +24,13 @@ namespace Librarian.Sephirah.Services
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppId."));
                     }
-                    var app = _dbContext.Apps.Include(x => x.ChildApps)
+                    var app = _dbContext.Apps.Include(x => x.ChildAppInfos)
                                              .SingleOrDefault(x => x.Id == appId && x.Source == Common.Constants.Proto.AppSourceInternal);
                     if (app == null)
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
                     }
-                    foreach (var childApp in app.ChildApps)
+                    foreach (var childApp in app.ChildAppInfos)
                     {
                         _pullMetadataService.AddPullApp(childApp.Id);
                     }
@@ -54,21 +54,21 @@ namespace Librarian.Sephirah.Services
                     if (app == null)
                     {
                         // create new internal app
-                        var newInternalApp = new Common.Models.App
+                        var newInternalApp = new Common.Models.AppInfo
                         {
                             Id = _idGenerator.CreateId(),
                             Source = Common.Constants.Proto.AppSourceInternal,
                             Name = $"{protoAppId.Source}_{protoAppId.SourceAppId}",
                             Type = TuiHub.Protos.Librarian.V1.AppType.Game
                         };
-                        var newExternalApp = new Common.Models.App
+                        var newExternalApp = new Common.Models.AppInfo
                         {
                             Id = _idGenerator.CreateId(),
                             Source = appSource,
                             SourceAppId = appId,
                             Name = string.Empty,
                             Type = TuiHub.Protos.Librarian.V1.AppType.Game,
-                            ParentApp = newInternalApp
+                            ParentAppInfo = newInternalApp
                         };
                         _dbContext.Apps.Add(newInternalApp);
                         _dbContext.Apps.Add(newExternalApp);

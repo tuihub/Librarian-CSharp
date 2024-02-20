@@ -27,7 +27,7 @@ namespace Librarian.Angela.Providers
         public async Task PullAppAsync(long internalID)
         {
             var app = _dbContext.Apps
-                      .Include(x => x.AppDetails)
+                      .Include(x => x.AppInfoDetails)
                       .Single(x => x.Id == internalID);
             if (app.Source != "steam")
             {
@@ -35,7 +35,7 @@ namespace Librarian.Angela.Providers
             }
             else
             {
-                app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId), "cn", "schinese"));
+                app.UpdateFromAppInfo(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId), "cn", "schinese"));
             }
             await _dbContext.SaveChangesAsync();
         }

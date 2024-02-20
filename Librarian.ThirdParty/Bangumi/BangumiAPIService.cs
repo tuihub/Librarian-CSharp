@@ -26,7 +26,7 @@ namespace Librarian.ThirdParty.Bangumi
 
         // TODO: Add cancellation token
         // TODO: Add AltName
-        public async Task<App> GetAppAsync(int appId)
+        public async Task<AppInfo> GetAppAsync(int appId)
         {
             var options = new RestClientOptions(_bangumiAPIBaseURL)
             {
@@ -57,7 +57,7 @@ namespace Librarian.ThirdParty.Bangumi
                     foreach (JProperty parsedProperty in parsedObject.Properties())
                         if (parsedProperty.Value.ToString().Equals("开发"))
                             developer = parsedProperty?.Parent?.Last?.First?.ToString();
-            return new App
+            return new AppInfo
             {
                 Source = "bangumi",
                 SourceAppId = respObj.id.ToString(),
@@ -67,7 +67,7 @@ namespace Librarian.ThirdParty.Bangumi
                 ShortDescription = shortDescription,
                 IconImageUrl = respObj.images?.small?.ToString(),
                 BackgroundImageUrl = respObj.images?.large?.ToString(),
-                AppDetails = new AppDetails
+                AppInfoDetails = new AppInfoDetails
                 {
                     Description = respObj.summary?.ToString(),
                     ReleaseDate = releaseDate,

@@ -22,13 +22,13 @@ namespace Librarian.ThirdParty.Steam
             _webInterfaceFactory = new SteamWebInterfaceFactory(_steamAPIKey);
         }
 
-        public async Task<App> GetAppAsync(uint appId, string currencyCode = "", string language = "")
+        public async Task<AppInfo> GetAppAsync(uint appId, string currencyCode = "", string language = "")
         {
             var webInterface = _webInterfaceFactory.CreateSteamStoreInterface(new HttpClient());
             var appDetails = await webInterface.GetStoreAppDetailsAsync(appId, currencyCode, language);
             if (DateTime.TryParse(appDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
                 appReleaseDate = DateTime.MinValue;
-            return new App
+            return new AppInfo
             {
                 Source = "steam",
                 SourceAppId = appDetails.SteamAppId.ToString(),
@@ -38,7 +38,7 @@ namespace Librarian.ThirdParty.Steam
                 ShortDescription = appDetails.ShortDescription,
                 IconImageUrl = null,
                 BackgroundImageUrl = appDetails.HeaderImage,
-                AppDetails = new AppDetails
+                AppInfoDetails = new AppInfoDetails
                 {
                     Description = appDetails.DetailedDescription,
                     ReleaseDate = appReleaseDate,

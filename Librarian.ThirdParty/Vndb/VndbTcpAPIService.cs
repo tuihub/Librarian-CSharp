@@ -11,7 +11,7 @@ namespace Librarian.ThirdParty.Vndb
 {
     public class VndbTcpAPIService
     {
-        public async Task<App> GetAppAsync(uint appId)
+        public async Task<AppInfo> GetAppAsync(uint appId)
         {
             var client = new VndbSharp.Vndb(useTls: true)
                                       .WithTimeout(new TimeSpan(0, 0, 30))
@@ -35,7 +35,7 @@ namespace Librarian.ThirdParty.Vndb
                 var vn = vns.First();
                 var shortDescription = vn.Description.Length > 97 ?
                     vn.Description[..97] + "..." : vn.Description;
-                return new App
+                return new AppInfo
                 {
                     Source = "vndb",
                     SourceAppId = vn.Id.ToString(),
@@ -45,7 +45,7 @@ namespace Librarian.ThirdParty.Vndb
                     ShortDescription = shortDescription,
                     IconImageUrl = null,
                     BackgroundImageUrl = vn.Image,
-                    AppDetails = new AppDetails
+                    AppInfoDetails = new AppInfoDetails
                     {
                         Description = vn.Description,
                         ReleaseDate = vn.Released.ToDateTime(),

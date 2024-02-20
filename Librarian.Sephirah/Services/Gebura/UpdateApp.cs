@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Services
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check App exists
             var appReq = request.App;
-            var app = _dbContext.Apps.Include(x => x.AppDetails)
+            var app = _dbContext.Apps.Include(x => x.AppInfoDetails)
                                      .SingleOrDefault(x => x.Id == appReq.Id.Id);
             if (app == null)
             {
@@ -39,8 +39,8 @@ namespace Librarian.Sephirah.Services
             if (appReq.CoverImageUrl != null) { app.CoverImageUrl = appReq.CoverImageUrl; }
             if (appReq.Details != null)
             {
-                if (app.AppDetails == null) { app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details); }
-                else app.AppDetails!.UpdateFromProtoAppDetails(appReq.Details);
+                if (app.AppInfoDetails == null) { app.AppInfoDetails = new Common.Models.AppDetails(app.Id, appReq.Details); }
+                else app.AppInfoDetails!.UpdateFromProtoAppDetails(appReq.Details);
             }
             app.UpdatedAt = DateTime.Now;
             _dbContext.SaveChanges();
