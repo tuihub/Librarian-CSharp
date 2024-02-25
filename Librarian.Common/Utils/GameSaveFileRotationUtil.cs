@@ -19,7 +19,7 @@
                                                                     x.ValidScope == Models.ValidScope.AppPackage)?.Count;
             if (ret != null) return ret;
             // App
-            var appId = db.AppPackages.Single(x => x.Id == appPackageId).AppId;
+            var appId = db.AppPackages.Single(x => x.Id == appPackageId).AppInfoId;
             ret = db.GameSaveFileRotations.SingleOrDefault(x => x.UserId == userId &&
                                                                 x.EntityInternalId == appId &&
                                                                 x.ValidScope == Models.ValidScope.App)?.Count;

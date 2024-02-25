@@ -12,8 +12,8 @@ namespace Librarian.Common.Utils
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<AppInfo> Apps { get; set; } = null!;
         public DbSet<AppInfoDetails> AppDetails { get; set; } = null!;
-        public DbSet<AppPackage> AppPackages { get; set; } = null!;
-        public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
+        public DbSet<App> AppPackages { get; set; } = null!;
+        public DbSet<AppBinary> AppPackagesBinaries { get; set; } = null!;
         public DbSet<AppPackageBinaryChunk> AppPackagesBinariesChunks { get; set; } = null!;
         public DbSet<UserAppPackageRunTime> UserAppPackageRunTimes { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;

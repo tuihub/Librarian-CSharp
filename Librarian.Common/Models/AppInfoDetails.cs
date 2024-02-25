@@ -18,7 +18,7 @@ namespace Librarian.Common.Models
         public string? Publisher { get; set; }
         [MaxLength(128)]
         public string? Version { get; set; }
-        public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
+        //public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
         // one-to-one relation(required, to parent)
         public long AppId { get; set; }
         public AppInfo App { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace Librarian.Common.Models
             Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
             Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
             Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
-            ImageUrls = appInfoDetails.ImageUrls;
+            //ImageUrls = appInfoDetails.ImageUrls;
         }
         public AppInfoDetails() { }
         public TuiHub.Protos.Librarian.V1.AppInfoDetails ToProtoAppInfoDetails()
@@ -49,7 +49,7 @@ namespace Librarian.Common.Models
                 Developer = this.Developer ?? string.Empty,
                 Publisher = this.Publisher ?? string.Empty,
                 Version = this.Version ?? string.Empty,
-                ImageUrls = { this.ImageUrls }
+                //ImageUrls = { this.ImageUrls }
             };
         }
         public void UpdateFromProtoAppInfoDetails(TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
@@ -64,7 +64,7 @@ namespace Librarian.Common.Models
             this.Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
             this.Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
             this.Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
-            this.ImageUrls = appInfoDetails.ImageUrls;
+            //this.ImageUrls = appInfoDetails.ImageUrls;
         }
 
         public void UpdateFromAppInfoDetails(AppInfoDetails appInfoDetails)
@@ -74,7 +74,7 @@ namespace Librarian.Common.Models
             this.Developer = appInfoDetails.Developer;
             this.Publisher = appInfoDetails.Publisher;
             this.Version = appInfoDetails.Version;
-            this.ImageUrls = appInfoDetails.ImageUrls;
+            //this.ImageUrls = appInfoDetails.ImageUrls;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Librarian.Common.Models
 {
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
-    public class AppPackageBinary
+    public class AppBinary
     {
         // same as AppPackage Id
         [Key]
@@ -29,7 +29,7 @@ namespace Librarian.Common.Models
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required, to parent)
         public long AppPackageId { get; set; }
-        public AppPackage AppPackage { get; set; } = null!;
+        public App AppPackage { get; set; } = null!;
         // one-to-many relation(required, to child)
         public ICollection<AppPackageBinaryChunk> AppPackageBinaryChunks { get; } = new List<AppPackageBinaryChunk>();
 

@@ -17,7 +17,7 @@ namespace Librarian.Common.Models
         public User User { get; set; } = null!;
         // one-to-many relation(required, to parent)
         public long AppPackageId { get; set; }
-        public AppPackage AppPackage { get; set; } = null!;
+        public App AppPackage { get; set; } = null!;
         public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
     }
 }

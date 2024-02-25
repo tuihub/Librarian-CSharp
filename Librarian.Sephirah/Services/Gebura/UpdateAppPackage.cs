@@ -26,7 +26,7 @@ namespace Librarian.Sephirah.Services
             appPackage.Name = appPackageReq.Name;
             appPackage.Description = appPackageReq.Description;
             appPackage.IsPublic = appPackageReq.Public;
-            appPackage.AppPackageBinary = appPackage.AppPackageBinary;
+            appPackage.AppBinary = appPackage.AppBinary;
             appPackage.UpdatedAt = DateTime.Now;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppPackageResponse());

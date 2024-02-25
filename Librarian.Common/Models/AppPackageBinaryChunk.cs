@@ -19,7 +19,7 @@ namespace Librarian.Common.Models
         public byte[]? Sha256 { get; set; }
         // one-to-many relation(required, to parent)
         public long AppPackageBinaryId { get; set; }
-        public AppPackageBinary AppPackageBinary { get; set; } = null!;
+        public AppBinary AppPackageBinary { get; set; } = null!;
         public TuiHub.Protos.Librarian.V1.AppPackageBinary.Types.Chunk ToProtoAppPackageBinaryChunk()
         {
             return new TuiHub.Protos.Librarian.V1.AppPackageBinary.Types.Chunk

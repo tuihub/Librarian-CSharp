@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             var internalId = _idGenerator.CreateId();
             var appPackage = new Common.Models.AppPackage(internalId, request.AppPackage);
             var app = _dbContext.Apps.Single(x => x.Id == appPackage.SourceAppId);
-            app.AppPackages.Add(appPackage);
+            app.Apps.Add(appPackage);
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppPackageResponse
             {

@@ -41,8 +41,8 @@ namespace Librarian.Common.Models
         public ICollection<AppInfo> ChildAppInfos { get; } = new List<AppInfo>();
         // one-to-one relation(required, to child)
         public AppInfoDetails? AppInfoDetails { get; set; }
-        // one-to-many relation(required, to child)
-        public ICollection<AppPackage> AppPackages { get; } = new List<AppPackage>();
+        // one-to-many relation(optional, to child)
+        public ICollection<App> Apps { get; } = new List<App>();
         // many-to-many relation(wihtout entity, to other parent)
         public ICollection<User> Users { get; } = new List<User>();
         // computed
