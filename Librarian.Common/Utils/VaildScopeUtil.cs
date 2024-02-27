@@ -4,13 +4,13 @@ namespace Librarian.Common.Utils
 {
     public static class VaildScopeUtil
     {
-        public static ValidScope FromProtoVaildScope(TuiHub.Protos.Librarian.Sephirah.V1.ValidScope vaildScope)
+        public static EntityType FromProtoVaildScope(TuiHub.Protos.Librarian.Sephirah.V1.ValidScope vaildScope)
         {
             return vaildScope switch
             {
-                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.Account => ValidScope.Account,
-                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.App => ValidScope.App,
-                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.AppPackage => ValidScope.AppPackage,
+                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.Account => EntityType.Account,
+                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.App => EntityType.AppInfo,
+                TuiHub.Protos.Librarian.Sephirah.V1.ValidScope.AppPackage => EntityType.App,
                 _ => throw new ArgumentException("Invaild ValidScope")
             };
         }

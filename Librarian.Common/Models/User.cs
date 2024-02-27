@@ -26,10 +26,12 @@ namespace Librarian.Common.Models
         public DateTime? UpdatedAt { get; set; }
         // one-to-many relation(required, to child)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
+        // many-to-many relation(required, to child)
+        public ICollection<Device> Devices { get; } = new List<Device>();
         // many-to-many relation(wihtout entity, to other parent)
-        public ICollection<AppInfo> Apps { get; } = new List<AppInfo>();
+        public ICollection<App> Apps { get; } = new List<App>();
         // one-to-many relation(required, to child)
-        public ICollection<GameSaveFileRotation> GameSaveFileRotations = new List<GameSaveFileRotation>();
+        public ICollection<UserAppSaveFileCapacity> GameSaveFileRotations = new List<UserAppSaveFileCapacity>();
 
         public TuiHub.Protos.Librarian.Sephirah.V1.User ToProtoUser(bool withPassword = false)
         {

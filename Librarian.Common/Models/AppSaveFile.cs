@@ -7,27 +7,23 @@ namespace Librarian.Common.Models
 {
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
-    public class GameSaveFile
+    public class AppSaveFile
     {
-        // same InternalId as FileMeta
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        public GameSaveFileStatus Status { get; set; }
+        public AppSaveFileStatus Status { get; set; }
         public bool IsPinned { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
-        // one-to-one relation(required, to parent)
+        // one-to-one relation(required)
         public long FileMetadataId { get; set; }
         public FileMetadata FileMetadata { get; set; } = null!;
         // one-to-many relation(to parent)
-        public long UserId { get; set; }
-        public User User { get; set; } = null!;
-        // one-to-many relation(to parent)
-        public long AppPackageId { get; set; }
-        public App AppPackage { get; set; } = null!;
+        public long AppId { get; set; }
+        public App App { get; set; } = null!;
     }
-    public enum GameSaveFileStatus
+    public enum AppSaveFileStatus
     {
         Pending,
         InProgress,

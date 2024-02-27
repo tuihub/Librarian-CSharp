@@ -20,7 +20,7 @@ namespace Librarian.Sephirah.Services
             var gameSaveFile = await _dbContext.GameSaveFiles.SingleAsync(x => x.Id == id);
             var fileMetadata = await _dbContext.FileMetadatas.SingleOrDefaultAsync(x => x.Id == id);
             // only remove in minio when status is Stored
-            if (gameSaveFile.Status == GameSaveFileStatus.Stored)
+            if (gameSaveFile.Status == AppSaveFileStatus.Stored)
             {
                 var minioClient = MinioClientUtil.GetMinioClient();
                 var rmArgs = new RemoveObjectArgs()

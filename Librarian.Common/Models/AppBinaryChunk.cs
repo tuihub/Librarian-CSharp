@@ -8,21 +8,18 @@ using System.Threading.Tasks;
 
 namespace Librarian.Common.Models
 {
-    public class AppPackageBinaryChunk
+    public class AppBinaryChunk
     {
-        // not InternalId
+        // not InternalId, database generated
         [Key]
         public long Id { get; set; }
         public long Sequence { get; set; }
         public long SizeBytes { get; set; }
         public string PublicUrl { get; set; } = null!;
         public byte[]? Sha256 { get; set; }
-        // one-to-many relation(required, to parent)
-        public long AppPackageBinaryId { get; set; }
-        public AppBinary AppPackageBinary { get; set; } = null!;
-        public TuiHub.Protos.Librarian.V1.AppPackageBinary.Types.Chunk ToProtoAppPackageBinaryChunk()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary.Types.Chunk ToProtoAppPackageBinaryChunk()
         {
-            return new TuiHub.Protos.Librarian.V1.AppPackageBinary.Types.Chunk
+            return new TuiHub.Protos.Librarian.Sephirah.V1.AppBinary.Types.Chunk
             {
                 Sequence = Sequence,
                 SizeBytes = SizeBytes,

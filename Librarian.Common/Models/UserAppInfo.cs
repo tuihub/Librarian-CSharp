@@ -9,15 +9,15 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
-    [PrimaryKey(nameof(UserId), nameof(AppPackageId))]
-    public class UserAppPackage
+    [PrimaryKey(nameof(UserId), nameof(AppInfoId))]
+    public class UserAppInfo
     {
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
         // one-to-many relation(required, to parent)
-        public long AppPackageId { get; set; }
-        public App AppPackage { get; set; } = null!;
+        public long AppInfoId { get; set; }
+        public AppInfo AppInfo { get; set; } = null!;
         public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
     }
 }

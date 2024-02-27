@@ -16,11 +16,16 @@ namespace Librarian.Common.Models
         public string Name { get; set; } = null!;
         [MaxLength(1024)]
         public string? Description { get; set; }
-        public bool IsPublic { get; set; }
+        public bool IsPublic { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
-        // one-to-one relation(required, to child)
-        public AppBinary? AppBinary { get; set; }
+        // one-to-many relation(required, to child)
+        public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
+        // one-to-many relation(required, to child)
+        public ICollection<AppSaveFile> AppSaveFiles { get; } = new List<AppSaveFile>();
+        // one-to-many relation(optional, to parent)
+        public long? UserId { get; set; }
+        public User? User { get; set; }
         // one-to-many relation(optional, to parent)
         public long? AppInfoId { get; set; }
         public AppInfo? AppInfo { get; set; }

@@ -20,7 +20,7 @@ namespace Librarian.Sephirah.Services
         {
             var internalId = JwtUtil.GetInternalIdFromJwt(context);
             var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
-            if (gameSaveFile.Status != GameSaveFileStatus.Stored)
+            if (gameSaveFile.Status != AppSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // get object from minio

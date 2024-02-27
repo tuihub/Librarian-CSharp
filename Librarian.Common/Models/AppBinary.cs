@@ -11,7 +11,6 @@ namespace Librarian.Common.Models
     [Index(nameof(UpdatedAt))]
     public class AppBinary
     {
-        // same as AppPackage Id
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
@@ -27,23 +26,27 @@ namespace Librarian.Common.Models
         public string TokenServerUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
-        // one-to-one relation(required, to parent)
-        public long AppPackageId { get; set; }
-        public App AppPackage { get; set; } = null!;
         // one-to-many relation(required, to child)
-        public ICollection<AppPackageBinaryChunk> AppPackageBinaryChunks { get; } = new List<AppPackageBinaryChunk>();
+        public ICollection<AppBinaryChunk> AppBinaryChunks { get; } = new List<AppBinaryChunk>();
+        // one-to-many relation(required, to parent)
+        public long AppInfoId { get; set; }
+        public AppInfo AppInfo { get; set; } = null!;
+        // one-to-many relation(required, to parent)
+        public long SentinelId { get; set; }
+        public Sentinel Sentinel { get; set; } = null!;
 
-        public TuiHub.Protos.Librarian.V1.AppPackageBinary ToProtoAppPackageBinary()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary ToProtoAppPackageBinary()
         {
-            var protoAppPackageBinary = new TuiHub.Protos.Librarian.V1.AppPackageBinary
+            var protoAppPackageBinary = new TuiHub.Protos.Librarian.Sephirah.V1.AppBinary
             {
+                Id = new InternalID { Id = Id },
                 Name = Name,
                 SizeBytes = SizeBytes,
                 PublicUrl = PublicUrl,
                 Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory()),
                 TokenServerUrl = TokenServerUrl
             };
-            protoAppPackageBinary.Chunks.AddRange(AppPackageBinaryChunks.Select(x => x.ToProtoAppPackageBinaryChunk()));
+            protoAppPackageBinary.Chunks.AddRange(AppBinaryChunks.Select(x => x.ToProtoAppPackageBinaryChunk()));
             return protoAppPackageBinary;
         }
     }

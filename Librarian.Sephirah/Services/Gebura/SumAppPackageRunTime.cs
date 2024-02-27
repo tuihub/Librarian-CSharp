@@ -20,14 +20,14 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.Unimplemented, "Only support overall aggregation type."));
             var totalRunTime = _dbContext.UserAppPackages
                                          .SingleOrDefault(x => x.UserId == userId &&
-                                                      x.AppPackageId == appPackageId)
+                                                      x.AppInfoId == appPackageId)
                                          ?.TotalRunTime;
             if (totalRunTime == null)
             {
-                _dbContext.UserAppPackages.Add(new UserAppPackage
+                _dbContext.UserAppPackages.Add(new UserAppInfo
                 {
                     UserId = userId,
-                    AppPackageId = appPackageId,
+                    AppInfoId = appPackageId,
                     TotalRunTime = TimeSpan.Zero
                 });
                 _dbContext.SaveChanges();

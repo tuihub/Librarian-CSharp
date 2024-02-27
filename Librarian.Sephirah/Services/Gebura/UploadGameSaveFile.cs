@@ -30,10 +30,10 @@ namespace Librarian.Sephirah.Services
                         $" > {HumanizeUtil.BytesToString((long)user.GameSaveFileCapacityBytes)} limit)."));
             var internalId = _idGenerator.CreateId();
             var fileMetadata = new Common.Models.FileMetadata(internalId, request.FileMetadata);
-            var gameSaveFile = new GameSaveFile
+            var gameSaveFile = new AppSaveFile
             {
                 Id = internalId,
-                Status = GameSaveFileStatus.Pending,
+                Status = AppSaveFileStatus.Pending,
                 FileMetadata = fileMetadata,
                 UserId = userInternalId,
                 AppPackageId = appPackageInternalId,

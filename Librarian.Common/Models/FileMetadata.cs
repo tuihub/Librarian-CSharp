@@ -24,8 +24,6 @@ namespace Librarian.Common.Models
         public byte[] Sha256 { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
-        // one-to-one relation(required, to child)
-        public GameSaveFile? GameSaveFile { get; set; }
         public FileMetadata(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata metadata)
         {
             Id = internalId;

@@ -22,15 +22,15 @@ namespace Librarian.Common.Models
         public long UserId { get; set; }
         public User User { get; set; } = null!;
         public AppCategory() { }
-        public AppCategory(long id, long userId, TuiHub.Protos.Librarian.V1.AppCategory appCategory)
+        public AppCategory(long id, long userId, TuiHub.Protos.Librarian.Sephirah.V1.AppCategory appCategory)
         {
             Id = id;
             Name = appCategory.Name;
             UserId = userId;
         }
-        public TuiHub.Protos.Librarian.V1.AppCategory ToProtoAppCategory()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppCategory ToProtoAppCategory()
         {
-            return new TuiHub.Protos.Librarian.V1.AppCategory
+            return new TuiHub.Protos.Librarian.Sephirah.V1.AppCategory
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
                 Name = Name

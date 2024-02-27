@@ -21,7 +21,7 @@ namespace Librarian.Sephirah.Services
         {
             var internalId = JwtUtil.GetInternalIdFromJwt(context);
             var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
-            if (gameSaveFile.Status == GameSaveFileStatus.Stored)
+            if (gameSaveFile.Status == AppSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Current game save has been stored."));
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // two stream, one for Sha256, the other for Minio
@@ -34,7 +34,7 @@ namespace Librarian.Sephirah.Services
             _logger.LogDebug($"SimpleUploadFile: Starting readTask");
             var readTask = Task.Run(async () =>
             {
-                gameSaveFile.Status = GameSaveFileStatus.InProgress;
+                gameSaveFile.Status = AppSaveFileStatus.InProgress;
                 await _dbContext.SaveChangesAsync();
                 await foreach (var message in requestStream.ReadAllAsync())
                 {
@@ -95,7 +95,7 @@ namespace Librarian.Sephirah.Services
                                            .WithObject(internalId.ToString());
                 await minioClient.RemoveObjectAsync(removeObjectArgs);
                 // update db
-                gameSaveFile.Status = GameSaveFileStatus.Sha256Mismatch;
+                gameSaveFile.Status = AppSaveFileStatus.Sha256Mismatch;
                 // throw rpcex
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "SHA256 digest not match."));
             }
@@ -103,9 +103,9 @@ namespace Librarian.Sephirah.Services
             writeTaskCancellationTokenSource.Cancel();
             // update db
             var ret = new SimpleUploadFileResponse();
-            if (gameSaveFile.Status == GameSaveFileStatus.InProgress)
+            if (gameSaveFile.Status == AppSaveFileStatus.InProgress)
             {
-                gameSaveFile.Status = GameSaveFileStatus.Stored;
+                gameSaveFile.Status = AppSaveFileStatus.Stored;
                 ret.Status = FileTransferStatus.Success;
             }
             else

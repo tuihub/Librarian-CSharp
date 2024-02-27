@@ -16,17 +16,17 @@
             // AppPackage
             var ret = db.GameSaveFileRotations.SingleOrDefault(x => x.UserId == userId &&
                                                                     x.EntityInternalId == appPackageId &&
-                                                                    x.ValidScope == Models.ValidScope.AppPackage)?.Count;
+                                                                    x.EntityType == Models.EntityType.App)?.Count;
             if (ret != null) return ret;
             // App
-            var appId = db.AppPackages.Single(x => x.Id == appPackageId).AppInfoId;
+            var appId = db.AppPackages.Single(x => x.Id == appPackageId).AppId;
             ret = db.GameSaveFileRotations.SingleOrDefault(x => x.UserId == userId &&
                                                                 x.EntityInternalId == appId &&
-                                                                x.ValidScope == Models.ValidScope.App)?.Count;
+                                                                x.EntityType == Models.EntityType.AppInfo)?.Count;
             if (ret != null) return ret;
             // User
             ret = db.GameSaveFileRotations.SingleOrDefault(x => x.UserId == userId &&
-                                                                x.ValidScope == Models.ValidScope.Account)?.Count;
+                                                                x.EntityType == Models.EntityType.Account)?.Count;
             return ret;
         }
     }

@@ -35,6 +35,9 @@ namespace Librarian.Common.Models
         public string? CoverImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // relations
+        // one-to-many relation(required, to child)
+        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
         // one-to-many relation to self(optional)
         public long? ParentAppInfoId { get; set; }
         public AppInfo? ParentAppInfo { get; set; }

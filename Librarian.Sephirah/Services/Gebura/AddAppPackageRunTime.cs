@@ -18,9 +18,9 @@ namespace Librarian.Sephirah.Services
             var startTime = request.TimeRange.StartTime.ToDateTime();
             var duration = request.TimeRange.Duration.ToTimeSpan();
             // update db
-            var userAppPackage = _dbContext.UserAppPackages.Single(x => x.UserId == userId && x.AppPackageId == appPackageId);
+            var userAppPackage = _dbContext.UserAppPackages.Single(x => x.UserId == userId && x.AppInfoId == appPackageId);
             userAppPackage.TotalRunTime += duration;
-            var appPackageRunTime = new UserAppPackageRunTime
+            var appPackageRunTime = new AppInstRunTime
             {
                 UserId = userId,
                 AppPackageId = appPackageId,

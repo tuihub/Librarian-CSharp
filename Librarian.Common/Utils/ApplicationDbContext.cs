@@ -10,19 +10,19 @@ namespace Librarian.Common.Utils
     {
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        public DbSet<AppInfo> Apps { get; set; } = null!;
-        public DbSet<AppInfoDetails> AppDetails { get; set; } = null!;
-        public DbSet<App> AppPackages { get; set; } = null!;
-        public DbSet<AppBinary> AppPackagesBinaries { get; set; } = null!;
-        public DbSet<AppPackageBinaryChunk> AppPackagesBinariesChunks { get; set; } = null!;
-        public DbSet<UserAppPackageRunTime> UserAppPackageRunTimes { get; set; } = null!;
+        public DbSet<App> Apps { get; set; } = null!;
+        public DbSet<AppDetails> AppDetails { get; set; } = null!;
+        public DbSet<AppPackage> AppPackages { get; set; } = null!;
+        public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
+        public DbSet<AppBinaryChunk> AppPackagesBinariesChunks { get; set; } = null!;
+        public DbSet<AppInstRunTime> UserAppPackageRunTimes { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
-        public DbSet<GameSaveFile> GameSaveFiles { get; set; } = null!;
-        public DbSet<GameSaveFileRotation> GameSaveFileRotations { get; set; } = null!;
+        public DbSet<AppSaveFile> GameSaveFiles { get; set; } = null!;
+        public DbSet<UserAppSaveFileCapacity> GameSaveFileRotations { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<AppCategory> AppCategories { get; set; } = null!;
         public DbSet<UserAppAppCategory> UserAppAppCategories { get; set; } = null!;
-        public DbSet<UserAppPackage> UserAppPackages { get; set; } = null!;
+        public DbSet<UserAppInfo> UserAppPackages { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var dbType = GlobalContext.SystemConfig.DbType;
@@ -50,10 +50,10 @@ namespace Librarian.Common.Utils
             //            .Property(x => x.Sha256)
             //            .IsFixedLength(true);
 
-            modelBuilder.Entity<AppInfo>()
-                        .HasOne(e => e.ParentAppInfo)
-                        .WithMany(e => e.ChildAppInfos)
-                        .HasForeignKey(e => e.ParentAppInfoId)
+            modelBuilder.Entity<App>()
+                        .HasOne(e => e.ParentApp)
+                        .WithMany(e => e.ChildApps)
+                        .HasForeignKey(e => e.ParentAppId)
                         .IsRequired(false);
 
             // applying custom attribute
