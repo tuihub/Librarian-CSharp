@@ -24,9 +24,8 @@ namespace Librarian.ThirdParty.Bangumi
             _bangumiAPIKey = apiKey;
         }
 
-        // TODO: Add cancellation token
         // TODO: Add AltName
-        public async Task<AppInfo> GetAppAsync(int appId)
+        public async Task<AppInfo> GetAppInfoAsync(int appInfoId, CancellationToken cts = default)
         {
             var options = new RestClientOptions(_bangumiAPIBaseURL)
             {
@@ -35,8 +34,9 @@ namespace Librarian.ThirdParty.Bangumi
             };
             var client = new RestClient(options);
             var request = new RestRequest("/v0/subjects/{subject_id}")
-                                .AddUrlSegment("subject_id", appId);
-            var response = await client.ExecuteGetAsync(request);
+                                .AddUrlSegment("subject_id", appInfoId);
+            var response = await client.ExecuteGetAsync(request, cts);
+            cts.ThrowIfCancellationRequested();
             if (response == null)
                 throw new Exception("Bangumi API returned null response.");
             if (response.IsSuccessStatusCode == false)
@@ -66,6 +66,7 @@ namespace Librarian.ThirdParty.Bangumi
                 Type = respObj.type.ToString().Equals("4") ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
                 ShortDescription = shortDescription,
                 IconImageUrl = respObj.images?.small?.ToString(),
+                CoverImageUrl = respObj.images?.large?.ToString(),
                 BackgroundImageUrl = respObj.images?.large?.ToString(),
                 AppInfoDetails = new AppInfoDetails
                 {

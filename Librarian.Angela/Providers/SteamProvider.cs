@@ -24,18 +24,18 @@ namespace Librarian.Angela.Providers
             _dbContext = dbContext;
         }
 
-        public async Task PullAppAsync(long internalID)
+        public async Task PullAppInfoAsync(long internalID)
         {
-            var app = _dbContext.AppInfos
-                      .Include(x => x.AppDetails)
-                      .Single(x => x.Id == internalID);
-            if (app.Source != "steam")
+            var appInfo = _dbContext.AppInfos
+                          .Include(x => x.AppInfoDetails)
+                          .Single(x => x.Id == internalID);
+            if (appInfo.Source != "steam")
             {
                 throw new NotImplementedException();
             }
             else
             {
-                app.UpdateFromApp(await _steamAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId), "cn", "schinese"));
+                appInfo.UpdateFromAppInfo(await _steamAPIService.GetAppInfoAsync(Convert.ToUInt32(appInfo.SourceAppId), "cn", "schinese"));
             }
             await _dbContext.SaveChangesAsync();
         }

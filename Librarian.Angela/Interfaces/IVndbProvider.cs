@@ -9,6 +9,6 @@ namespace Librarian.Angela.Interfaces
 {
     public interface IVndbProvider
     {
-        public Task PullAppAsync(long internalID);
+        public Task PullAppInfoAsync(long internalID);
     }
 }

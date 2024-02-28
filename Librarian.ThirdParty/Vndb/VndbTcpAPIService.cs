@@ -11,7 +11,7 @@ namespace Librarian.ThirdParty.Vndb
 {
     public class VndbTcpAPIService
     {
-        public async Task<AppInfo> GetAppAsync(uint appId)
+        public async Task<AppInfo> GetAppInfoAsync(uint appId)
         {
             var client = new VndbSharp.Vndb(useTls: true)
                                       .WithTimeout(new TimeSpan(0, 0, 30))
@@ -44,7 +44,7 @@ namespace Librarian.ThirdParty.Vndb
                     Type = TuiHub.Protos.Librarian.V1.AppType.Game,
                     ShortDescription = shortDescription,
                     IconImageUrl = null,
-                    BackgroundImageUrl = vn.Image,
+                    CoverImageUrl = vn.Image,
                     AppInfoDetails = new AppInfoDetails
                     {
                         Description = vn.Description,

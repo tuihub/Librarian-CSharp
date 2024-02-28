@@ -22,28 +22,28 @@ namespace Librarian.ThirdParty.Steam
             _webInterfaceFactory = new SteamWebInterfaceFactory(_steamAPIKey);
         }
 
-        public async Task<AppInfo> GetAppAsync(uint appId, string currencyCode = "", string language = "")
+        public async Task<AppInfo> GetAppInfoAsync(uint appId, string currencyCode = "", string language = "")
         {
             var webInterface = _webInterfaceFactory.CreateSteamStoreInterface(new HttpClient());
-            var appDetails = await webInterface.GetStoreAppDetailsAsync(appId, currencyCode, language);
-            if (DateTime.TryParse(appDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
+            var appInfoDetails = await webInterface.GetStoreAppDetailsAsync(appId, currencyCode, language);
+            if (DateTime.TryParse(appInfoDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
                 appReleaseDate = DateTime.MinValue;
             return new AppInfo
             {
                 Source = "steam",
-                SourceAppId = appDetails.SteamAppId.ToString(),
-                SourceUrl = "https://store.steampowered.com/app/" + appDetails.SteamAppId.ToString(),
-                Name = appDetails.Name,
-                Type = appDetails.Type == "game" ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
-                ShortDescription = appDetails.ShortDescription,
+                SourceAppId = appInfoDetails.SteamAppId.ToString(),
+                SourceUrl = "https://store.steampowered.com/app/" + appInfoDetails.SteamAppId.ToString(),
+                Name = appInfoDetails.Name,
+                Type = appInfoDetails.Type == "game" ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
+                ShortDescription = appInfoDetails.ShortDescription,
                 IconImageUrl = null,
-                BackgroundImageUrl = appDetails.HeaderImage,
+                CoverImageUrl = appInfoDetails.HeaderImage,
                 AppInfoDetails = new AppInfoDetails
                 {
-                    Description = appDetails.DetailedDescription,
+                    Description = appInfoDetails.DetailedDescription,
                     ReleaseDate = appReleaseDate,
-                    Developer = string.Join(',', appDetails.Developers),
-                    Publisher = string.Join(',', appDetails.Publishers),
+                    Developer = string.Join(',', appInfoDetails.Developers),
+                    Publisher = string.Join(',', appInfoDetails.Publishers),
                     Version = null
                 }
             };

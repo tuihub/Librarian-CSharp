@@ -26,22 +26,22 @@ namespace Librarian.Angela.Providers
             _dbContext = dbContext;
         }
 
-        public async Task PullAppAsync(long internalID)
+        public async Task PullAppInfoAsync(long internalID)
         {
-            var app = _dbContext.AppInfos
-                      .Include(x => x.AppInfoDetails)
-                      .Single(x => x.Id == internalID);
-            if (app.Source != "bangumi")
+            var appInfo = _dbContext.AppInfos
+                          .Include(x => x.AppInfoDetails)
+                          .Single(x => x.Id == internalID);
+            if (appInfo.Source != "bangumi")
             {
                 throw new NotImplementedException();
             }
             else
             {
-                var bangumiApp = await _bangumiAPIService.GetAppAsync(Convert.ToInt32(app.SourceAppId));
-                bangumiApp.AppInfoDetails!.Description = "<div style=\"white-space: pre-line\">" +
-                                                     bangumiApp.AppInfoDetails!.Description +
+                var bangumiAppInfo = await _bangumiAPIService.GetAppInfoAsync(Convert.ToInt32(appInfo.SourceAppId));
+                bangumiAppInfo.AppInfoDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                     bangumiAppInfo.AppInfoDetails!.Description +
                                                      "</div>";
-                app.UpdateFromAppInfo(bangumiApp);
+                appInfo.UpdateFromAppInfo(bangumiAppInfo);
             }
             await _dbContext.SaveChangesAsync();
         }

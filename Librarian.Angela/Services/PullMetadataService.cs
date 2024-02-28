@@ -69,19 +69,19 @@ namespace Librarian.Angela.Services
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
-                                    await steamProvider.PullAppAsync(externalApp.InternalID);
+                                    await steamProvider.PullAppInfoAsync(externalApp.InternalID);
                                 }
                                 else if (appSource == "vndb")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
-                                    await vndbProvider.PullAppAsync(externalApp.InternalID);
+                                    await vndbProvider.PullAppInfoAsync(externalApp.InternalID);
                                 }
                                 else if (appSource == "bangumi")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
-                                    await bangumiProvider.PullAppAsync(externalApp.InternalID);
+                                    await bangumiProvider.PullAppInfoAsync(externalApp.InternalID);
                                 }
                                 else
                                 {

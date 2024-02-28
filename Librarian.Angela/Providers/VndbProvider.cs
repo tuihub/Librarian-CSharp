@@ -23,22 +23,22 @@ namespace Librarian.Angela.Providers
             _dbContext = dbContext;
         }
 
-        public async Task PullAppAsync(long internalID)
+        public async Task PullAppInfoAsync(long internalID)
         {
-            var app = _dbContext.AppInfos
-                      .Include(x => x.AppDetails)
-                      .Single(x => x.Id == internalID);
-            if (app.Source != "vndb")
+            var appInfo = _dbContext.AppInfos
+                          .Include(x => x.AppInfoDetails)
+                          .Single(x => x.Id == internalID);
+            if (appInfo.Source != "vndb")
             {
                 throw new NotImplementedException();
             }
             else
             {
-                var vndbApp = await _vndbTcpAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId));
-                vndbApp.AppDetails!.Description = "<div style=\"white-space: pre-line\">" +
-                                                  vndbApp.AppDetails!.Description +
+                var vndbAppInfo = await _vndbTcpAPIService.GetAppInfoAsync(Convert.ToUInt32(appInfo.SourceAppId));
+                vndbAppInfo.AppInfoDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                  vndbAppInfo.AppInfoDetails!.Description +
                                                   "</div>";
-                app.UpdateFromApp(vndbApp);
+                appInfo.UpdateFromAppInfo(vndbAppInfo);
             }
             await _dbContext.SaveChangesAsync();
         }
