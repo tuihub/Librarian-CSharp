@@ -10,19 +10,25 @@ namespace Librarian.Common.Utils
     {
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public DbSet<AppInfo> AppInfos { get; set; } = null!;
+        public DbSet<AppInfoDetails> AppInfoDetails { get; set; } = null!;
+        public DbSet<AppBinary> AppBinaries { get; set; } = null!;
+        public DbSet<AppBinaryChunk> AppBinaryChunks { get; set; } = null!;
         public DbSet<App> Apps { get; set; } = null!;
-        public DbSet<AppDetails> AppDetails { get; set; } = null!;
-        public DbSet<AppPackage> AppPackages { get; set; } = null!;
-        public DbSet<AppPackageBinary> AppPackagesBinaries { get; set; } = null!;
-        public DbSet<AppBinaryChunk> AppPackagesBinariesChunks { get; set; } = null!;
-        public DbSet<AppInstRunTime> UserAppPackageRunTimes { get; set; } = null!;
-        public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
-        public DbSet<AppSaveFile> GameSaveFiles { get; set; } = null!;
-        public DbSet<AppSaveFileCapacity> GameSaveFileRotations { get; set; } = null!;
-        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<AppSaveFile> AppSaveFiles { get; set; } = null!;
+        public DbSet<AppInst> AppInsts { get; set; } = null!;
+        public DbSet<AppInstRunTime> AppInstRunTimes { get; set; } = null!;
         public DbSet<AppCategory> AppCategories { get; set; } = null!;
-        public DbSet<UserAppAppCategory> UserAppAppCategories { get; set; } = null!;
-        public DbSet<UserAppInfo> UserAppPackages { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Account> Accounts { get; set; } = null!;
+        public DbSet<Sentinel> Sentinels { get; set; } = null!;
+        public DbSet<Device> Devices { get; set; } = null!;
+        public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
+        // relation
+        public DbSet<UserAppInfo> UserAppInfos { get; set; } = null!;
+        // internal
+        public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var dbType = GlobalContext.SystemConfig.DbType;
@@ -50,10 +56,10 @@ namespace Librarian.Common.Utils
             //            .Property(x => x.Sha256)
             //            .IsFixedLength(true);
 
-            modelBuilder.Entity<App>()
-                        .HasOne(e => e.ParentApp)
-                        .WithMany(e => e.ChildApps)
-                        .HasForeignKey(e => e.ParentAppId)
+            modelBuilder.Entity<AppInfo>()
+                        .HasOne(e => e.ParentAppInfo)
+                        .WithMany(e => e.ChildAppInfos)
+                        .HasForeignKey(e => e.ParentAppInfoId)
                         .IsRequired(false);
 
             // applying custom attribute
