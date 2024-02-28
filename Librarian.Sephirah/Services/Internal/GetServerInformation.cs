@@ -10,7 +10,13 @@ namespace Librarian.Sephirah.Services
     {
         public override Task<GetServerInformationResponse> GetServerInformation(GetServerInformationRequest request, ServerCallContext context)
         {
-            return Task.FromResult(new GetServerInformationResponse
+            var token = context.RequestHeaders
+                               .Single(x => x.Key == "authorization")
+                               .Value
+                               .Substring("Bearer ".Length)
+                               .Trim();
+            var valid = JwtUtil.ValidateToken(token, GlobalContext.JwtConfig.AccessTokenAudience);
+            var response = new GetServerInformationResponse
             {
                 ServerBinarySummary = new ServerBinarySummary
                 {
@@ -22,8 +28,27 @@ namespace Librarian.Sephirah.Services
                 {
                     Version = Assembly.GetAssembly(typeof(TuiHub.Protos.Librarian.V1.InternalID))?.GetName().Version?.ToString() ?? "Unknown",
                 },
-                CurrentTime = DateTime.UtcNow.ToTimestamp()
-            });
+                CurrentTime = DateTime.UtcNow.ToTimestamp(),
+                ServerInstanceSummary =
+                {
+                    Name = GlobalContext.InstanceConfig.Name,
+                    Description = GlobalContext.InstanceConfig.Description,
+                    WebsiteUrl = GlobalContext.InstanceConfig.WebsiteUrl,
+                    LogoUrl = GlobalContext.InstanceConfig.LogoUrl,
+                    BackgroundUrl = GlobalContext.InstanceConfig.BackgroundUrl
+                }
+            };
+            if (valid)
+            {
+                response.FeatureSummary = new ServerFeatureSummary
+                {
+                    SupportedAccountPlatforms = { },
+                    SupportedAppInfoSources = { "steam", "bangumi", "vndb" },
+                    SupportedFeedSources = { },
+                    SupportedNotifyDestinations = { }
+                };
+            }
+            return Task.FromResult(response);
         }
     }
 }
