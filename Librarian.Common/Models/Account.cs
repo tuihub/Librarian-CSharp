@@ -1,0 +1,35 @@
+﻿using Google.Protobuf;
+using Librarian.Common.Utils;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using TuiHub.Protos.Librarian.V1;
+
+namespace Librarian.Common.Models
+{
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
+    public class Account
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long Id { get; set; }
+        [MaxLength(128)]
+        public string Platform { get; set; } = null!;
+        [MaxLength(128)]
+        public string PlatformAccountId { get; set; } = null!;
+        [MaxLength(128)]
+        public string Name { get; set; } = null!;
+        [MaxLength(256)]
+        public string ProfileUrl { get; set; } = null!;
+        [MaxLength(256)]
+        public string AvatarUrl { get; set; } = null!;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
+        // one-to-many relation(to child, only used in non-internal appInfo)
+        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
+        // one-to-many relation(required, to parent)
+        public long UserId { get; set; }
+        public User User { get; set; } = null!;
+    }
+}

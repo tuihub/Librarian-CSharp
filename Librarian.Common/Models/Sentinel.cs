@@ -20,5 +20,8 @@ namespace Librarian.Common.Models
         // relations
         // one-to-many relation(required, to child)
         public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
+        // one-to-many relation(required, to parent)
+        public long UserId { get; set; }
+        public User User { get; set; } = null!;
     }
 }

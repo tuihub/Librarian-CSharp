@@ -24,7 +24,7 @@ namespace Librarian.Sephirah.Services
             }
             else
             {
-                gameSaveFileRotation ??= new UserAppSaveFileCapacity();
+                gameSaveFileRotation ??= new AppSaveFileCapacity();
                 gameSaveFileRotation.EntityInternalId = request.EntityId.Id;
                 gameSaveFileRotation.EntityType = VaildScopeUtil.FromProtoVaildScope(request.ValidScope);
                 gameSaveFileRotation.Count = request.Count;

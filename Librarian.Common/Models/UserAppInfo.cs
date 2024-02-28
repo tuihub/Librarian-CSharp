@@ -9,6 +9,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    // for internal appInfo
     [PrimaryKey(nameof(UserId), nameof(AppInfoId))]
     public class UserAppInfo
     {

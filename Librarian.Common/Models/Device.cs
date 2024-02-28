@@ -29,7 +29,7 @@ namespace Librarian.Common.Models
         // relations
         // one-to-many relation(required, to child)
         public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
-        // many-to-many relation(required, to parent)
+        // many-to-many relation(required)
         public ICollection<User> Users { get; } = new List<User>();
         // func
         public Device(TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo deviceInfo)

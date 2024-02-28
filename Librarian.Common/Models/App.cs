@@ -29,6 +29,8 @@ namespace Librarian.Common.Models
         // one-to-many relation(optional, to parent)
         public long? AppInfoId { get; set; }
         public AppInfo? AppInfo { get; set; }
+        // many-to-many relation(optional)
+        public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // func
         public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {

@@ -20,18 +20,21 @@ namespace Librarian.Common.Models
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }
-        public long GameSaveFileUsedCapacityBytes { get; set; } = 0;
-        public long? GameSaveFileCapacityBytes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // relations
+        // one-to-many relation(required, to child)
+        public ICollection<Account> Accounts { get; } = new List<Account>();
+        // one-to-many relation(required, to child)
+        public ICollection<Sentinel> Sentinels { get; } = new List<Sentinel>();
+        // one-to-many relation(required, to child)
+        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
+        // one-to-many relation(to child, only used in internal appInfo)
+        public ICollection<App> Apps { get; } = new List<App>();
+        // many-to-many relation(required)
+        public ICollection<Device> Devices { get; } = new List<Device>();
         // one-to-many relation(required, to child)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
-        // many-to-many relation(required, to child)
-        public ICollection<Device> Devices { get; } = new List<Device>();
-        // many-to-many relation(wihtout entity, to other parent)
-        public ICollection<App> Apps { get; } = new List<App>();
-        // one-to-many relation(required, to child)
-        public ICollection<UserAppSaveFileCapacity> GameSaveFileRotations = new List<UserAppSaveFileCapacity>();
 
         public TuiHub.Protos.Librarian.Sephirah.V1.User ToProtoUser(bool withPassword = false)
         {

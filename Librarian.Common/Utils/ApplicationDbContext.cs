@@ -18,7 +18,7 @@ namespace Librarian.Common.Utils
         public DbSet<AppInstRunTime> UserAppPackageRunTimes { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<AppSaveFile> GameSaveFiles { get; set; } = null!;
-        public DbSet<UserAppSaveFileCapacity> GameSaveFileRotations { get; set; } = null!;
+        public DbSet<AppSaveFileCapacity> GameSaveFileRotations { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<AppCategory> AppCategories { get; set; } = null!;
         public DbSet<UserAppAppCategory> UserAppAppCategories { get; set; } = null!;

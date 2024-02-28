@@ -36,18 +36,24 @@ namespace Librarian.Common.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         // relations
-        // one-to-many relation(required, to child)
-        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
         // one-to-many relation to self(optional)
+        public ICollection<AppInfo> ChildAppInfos { get; } = new List<AppInfo>();
         public long? ParentAppInfoId { get; set; }
         public AppInfo? ParentAppInfo { get; set; }
-        public ICollection<AppInfo> ChildAppInfos { get; } = new List<AppInfo>();
         // one-to-one relation(required, to child)
         public AppInfoDetails? AppInfoDetails { get; set; }
+        // one-to-many relation(required, to child)
+        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
         // one-to-many relation(optional, to child)
         public ICollection<App> Apps { get; } = new List<App>();
-        // many-to-many relation(wihtout entity, to other parent)
-        public ICollection<User> Users { get; } = new List<User>();
+        // one-to-many relation(to parent, only used in internal appInfo)
+        public long? UserId { get; set; }
+        public User? User { get; set; }
+        // one-to-many relation(to parent, only used in non-internal appInfo)
+        public long? AccountId { get; set; }
+        public Account? Account { get; set; }
+        // many-to-many relation(optional)
+        public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // computed
         public bool IsInternal => Source == Constants.Proto.AppSourceInternal;
         // func
