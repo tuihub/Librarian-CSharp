@@ -1,4 +1,5 @@
-﻿using Librarian.Common.Models;
+﻿using Librarian.Common.Configs;
+using Librarian.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.ComponentModel.DataAnnotations;

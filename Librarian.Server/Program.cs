@@ -3,7 +3,7 @@ using Librarian.Angela;
 using Librarian.Angela.Interfaces;
 using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
-using Librarian.Common.Models;
+using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +22,8 @@ var systemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemCo
 GlobalContext.SystemConfig = systemConfig;
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? throw new Exception("JwtConfig parse failed");
 GlobalContext.JwtConfig = jwtConfig;
+var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
+GlobalContext.InstanceConfig = instanceConfig;
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();

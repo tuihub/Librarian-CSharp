@@ -3,7 +3,7 @@ using IdGen.DependencyInjection;
 using Librarian.Angela.Interfaces;
 using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
-using Librarian.Common.Models;
+using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -59,6 +59,8 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                 GlobalContext.SystemConfig = systemConfig;
                 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? throw new Exception("JwtConfig parse failed");
                 GlobalContext.JwtConfig = jwtConfig;
+                var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
+                GlobalContext.InstanceConfig = instanceConfig;
                 // Change to dev db
                 GlobalContext.SystemConfig.DbType = ApplicationDbType.MySQL;
                 GlobalContext.SystemConfig.DbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR") ??

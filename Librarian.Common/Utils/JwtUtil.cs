@@ -88,21 +88,21 @@ namespace Librarian.Common.Utils
             var jwtToken = handler.WriteToken(token);
             return jwtToken;
         }
-        //public static bool ValidateRefreshToken(JwtSecurityTokenHandler handler, string token)
-        //{
-        //    var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
-        //    var parameters = new TokenValidationParameters
-        //    {
-        //        ValidateIssuer = false,
-        //        //ValidIssuer = GlobalContext.JwtConfig.Issuer,
-        //        ValidAudience = GlobalContext.JwtConfig.RefreshTokenAudience,
-        //        ValidateIssuerSigningKey = true,
-        //        IssuerSigningKey = new SymmetricSecurityKey(key),
-        //        RequireExpirationTime = true
-        //    };
-        //    var principal = handler.ValidateToken(token, parameters, out _);
-        //    return principal != null;
-        //}
+        public static bool ValidateToken(string token, string audience)
+        {
+            var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
+            var handler = new JwtSecurityTokenHandler();
+            var parameters = new TokenValidationParameters
+            {
+                ValidIssuer = GlobalContext.JwtConfig.Issuer,
+                ValidAudience = audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                RequireExpirationTime = true
+            };
+            var principal = handler.ValidateToken(token, parameters, out _);
+            return principal != null;
+        }
         public static long GetInternalIdFromJwt(ServerCallContext context)
         {
             var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;

@@ -1,4 +1,4 @@
-﻿using Librarian.Common.Models;
+﻿using Librarian.Common.Configs;
 
 namespace Librarian.Common.Utils
 {
@@ -6,5 +6,6 @@ namespace Librarian.Common.Utils
     {
         public static SystemConfig SystemConfig { get; set; } = null!;
         public static JwtConfig JwtConfig { get; set; } = null!;
+        public static InstanceConfig InstanceConfig { get; set; } = null!;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Librarian.Common.Models
+﻿namespace Librarian.Common.Configs
 {
     public class JwtConfig
     {
