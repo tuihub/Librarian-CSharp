@@ -25,8 +25,8 @@ namespace Librarian.Angela.Providers
 
         public async Task PullAppAsync(long internalID)
         {
-            var app = _dbContext.Apps
-                      .Include(x => x.AppInfoDetails)
+            var app = _dbContext.AppInfos
+                      .Include(x => x.AppDetails)
                       .Single(x => x.Id == internalID);
             if (app.Source != "vndb")
             {
@@ -35,10 +35,10 @@ namespace Librarian.Angela.Providers
             else
             {
                 var vndbApp = await _vndbTcpAPIService.GetAppAsync(Convert.ToUInt32(app.SourceAppId));
-                vndbApp.AppInfoDetails!.Description = "<div style=\"white-space: pre-line\">" +
-                                                  vndbApp.AppInfoDetails!.Description +
+                vndbApp.AppDetails!.Description = "<div style=\"white-space: pre-line\">" +
+                                                  vndbApp.AppDetails!.Description +
                                                   "</div>";
-                app.UpdateFromAppInfo(vndbApp);
+                app.UpdateFromApp(vndbApp);
             }
             await _dbContext.SaveChangesAsync();
         }

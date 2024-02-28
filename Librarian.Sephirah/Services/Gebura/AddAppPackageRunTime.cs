@@ -14,7 +14,7 @@ namespace Librarian.Sephirah.Services
         {
             var userId = JwtUtil.GetInternalIdFromJwt(context);
             var appPackageId = request.AppPackageId.Id;
-            var appPackage = _dbContext.AppPackages.Single(x => x.Id == appPackageId);
+            var appPackage = _dbContext.Apps.Single(x => x.Id == appPackageId);
             var startTime = request.TimeRange.StartTime.ToDateTime();
             var duration = request.TimeRange.Duration.ToTimeSpan();
             // update db

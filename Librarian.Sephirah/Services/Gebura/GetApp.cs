@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<GetAppResponse> GetApp(GetAppRequest request, ServerCallContext context)
         {
             var appId = request.AppId.Id;
-            var app = _dbContext.Apps.Include(x => x.AppInfoDetails)
+            var app = _dbContext.AppInfos.Include(x => x.AppDetails)
                                      .SingleOrDefault(x => x.Id == appId);
             if (app == null)
             {

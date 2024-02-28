@@ -24,7 +24,7 @@ namespace Librarian.Sephirah.Services
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppId."));
                     }
-                    var app = _dbContext.Apps.Include(x => x.ChildAppInfos)
+                    var app = _dbContext.AppInfos.Include(x => x.ChildAppInfos)
                                              .SingleOrDefault(x => x.Id == appId && x.Source == Common.Constants.Proto.AppSourceInternal);
                     if (app == null)
                     {
@@ -49,7 +49,7 @@ namespace Librarian.Sephirah.Services
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppId."));
                     }
 
-                    var app = _dbContext.Apps.SingleOrDefault(x => x.Source == appSource && x.SourceAppId == appId);
+                    var app = _dbContext.AppInfos.SingleOrDefault(x => x.Source == appSource && x.SourceAppId == appId);
                     // external app not exists
                     if (app == null)
                     {
@@ -70,8 +70,8 @@ namespace Librarian.Sephirah.Services
                             Type = TuiHub.Protos.Librarian.V1.AppType.Game,
                             ParentAppInfo = newInternalApp
                         };
-                        _dbContext.Apps.Add(newInternalApp);
-                        _dbContext.Apps.Add(newExternalApp);
+                        _dbContext.AppInfos.Add(newInternalApp);
+                        _dbContext.AppInfos.Add(newExternalApp);
                         await _dbContext.SaveChangesAsync();
                         _pullMetadataService.AddPullApp(newExternalApp.Id, true);
                     }

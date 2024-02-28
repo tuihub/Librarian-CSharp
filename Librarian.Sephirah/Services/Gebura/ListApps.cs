@@ -19,9 +19,9 @@ namespace Librarian.Sephirah.Services
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter apps
-            IQueryable<Common.Models.AppInfo> apps;
-            if (containDetails == false) { apps = _dbContext.Apps.AsQueryable(); }
-            else { apps = _dbContext.Apps.Include(x => x.AppInfoDetails).AsQueryable(); }
+            IQueryable<Common.Models.App> apps;
+            if (containDetails == false) { apps = _dbContext.AppInfos.AsQueryable(); }
+            else { apps = _dbContext.AppInfos.Include(x => x.AppDetails).AsQueryable(); }
             if (idFilters.Count > 0)
             {
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
@@ -37,7 +37,7 @@ namespace Librarian.Sephirah.Services
             apps = apps.ApplyPagingRequest(request.Paging);
             if (containDetails == false)
             {
-                apps = apps.Select(x => x.GetAppInfoWithoutDetails());
+                apps = apps.Select(x => x.GetAppWithoutDetails());
             }
             // construct response
             var response = new ListAppsResponse

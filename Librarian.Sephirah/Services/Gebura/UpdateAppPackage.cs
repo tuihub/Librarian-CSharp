@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check AppPackage exists
             var appPackageReq = request.AppPackage;
-            var appPackage = _dbContext.AppPackages.SingleOrDefault(x => x.Id == appPackageReq.Id.Id);
+            var appPackage = _dbContext.Apps.SingleOrDefault(x => x.Id == appPackageReq.Id.Id);
             if (appPackage == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppPackage not exists."));

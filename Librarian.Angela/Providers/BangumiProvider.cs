@@ -28,7 +28,7 @@ namespace Librarian.Angela.Providers
 
         public async Task PullAppAsync(long internalID)
         {
-            var app = _dbContext.Apps
+            var app = _dbContext.AppInfos
                       .Include(x => x.AppInfoDetails)
                       .Single(x => x.Id == internalID);
             if (app.Source != "bangumi")

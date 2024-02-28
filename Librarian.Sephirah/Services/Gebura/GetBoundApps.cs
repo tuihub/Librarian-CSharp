@@ -20,7 +20,7 @@ namespace Librarian.Sephirah.Services
         public override Task<GetBoundAppsResponse> GetBoundApps(GetBoundAppsRequest request, ServerCallContext context)
         {
             var appId = request.AppId.Id;
-            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appId);
+            var app = _dbContext.AppInfos.SingleOrDefault(x => x.Id == appId);
             if (app == null) 
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             var ret = new GetBoundAppsResponse();

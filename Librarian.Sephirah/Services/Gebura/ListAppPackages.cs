@@ -15,7 +15,7 @@ namespace Librarian.Sephirah.Services
             var sourceFilter = request.SourceFilter;
             var idFilter = request.IdFilter;
             var assignedAppIdFilter = request.AssignedAppIdFilter;
-            var appPackages = _dbContext.AppPackages.AsQueryable();
+            var appPackages = _dbContext.Apps.AsQueryable();
             if (idFilter.Count > 0)
                 appPackages = appPackages.Where(x => idFilter.Select(x => x.Id).Contains(x.Id));
             if (assignedAppIdFilter.Count > 0)

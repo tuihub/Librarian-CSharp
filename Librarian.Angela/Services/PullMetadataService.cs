@@ -55,7 +55,7 @@ namespace Librarian.Angela.Services
                         {
                             using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
                             {
-                                var app = dbContext.Apps.Single(x => x.Id == externalApp.InternalID);
+                                var app = dbContext.AppInfos.Single(x => x.Id == externalApp.InternalID);
                                 appSource = app.Source;
                                 parentAppId = app.ParentAppInfoId;
                             }
@@ -103,8 +103,8 @@ namespace Librarian.Angela.Services
                                         {
                                             using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
                                             {
-                                                var app = dbContext.Apps.Single(x => x.Id == parentAppId);
-                                                app.Name = dbContext.Apps.Single(x => x.Id == externalApp.InternalID).Name;
+                                                var app = dbContext.AppInfos.Single(x => x.Id == parentAppId);
+                                                app.Name = dbContext.AppInfos.Single(x => x.Id == externalApp.InternalID).Name;
                                                 await dbContext.SaveChangesAsync();
                                             }
                                         }
