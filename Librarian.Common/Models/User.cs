@@ -23,7 +23,7 @@ namespace Librarian.Common.Models
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(required, to child)

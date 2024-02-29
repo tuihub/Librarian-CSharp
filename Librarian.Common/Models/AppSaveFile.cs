@@ -16,7 +16,7 @@ namespace Librarian.Common.Models
         public long Id { get; set; }
         public AppSaveFileStatus Status { get; set; }
         public bool IsPinned { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // one-to-one relation(required)
         public long FileMetadataId { get; set; }

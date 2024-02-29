@@ -15,7 +15,7 @@ namespace Librarian.Common.Models
         public long EntityInternalId { get; set; }
         public long? Count { get; set; }
         public long? SizeBytes { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
 

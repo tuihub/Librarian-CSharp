@@ -32,7 +32,7 @@ namespace Librarian.Common.Models
         public string? BackgroundImageUrl { get; set; }
         [MaxLength(256)]
         public string? CoverImageUrl { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation to self(optional)
@@ -135,7 +135,7 @@ namespace Librarian.Common.Models
             this.IconImageUrl = appInfo.IconImageUrl;
             this.BackgroundImageUrl = appInfo.BackgroundImageUrl;
             this.CoverImageUrl = appInfo.CoverImageUrl;
-            this.UpdatedAt = DateTime.Now;
+            this.UpdatedAt = DateTime.UtcNow;
             if (appInfo.Details != null)
             {
                 this.AppInfoDetails ??= new AppInfoDetails();
@@ -155,7 +155,7 @@ namespace Librarian.Common.Models
             this.IconImageUrl = appInfo.IconImageUrl;
             this.BackgroundImageUrl = appInfo.BackgroundImageUrl;
             this.CoverImageUrl = appInfo.CoverImageUrl;
-            this.UpdatedAt = DateTime.Now;
+            this.UpdatedAt = DateTime.UtcNow;
             if (appInfo.AppInfoDetails != null)
             {
                 this.AppInfoDetails ??= new AppInfoDetails();

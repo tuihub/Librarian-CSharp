@@ -22,7 +22,7 @@ namespace Librarian.Common.Models
         [MaxLength(128)]
         public string? Version { get; set; }
         //public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-one relation(required, to parent)

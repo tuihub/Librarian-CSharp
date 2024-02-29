@@ -26,7 +26,7 @@ namespace Librarian.Common.Models
         public string? ClientSourceCodeAddress { get; set; }
         [MaxLength(256)]
         public string? ClientVersion { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(required, to child)

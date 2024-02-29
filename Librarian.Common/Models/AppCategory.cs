@@ -16,7 +16,7 @@ namespace Librarian.Common.Models
         public long Id { get; set; }
         [MaxLength(128)]
         public string Name { get; set; } = null!;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(required, to parent)

@@ -19,7 +19,7 @@ namespace Librarian.Common.Models
         [MaxLength(1024)]
         public string? Description { get; set; }
         public bool IsPublic { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(required, to child)

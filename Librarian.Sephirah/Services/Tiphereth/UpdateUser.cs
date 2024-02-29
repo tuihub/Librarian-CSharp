@@ -23,7 +23,7 @@ namespace Librarian.Sephirah.Services
             if (userReq.Password.Length > 0) { user.Password = PasswordHasher.HashPassword(userReq.Password); }
             if (userReq.Type != UserType.Unspecified) { user.Type = userReq.Type; }
             if (userReq.Status != UserStatus.Unspecified) { user.Status = userReq.Status; }
-            user.UpdatedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateUserResponse());
         }

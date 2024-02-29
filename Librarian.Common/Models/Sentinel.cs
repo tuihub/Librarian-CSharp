@@ -20,7 +20,7 @@ namespace Librarian.Common.Models
         public string? Description { get; set; }
         public string Token { get; set; } = null!;
         //public ICollection<string> CdnUrls { get; set; } = new List<string>();
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(required, to child)

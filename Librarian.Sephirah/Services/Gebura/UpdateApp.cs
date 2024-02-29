@@ -42,7 +42,7 @@ namespace Librarian.Sephirah.Services
                 if (app.AppDetails == null) { app.AppDetails = new Common.Models.AppDetails(app.Id, appReq.Details); }
                 else app.AppDetails!.UpdateFromProtoAppDetails(appReq.Details);
             }
-            app.UpdatedAt = DateTime.Now;
+            app.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }

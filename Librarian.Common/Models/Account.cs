@@ -25,7 +25,7 @@ namespace Librarian.Common.Models
         public string ProfileUrl { get; set; } = null!;
         [MaxLength(256)]
         public string AvatarUrl { get; set; } = null!;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
         // one-to-many relation(to child, only used in non-internal appInfo)

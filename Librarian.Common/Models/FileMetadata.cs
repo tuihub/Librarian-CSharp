@@ -25,7 +25,7 @@ namespace Librarian.Common.Models
         [MaxLength(32)]
         [IsFixedLength]
         public byte[] Sha256 { get; set; } = null!;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public FileMetadata(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata metadata)
         {

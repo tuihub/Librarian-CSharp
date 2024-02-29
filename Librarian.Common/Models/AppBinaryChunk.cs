@@ -20,7 +20,7 @@ namespace Librarian.Common.Models
         public long SizeBytes { get; set; }
         public string PublicUrl { get; set; } = null!;
         public byte[]? Sha256 { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary.Types.Chunk ToProtoAppPackageBinaryChunk()
         {

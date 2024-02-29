@@ -17,7 +17,7 @@ namespace Librarian.Common.Models
         public long InternalId { get; set; }
         public TokenStatus Status { get; set; } = TokenStatus.Normal;
         public string Token { get; set; } = null!;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // computed
         public DateTime ExpiredAt

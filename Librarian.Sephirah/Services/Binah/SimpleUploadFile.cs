@@ -112,7 +112,7 @@ namespace Librarian.Sephirah.Services
             {
                 ret.Status = FileTransferStatus.Failed;
             }
-            gameSaveFile.UpdatedAt = DateTime.Now;
+            gameSaveFile.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             await responseStream.WriteAsync(ret);
         }
