@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request, ServerCallContext context)
         {
             string accessTokenNew, refreshTokenNew;
-            long? sessionId = null;
+            Session? oldSession = null;
             var internalId = context.GetInternalIdFromHeader();
             var deviceId = request.DeviceId?.Id;
             // get user
@@ -26,18 +26,18 @@ namespace Librarian.Sephirah.Services
             if (deviceId != null)
             {
                 var token = context.GetBearerToken();
-                var session = _dbContext.Sessions
+                oldSession = _dbContext.Sessions
                     .SingleOrDefault(x => x.Token == token
+                        && x.ExpiredAt > DateTime.UtcNow
                         && x.UserId == internalId
                         && x.DeviceId == deviceId
                         && x.Status == Common.Models.TokenStatus.Normal);
-                if (session == null)
+                if (oldSession == null)
                 {
                     throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid refresh token."));
                 }
-                sessionId = session.Id;
-                session.Status = Common.Models.TokenStatus.Used;
-                session.UpdatedAt = DateTime.UtcNow;
+                oldSession.Status = Common.Models.TokenStatus.Used;
+                oldSession.UpdatedAt = DateTime.UtcNow;
             }
             // get new token
             accessTokenNew = JwtUtil.GenerateAccessToken(internalId);
@@ -46,10 +46,12 @@ namespace Librarian.Sephirah.Services
             {
                 _dbContext.Sessions.Add(new Common.Models.Session
                 {
-                    InternalId = (long)sessionId!,
+                    InternalId = oldSession!.InternalId,
                     Token = refreshTokenNew,
                     UserId = user.Id,
-                    DeviceId = (long)deviceId
+                    DeviceId = (long)deviceId,
+                    CreatedAt = oldSession.CreatedAt,
+                    ExpiredAt = JwtUtil.GetTokenExpireTime(refreshTokenNew)
                 });
                 // save to db only when DeviceId is present
                 _dbContext.SaveChanges();

@@ -32,7 +32,8 @@ namespace Librarian.Sephirah.Services
                 if (deviceId != null)
                 {
                     var oldSessions = _dbContext.Sessions
-                        .Where(x => x.UserId == user.Id
+                        .Where(x => x.ExpiredAt > DateTime.UtcNow
+                            && x.UserId == user.Id
                             && x.DeviceId == deviceId
                             && x.Status == Common.Models.TokenStatus.Normal);
                     foreach (var session in oldSessions)
@@ -45,7 +46,8 @@ namespace Librarian.Sephirah.Services
                         InternalId = _idGenerator.CreateId(),
                         Token = refreshToken,
                         UserId = user.Id,
-                        DeviceId = (long)deviceId
+                        DeviceId = (long)deviceId,
+                        ExpiredAt = JwtUtil.GetTokenExpireTime(refreshToken)
                     });
                     _dbContext.SaveChanges();
                 }

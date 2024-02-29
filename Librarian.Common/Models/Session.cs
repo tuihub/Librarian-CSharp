@@ -1,6 +1,7 @@
 ﻿using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
@@ -9,6 +10,7 @@ namespace Librarian.Common.Models
     [Index(nameof(Token))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
+    [Index(nameof(ExpiredAt))]
     public class Session
     {
         // not internalId, database generated
@@ -19,11 +21,7 @@ namespace Librarian.Common.Models
         public string Token { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
-        // computed
-        public DateTime ExpiredAt
-        {
-            get => JwtUtil.GetTokenExpireTime(Token);
-        }
+        public DateTime ExpiredAt { get; set; }
         // relations
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
@@ -31,12 +29,26 @@ namespace Librarian.Common.Models
         // one-to-many relation(required, to parent)
         public long DeviceId { get; set; }
         public Device Device { get; set; } = null!;
+
+        public Session() { }
+        public TuiHub.Protos.Librarian.Sephirah.V1.UserSession ToProtoUserSession()
+        {
+            return new TuiHub.Protos.Librarian.Sephirah.V1.UserSession
+            {
+                Id = new InternalID { Id = InternalId },
+                UserId = new InternalID { Id = UserId },
+                DeviceInfo = Device.ToProtoDeviceInfo(),
+                CreateTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(CreatedAt),
+                ExpireTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(ExpiredAt)
+            };
+        }
     }
 
     public enum TokenStatus
     {
         Normal,
         Revoked,
-        Used
+        Used,
+        Deleted
     }
 }
