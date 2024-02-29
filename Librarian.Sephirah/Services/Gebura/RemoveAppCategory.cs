@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<RemoveAppCategoryResponse> RemoveAppCategory(RemoveAppCategoryRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             var appCategory = _dbContext.AppCategories.SingleOrDefault(x => x.Id == request.Id.Id);
             if (appCategory == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppCategory not exists."));

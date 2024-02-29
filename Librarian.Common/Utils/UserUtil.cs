@@ -8,7 +8,7 @@ namespace Librarian.Common.Utils
     {
         public static UserType GetUserTypeFromJwt(ServerCallContext context, ApplicationDbContext db)
         {
-            long internalId = JwtUtil.GetInternalIdFromJwt(context);
+            long internalId = JwtUtil.GetInternalIdFromHeader(context);
             var user = db.Users.Single(x => x.Id == internalId);
             return user.Type;
         }

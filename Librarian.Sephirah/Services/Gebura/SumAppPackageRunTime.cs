@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<SumAppPackageRunTimeResponse> SumAppPackageRunTime(SumAppPackageRunTimeRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             var appPackageId = request.AppPackageId.Id;
             var timeAggregation = request.TimeAggregation;
             if (timeAggregation.AggregationType != TimeAggregation.Types.AggregationType.Overall)

@@ -103,15 +103,24 @@ namespace Librarian.Common.Utils
             var principal = handler.ValidateToken(token, parameters, out _);
             return principal != null;
         }
-        public static long GetInternalIdFromJwt(ServerCallContext context)
+        public static string? GetBearerToken(this ServerCallContext context)
         {
-            var token = context.RequestHeaders.Single(x => x.Key == "authorization").Value;
-            var internalId = GetInternalIdFromJwt(token);
+            var token = context.RequestHeaders.SingleOrDefault(x => x.Key == "authorization")?.Value;
+            token = token?.Substring("Bearer ".Length).Trim();
+            return token;
+        }
+        public static long GetInternalIdFromHeader(this ServerCallContext context)
+        {
+            var token = context.GetBearerToken();
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+            var internalId = GetInternalIdFromJwtToken(token);
             return internalId;
         }
-        private static long GetInternalIdFromJwt(string token)
+        private static long GetInternalIdFromJwtToken(string token)
         {
-            token = token.Substring("Bearer ".Length).Trim();
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);

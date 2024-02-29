@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
         [Authorize(AuthenticationSchemes = "UploadToken")]
         public override async Task SimpleUploadFile(IAsyncStreamReader<SimpleUploadFileRequest> requestStream, IServerStreamWriter<SimpleUploadFileResponse> responseStream, ServerCallContext context)
         {
-            var internalId = JwtUtil.GetInternalIdFromJwt(context);
+            var internalId = JwtUtil.GetInternalIdFromHeader(context);
             var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
             if (gameSaveFile.Status == AppSaveFileStatus.Stored)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Current game save has been stored."));

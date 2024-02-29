@@ -21,11 +21,11 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<GetPurchasedAppsResponse> GetPurchasedApps(GetPurchasedAppsRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             // foreach for IEnumerable is not by reference
             // https://stackoverflow.com/questions/43055464/c-sharp-foreach-not-reference-to-original-objects-but-copies
             var apps = _dbContext.Users.Include(x => x.Apps)
-                                       .ThenInclude(x => x.ChildAppInfos)
+                                       .ThenInclude(x => x.ChildApps)
                                        .Single(x => x.Id == userId)
                                        .Apps
                                        .Select(x => x.Flatten().ToProtoAppMixed())

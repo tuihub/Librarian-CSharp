@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<AddAppPackageRunTimeResponse> AddAppPackageRunTime(AddAppPackageRunTimeRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             var appPackageId = request.AppPackageId.Id;
             var appPackage = _dbContext.Apps.Single(x => x.Id == appPackageId);
             var startTime = request.TimeRange.StartTime.ToDateTime();

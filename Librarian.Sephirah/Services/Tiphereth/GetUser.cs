@@ -8,7 +8,7 @@ namespace Librarian.Sephirah.Services
     {
         public override Task<GetUserResponse> GetUser(GetUserRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             // NOTE: request id can be null
             if (request.Id?.Id != null && request.Id.Id != userId)
             {

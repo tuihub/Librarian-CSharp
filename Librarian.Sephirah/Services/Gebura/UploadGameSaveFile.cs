@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<UploadGameSaveFileResponse> UploadGameSaveFile(UploadGameSaveFileRequest request, ServerCallContext context)
         {
             // check rotation count
-            var userInternalId = JwtUtil.GetInternalIdFromJwt(context);
+            var userInternalId = JwtUtil.GetInternalIdFromHeader(context);
             var appPackageInternalId = request.AppPackageId.Id;
             var appPackageSaveFileCount = _dbContext.GameSaveFiles.Count(x => x.UserId == userInternalId &&
                                                                               x.AppPackageId == appPackageInternalId);

@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<ListAppCategoriesResponse> ListAppCategories(ListAppCategoriesRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             var appCategories = _dbContext.AppCategories.Where(x => x.UserId == userId);
             var ret = new ListAppCategoriesResponse();
             ret.AppCategories.Add(appCategories.Select(x => x.ToProtoAppCategory()));

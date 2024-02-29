@@ -21,7 +21,7 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be internal."));
             }
-            var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromJwt(context));
+            var user = _dbContext.Users.Single(x => x.Id == JwtUtil.GetInternalIdFromHeader(context));
             user.Apps.Add(app);
             _dbContext.SaveChanges();
             return Task.FromResult(new PurchaseAppResponse());

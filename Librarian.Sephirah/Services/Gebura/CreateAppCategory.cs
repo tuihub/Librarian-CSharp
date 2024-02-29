@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<CreateAppCategoryResponse> CreateAppCategory(CreateAppCategoryRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromJwt(context);
+            var userId = JwtUtil.GetInternalIdFromHeader(context);
             var internalId = _idGenerator.CreateId();
             var appCategory = new Common.Models.AppCategory(internalId, userId, request.AppCategory);
             _dbContext.AppCategories.Add(appCategory);
