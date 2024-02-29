@@ -29,6 +29,7 @@ namespace Librarian.Common.Utils
         public DbSet<UserAppInfo> UserAppInfos { get; set; } = null!;
         // internal
         public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

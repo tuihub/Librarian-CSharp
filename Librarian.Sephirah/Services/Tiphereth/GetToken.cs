@@ -6,6 +6,7 @@ namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
+        // TODO: reduce token expiration time when DeviceId is not present
         public override Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
         {
             string accessToken, refreshToken;
@@ -22,6 +23,13 @@ namespace Librarian.Sephirah.Services
                 // get token
                 accessToken = JwtUtil.GenerateAccessToken(user.Id);
                 refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
+                _dbContext.RefreshTokens.Add(new Common.Models.RefreshToken
+                {
+                    Token = refreshToken,
+                    UserId = user.Id,
+                    DeviceId = request.DeviceId?.Id
+                });
+                _dbContext.SaveChanges();
             }
             else
             {
