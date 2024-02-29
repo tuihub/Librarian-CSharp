@@ -28,19 +28,21 @@ namespace Librarian.Sephirah.Services
                 // get token
                 accessToken = JwtUtil.GenerateAccessToken(user.Id);
                 refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
-                // set old refresh tokens to revoked
+                // set old sessions (refresh tokens) to revoked
                 if (deviceId != null)
                 {
-                    var oldRefreshTokens = _dbContext.RefreshTokens
+                    var oldSessions = _dbContext.Sessions
                         .Where(x => x.UserId == user.Id
                             && x.DeviceId == deviceId
                             && x.Status == Common.Models.TokenStatus.Normal);
-                    foreach (var oldRefreshToken in oldRefreshTokens)
+                    foreach (var session in oldSessions)
                     {
-                        oldRefreshToken.Status = Common.Models.TokenStatus.Revoked;
+                        session.Status = Common.Models.TokenStatus.Revoked;
+                        session.UpdatedAt = DateTime.UtcNow;
                     }
-                    _dbContext.RefreshTokens.Add(new Common.Models.RefreshToken
+                    _dbContext.Sessions.Add(new Common.Models.Session
                     {
+                        InternalId = _idGenerator.CreateId(),
                         Token = refreshToken,
                         UserId = user.Id,
                         DeviceId = (long)deviceId

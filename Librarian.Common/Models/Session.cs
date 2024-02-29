@@ -1,19 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Librarian.Common.Utils;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(InternalId))]
+    [Index(nameof(Status))]
+    [Index(nameof(Token))]
     [Index(nameof(CreatedAt))]
-    [Index(nameof(UsedAt))]
-    public class RefreshToken
+    [Index(nameof(UpdatedAt))]
+    public class Session
     {
         // not internalId, database generated
         [Key]
         public long Id { get; set; }
+        public long InternalId { get; set; }
         public TokenStatus Status { get; set; } = TokenStatus.Normal;
         public string Token { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UsedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        // computed
+        public DateTime ExpiredAt
+        {
+            get => JwtUtil.GetTokenExpireTime(Token);
+        }
         // relations
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }

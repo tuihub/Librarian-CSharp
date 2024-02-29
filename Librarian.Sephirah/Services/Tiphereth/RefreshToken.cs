@@ -13,6 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request, ServerCallContext context)
         {
             string accessTokenNew, refreshTokenNew;
+            long? sessionId = null;
             var internalId = context.GetInternalIdFromHeader();
             var deviceId = request.DeviceId?.Id;
             // get user
@@ -25,24 +26,27 @@ namespace Librarian.Sephirah.Services
             if (deviceId != null)
             {
                 var token = context.GetBearerToken();
-                var refreshTokenDb = _dbContext.RefreshTokens
+                var session = _dbContext.Sessions
                     .SingleOrDefault(x => x.Token == token
                         && x.UserId == internalId
                         && x.DeviceId == deviceId
                         && x.Status == Common.Models.TokenStatus.Normal);
-                if (refreshTokenDb == null)
+                if (session == null)
                 {
                     throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid refresh token."));
                 }
-                refreshTokenDb.Status = Common.Models.TokenStatus.Used;
+                sessionId = session.Id;
+                session.Status = Common.Models.TokenStatus.Used;
+                session.UpdatedAt = DateTime.UtcNow;
             }
             // get new token
             accessTokenNew = JwtUtil.GenerateAccessToken(internalId);
             refreshTokenNew = JwtUtil.GenerateRefreshToken(internalId);
             if (deviceId != null)
             {
-                _dbContext.RefreshTokens.Add(new Common.Models.RefreshToken
+                _dbContext.Sessions.Add(new Common.Models.Session
                 {
+                    InternalId = (long)sessionId!,
                     Token = refreshTokenNew,
                     UserId = user.Id,
                     DeviceId = (long)deviceId

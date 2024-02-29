@@ -126,6 +126,12 @@ namespace Librarian.Common.Utils
             var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);
             return internalId;
         }
+        public static DateTime GetTokenExpireTime(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            return jwtToken.ValidTo;
+        }
         public static void GetJwtBearerOptions(this JwtBearerOptions options, string validAudience)
         {
             var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
