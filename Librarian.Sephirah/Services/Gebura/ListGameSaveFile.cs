@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<ListGameSaveFilesResponse> ListGameSaveFiles(ListGameSaveFilesRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromHeader(context);
+            var userId = context.GetInternalIdFromHeader();
             var appPackageId = request.AppPackageId.Id;
             var fileMetadatas = _dbContext.GameSaveFiles
                                   .Where(x => x.AppPackageId == appPackageId &&

@@ -12,7 +12,7 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UpdateAppCategoryResponse> UpdateAppCategory(UpdateAppCategoryRequest request, ServerCallContext context)
         {
-            var userId = JwtUtil.GetInternalIdFromHeader(context);
+            var userId = context.GetInternalIdFromHeader();
             var appCategory = _dbContext.AppCategories.SingleOrDefault(x => x.Id == request.AppCategory.Id.Id);
             if (appCategory == null)
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppCategory not exists."));

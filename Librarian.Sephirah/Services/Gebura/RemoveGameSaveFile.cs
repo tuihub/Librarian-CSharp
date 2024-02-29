@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Services
         public override async Task<RemoveGameSaveFileResponse> RemoveGameSaveFile(RemoveGameSaveFileRequest request, ServerCallContext context)
         {
             var id = request.Id.Id;
-            var userId = JwtUtil.GetInternalIdFromHeader(context);
+            var userId = context.GetInternalIdFromHeader();
             var gameSaveFile = await _dbContext.GameSaveFiles.SingleAsync(x => x.Id == id);
             var fileMetadata = await _dbContext.FileMetadatas.SingleOrDefaultAsync(x => x.Id == id);
             // only remove in minio when status is Stored
