@@ -34,9 +34,9 @@ namespace Librarian.Common.Models
         // many-to-many relation(required)
         public ICollection<User> Users { get; } = new List<User>();
         // func
-        public Device(TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo deviceInfo)
+        public Device(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo deviceInfo)
         {
-            Id = deviceInfo.DeviceId.Id;
+            Id = internalId;
             DeviceName = deviceInfo.DeviceName;
             SystemType = deviceInfo.SystemType;
             SystemVersion = string.IsNullOrEmpty(deviceInfo.SystemVersion) ? null : deviceInfo.SystemVersion;
