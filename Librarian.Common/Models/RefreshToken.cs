@@ -10,7 +10,7 @@ namespace Librarian.Common.Models
         // not internalId, database generated
         [Key]
         public long Id { get; set; }
-        public bool Used { get; set; } = false;
+        public TokenStatus Status { get; set; } = TokenStatus.Normal;
         public string Token { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UsedAt { get; set; }
@@ -21,5 +21,12 @@ namespace Librarian.Common.Models
         // one-to-many relation(optional, to parent)
         public long? DeviceId { get; set; }
         public Device? Device { get; set; }
+    }
+
+    public enum TokenStatus
+    {
+        Normal,
+        Revoked,
+        Used
     }
 }
