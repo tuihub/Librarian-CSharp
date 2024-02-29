@@ -1,9 +1,12 @@
 ﻿using Librarian.Common.Utils;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class AppInfoDetails
     {
         // same as App Id
@@ -19,6 +22,9 @@ namespace Librarian.Common.Models
         [MaxLength(128)]
         public string? Version { get; set; }
         //public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
+        // relations
         // one-to-one relation(required, to parent)
         public long AppId { get; set; }
         public AppInfo App { get; set; } = null!;

@@ -6,6 +6,8 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(DeviceName))]
+    [Index(nameof(SystemType))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class Device

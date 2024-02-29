@@ -7,6 +7,8 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class AppInstRunTime
     {
         // not InternalId, database generated
@@ -14,5 +16,7 @@ namespace Librarian.Common.Models
         public long Id { get; set; }
         public DateTime StartDateTime { get; set; }
         public TimeSpan Duration { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
     }
 }

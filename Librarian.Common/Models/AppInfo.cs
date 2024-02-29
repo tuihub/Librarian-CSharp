@@ -5,10 +5,9 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
-    [Index(nameof(Source))]
-    [Index(nameof(SourceAppId))]
-    [Index(nameof(Type))]
+    [Index(nameof(Source), nameof(SourceAppId))]
     [Index(nameof(Name))]
+    [Index(nameof(Type))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class AppInfo

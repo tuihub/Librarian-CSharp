@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(Status))]
+    [Index(nameof(IsPinned))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class AppSaveFile

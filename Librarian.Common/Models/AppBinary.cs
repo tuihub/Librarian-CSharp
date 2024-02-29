@@ -7,6 +7,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(TokenServerUrl))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class AppBinary
@@ -26,6 +27,7 @@ namespace Librarian.Common.Models
         public string TokenServerUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // relations
         // one-to-many relation(required, to child)
         public ICollection<AppBinaryChunk> AppBinaryChunks { get; } = new List<AppBinaryChunk>();
         // one-to-many relation(required, to parent)

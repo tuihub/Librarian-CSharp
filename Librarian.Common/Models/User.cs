@@ -7,6 +7,9 @@ using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(Name))]
+    [Index(nameof(Type))]
+    [Index(nameof(Status))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class User

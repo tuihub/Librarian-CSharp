@@ -11,6 +11,7 @@ namespace Librarian.Common.Models
 {
     // for internal appInfo
     [PrimaryKey(nameof(UserId), nameof(AppInfoId))]
+    [Index(nameof(TotalRunTime))]
     public class UserAppInfo
     {
         // one-to-many relation(required, to parent)

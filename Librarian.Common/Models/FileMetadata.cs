@@ -8,6 +8,9 @@ using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(Name))]
+    [Index(nameof(SizeBytes))]
+    [Index(nameof(Type))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class FileMetadata

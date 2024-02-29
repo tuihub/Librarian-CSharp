@@ -3,7 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Librarian.Common.Models
 {
-    [Index(nameof(EntityInternalId))]
+    [Index(nameof(EntityType), nameof(EntityInternalId))]
+    [Index(nameof(CreatedAt))]
+    [Index(nameof(UpdatedAt))]
     public class AppSaveFileCapacity
     {
         // not internalId, database generated
@@ -13,6 +15,8 @@ namespace Librarian.Common.Models
         public long EntityInternalId { get; set; }
         public long? Count { get; set; }
         public long? SizeBytes { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
     }
 
     public enum EntityType

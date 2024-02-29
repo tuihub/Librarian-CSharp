@@ -5,6 +5,8 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(Name))]
+    [Index(nameof(IsPublic))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class App
@@ -19,6 +21,7 @@ namespace Librarian.Common.Models
         public bool IsPublic { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // relations
         // one-to-many relation(required, to child)
         public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
         // one-to-many relation(required, to child)

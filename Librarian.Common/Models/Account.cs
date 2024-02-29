@@ -7,6 +7,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
+    [Index(nameof(Platform), nameof(PlatformAccountId))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class Account
@@ -26,6 +27,7 @@ namespace Librarian.Common.Models
         public string AvatarUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+        // relations
         // one-to-many relation(to child, only used in non-internal appInfo)
         public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
         // one-to-many relation(required, to parent)
