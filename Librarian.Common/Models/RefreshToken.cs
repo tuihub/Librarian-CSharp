@@ -18,9 +18,9 @@ namespace Librarian.Common.Models
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
-        // one-to-many relation(optional, to parent)
-        public long? DeviceId { get; set; }
-        public Device? Device { get; set; }
+        // one-to-many relation(required, to parent)
+        public long DeviceId { get; set; }
+        public Device Device { get; set; } = null!;
     }
 
     public enum TokenStatus

@@ -12,6 +12,7 @@ namespace Librarian.Sephirah.Services
             string accessToken, refreshToken;
             var username = request.Username;
             var password = request.Password;
+            var deviceId = request.DeviceId?.Id;
             // get user
             var user = _dbContext.Users.SingleOrDefault(u => u.Name == username);
             if (user == null)
@@ -28,24 +29,24 @@ namespace Librarian.Sephirah.Services
                 accessToken = JwtUtil.GenerateAccessToken(user.Id);
                 refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
                 // set old refresh tokens to revoked
-                if (request.DeviceId != null)
+                if (deviceId != null)
                 {
                     var oldRefreshTokens = _dbContext.RefreshTokens
                         .Where(x => x.UserId == user.Id
-                            && x.DeviceId == request.DeviceId.Id
+                            && x.DeviceId == deviceId
                             && x.Status == Common.Models.TokenStatus.Normal);
                     foreach (var oldRefreshToken in oldRefreshTokens)
                     {
                         oldRefreshToken.Status = Common.Models.TokenStatus.Revoked;
                     }
+                    _dbContext.RefreshTokens.Add(new Common.Models.RefreshToken
+                    {
+                        Token = refreshToken,
+                        UserId = user.Id,
+                        DeviceId = (long)deviceId
+                    });
+                    _dbContext.SaveChanges();
                 }
-                _dbContext.RefreshTokens.Add(new Common.Models.RefreshToken
-                {
-                    Token = refreshToken,
-                    UserId = user.Id,
-                    DeviceId = request.DeviceId?.Id
-                });
-                _dbContext.SaveChanges();
             }
             else
             {
