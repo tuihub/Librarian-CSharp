@@ -11,14 +11,12 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
         {
-            // get user type
-            var userType = UserUtil.GetUserTypeFromJwt(context, _dbContext);
             var userIdFromJwt = context.GetInternalIdFromHeader();
-            // update user
             var userReq = request.User;
-            if (userType != UserType.Admin && userIdFromJwt != userReq.Id.Id)
+            // verify user type if request user id is not same as jwt user id
+            if (userReq.Id.Id != userIdFromJwt)
             {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "You don't have permission to update this user."));
+                UserUtil.VerifyUserAdminAndThrow(context, _dbContext, "You don't have permission to update this user.");
             }
             var user = _dbContext.Users.SingleOrDefault(x => x.Id == userReq.Id.Id);
             if (user == null)

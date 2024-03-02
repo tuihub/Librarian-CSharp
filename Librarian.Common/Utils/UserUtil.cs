@@ -13,11 +13,11 @@ namespace Librarian.Common.Utils
             return user.Type;
         }
 
-        public static void VerifyUserAdminAndThrow(ServerCallContext context, ApplicationDbContext db)
+        public static void VerifyUserAdminAndThrow(ServerCallContext context, ApplicationDbContext db, string? exMsg = null)
         {
             if (GetUserTypeFromJwt(context, db) != UserType.Admin)
             {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "Access Deined."));
+                throw new RpcException(new Status(StatusCode.PermissionDenied, exMsg ?? "Access Deined."));
             }
         }
     }

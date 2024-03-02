@@ -9,12 +9,12 @@ namespace Librarian.Sephirah.Services
         public override Task<GetUserResponse> GetUser(GetUserRequest request, ServerCallContext context)
         {
             var userIdFromJwt = context.GetInternalIdFromHeader();
-            var userType = UserUtil.GetUserTypeFromJwt(context, _dbContext);
             // NOTE: request id can be null
             var userIdToGet = request.Id?.Id == null ? userIdFromJwt : request.Id.Id;
-            if (userType != UserType.Admin && userIdFromJwt != userIdToGet)
+            // verify user type if request user id is not same as jwt user id
+            if (userIdToGet != userIdFromJwt)
             {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "You don't have permission to get this user."));
+                UserUtil.VerifyUserAdminAndThrow(context, _dbContext, "You don't have permission to get this user.");
             }
             // get user
             var user = _dbContext.Users.SingleOrDefault(u => u.Id == userIdToGet);
