@@ -28,7 +28,10 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfo not exists."));
             }
             // update AppInfo
-            appInfo.Source = appReq.Source;
+            if (!string.IsNullOrEmpty(appReq.Source) && appReq.Source != Common.Constants.Proto.AppSourceUnspecified)
+            { 
+                appInfo.Source = appReq.Source;
+            }
             if (appReq.SourceAppId != null) { appInfo.SourceAppId = appReq.SourceAppId; }
             if (appReq.SourceUrl != null) { appInfo.SourceUrl = appReq.SourceUrl; }
             if (appReq.Name != null) { appInfo.Name = appReq.Name; }
