@@ -9,19 +9,24 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         [Authorize]
-        public override Task<ListAppsResponse> ListApps(ListAppsRequest request, ServerCallContext context)
+        public override Task<ListAppInfosResponse> ListAppInfos(ListAppInfosRequest request, ServerCallContext context)
         {
             // verify user type(admin)
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // get request param
+            var excludeInternal = request.ExcludeInternal;
             var sourceFilters = request.SourceFilter;
             var typeFilters = request.TypeFilter;
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter apps
-            IQueryable<Common.Models.App> apps;
+            IQueryable<Common.Models.AppInfo> apps;
             if (containDetails == false) { apps = _dbContext.AppInfos.AsQueryable(); }
-            else { apps = _dbContext.AppInfos.Include(x => x.AppDetails).AsQueryable(); }
+            else { apps = _dbContext.AppInfos.Include(x => x.AppInfoDetails).AsQueryable(); }
+            if (excludeInternal == true)
+            {
+                apps = apps.Where(x => x.Source != Common.Constants.Proto.AppSourceInternal);
+            }
             if (idFilters.Count > 0)
             {
                 apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
@@ -37,14 +42,14 @@ namespace Librarian.Sephirah.Services
             apps = apps.ApplyPagingRequest(request.Paging);
             if (containDetails == false)
             {
-                apps = apps.Select(x => x.GetAppWithoutDetails());
+                apps = apps.Select(x => x.GetAppInfoWithoutDetails());
             }
             // construct response
-            var response = new ListAppsResponse
+            var response = new ListAppInfosResponse
             {
                 Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = apps.Count() }
             };
-            response.Apps.Add(apps.Select(x => x.ToProtoApp()));
+            response.AppInfos.Add(apps.Select(x => x.ToProtoAppInfo()));
             return Task.FromResult(response);
         }
     }
