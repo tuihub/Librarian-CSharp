@@ -8,7 +8,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models
 {
-    [Index(nameof(Platform), nameof(PlatformAccountId))]
+    [Index(nameof(Platform), nameof(PlatformAccountId), IsUnique = true)]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class Account
