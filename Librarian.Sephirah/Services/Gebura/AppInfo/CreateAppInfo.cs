@@ -9,20 +9,20 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         [Authorize]
-        public override Task<CreateAppResponse> CreateApp(CreateAppRequest request, ServerCallContext context)
+        public override Task<CreateAppInfoResponse> CreateAppInfo(CreateAppInfoRequest request, ServerCallContext context)
         {
             // verify user type(admin)
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-            // create app
-            var internalId = _idGenerator.CreateId();
-            if (!request.App.Internal)
+            // create appInfo
+            if (!request.AppInfo.Internal)
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppSource must be internal."));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfoSource must be internal."));
             }
-            var app = new Common.Models.App(internalId, request.App);
-            _dbContext.AppInfos.Add(app);
+            var internalId = _idGenerator.CreateId();
+            var appInfo = new Common.Models.AppInfo(internalId, request.AppInfo);
+            _dbContext.AppInfos.Add(appInfo);
             _dbContext.SaveChanges();
-            return Task.FromResult(new CreateAppResponse
+            return Task.FromResult(new CreateAppInfoResponse
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = internalId }
             });
