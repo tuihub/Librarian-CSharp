@@ -21,7 +21,7 @@ namespace Librarian.Angela.Services
         private readonly CancellationTokenSource _cts = new();
         private readonly ManualResetEventSlim _mres = new(false);
 
-        private readonly Queue<ExternalApp> _externalApps = new();
+        private readonly Queue<ExternalAppInfo> _externalAppInfos = new();
 
         public PullMetadataService(ILogger<PullMetadataService> logger, IServiceProvider serviceProvider)
         {
@@ -43,21 +43,21 @@ namespace Librarian.Angela.Services
                 while (true)
                 {
                     _mres.Wait(token);
-                    while (_externalApps.Count > 0)
+                    while (_externalAppInfos.Count > 0)
                     {
-                        var externalApp = _externalApps.Dequeue();
-                        _logger.LogDebug("Pulling app {Id}, UpdateParentAppName = {UpdateParentAppName}," +
-                            " _externalApps.Count = {Count}", 
-                            externalApp.InternalID, externalApp.UpdateParentAppName.ToString(), _externalApps.Count);
-                        string appSource;
-                        long? parentAppId;
+                        var externalAppInfo = _externalAppInfos.Dequeue();
+                        _logger.LogDebug("Pulling appInfo {Id}, UpdateParentAppInfoName = {UpdateParentAppInfoName}," +
+                            " _externalAppInfos.Count = {Count}", 
+                            externalAppInfo.InternalID, externalAppInfo.UpdateParentAppInfoName.ToString(), _externalAppInfos.Count);
+                        string appInfoSource;
+                        long? parentAppInfoId;
                         using (var scope = _serviceProvider.CreateScope())
                         {
                             using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
                             {
-                                var app = dbContext.AppInfos.Single(x => x.Id == externalApp.InternalID);
-                                appSource = app.Source;
-                                parentAppId = app.ParentAppInfoId;
+                                var appInfo = dbContext.AppInfos.Single(x => x.Id == externalAppInfo.InternalID);
+                                appInfoSource = appInfo.Source;
+                                parentAppInfoId = appInfo.ParentAppInfoId;
                             }
                         }
                         var retries = 0;
@@ -65,46 +65,46 @@ namespace Librarian.Angela.Services
                         {
                             try
                             {
-                                if (appSource == "steam")
+                                if (appInfoSource == "steam")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
-                                    await steamProvider.PullAppInfoAsync(externalApp.InternalID);
+                                    await steamProvider.PullAppInfoAsync(externalAppInfo.InternalID);
                                 }
-                                else if (appSource == "vndb")
+                                else if (appInfoSource == "vndb")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
-                                    await vndbProvider.PullAppInfoAsync(externalApp.InternalID);
+                                    await vndbProvider.PullAppInfoAsync(externalAppInfo.InternalID);
                                 }
-                                else if (appSource == "bangumi")
+                                else if (appInfoSource == "bangumi")
                                 {
                                     using var scope = _serviceProvider.CreateScope();
                                     var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
-                                    await bangumiProvider.PullAppInfoAsync(externalApp.InternalID);
+                                    await bangumiProvider.PullAppInfoAsync(externalAppInfo.InternalID);
                                 }
                                 else
                                 {
-                                    _logger.LogWarning("Unsupported app Id = {Id}, appSource {AppSource}", externalApp.InternalID, appSource);
+                                    _logger.LogWarning("Unsupported appInfo Id = {Id}, appInfoSource {AppInfoSource}", externalAppInfo.InternalID, appInfoSource);
                                     break;
                                 }
 
                                 // update parent app name
-                                if (externalApp.UpdateParentAppName == true)
+                                if (externalAppInfo.UpdateParentAppInfoName == true)
                                 {
-                                    if (parentAppId == null)
+                                    if (parentAppInfoId == null)
                                     {
                                         _logger.LogWarning("Parent app Id is null, skipping");
                                     }
                                     else
                                     {
-                                        _logger.LogDebug("Updating internal app(Id = {Id}) using external app(Id = {ExtId})", parentAppId, externalApp.InternalID);
+                                        _logger.LogDebug("Updating internal appInfo(Id = {Id}) using external appInfo(Id = {ExtId})", parentAppInfoId, externalAppInfo.InternalID);
                                         using (var scope = _serviceProvider.CreateScope())
                                         {
                                             using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
                                             {
-                                                var app = dbContext.AppInfos.Single(x => x.Id == parentAppId);
-                                                app.Name = dbContext.AppInfos.Single(x => x.Id == externalApp.InternalID).Name;
+                                                var appInfo = dbContext.AppInfos.Single(x => x.Id == parentAppInfoId);
+                                                appInfo.Name = dbContext.AppInfos.Single(x => x.Id == externalAppInfo.InternalID).Name;
                                                 await dbContext.SaveChangesAsync();
                                             }
                                         }
@@ -117,22 +117,22 @@ namespace Librarian.Angela.Services
                             catch (Exception ex)
                             {
                                 retries++;
-                                _logger.LogWarning(ex, "Failed to pull app {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
-                                    externalApp.InternalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
+                                _logger.LogWarning(ex, "Failed to pull appInfo {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
+                                    externalAppInfo.InternalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
                                 await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.MetadataServiceRetrySeconds * 1000), token);
                             }
                         }
 
                         if (token.IsCancellationRequested)
                             throw new OperationCanceledException(token);
-                        var pullIntervalSeconds = appSource switch
+                        var pullIntervalSeconds = appInfoSource switch
                         {
                             "steam" => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
                             "vndb" => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
                             "bangumi" => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
                             _ => throw new NotImplementedException()
                         };
-                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _externalApps.Count = {Count}", pullIntervalSeconds, _externalApps.Count);
+                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _externalAppInfos.Count = {Count}", pullIntervalSeconds, _externalAppInfos.Count);
                         await Task.Delay(Convert.ToInt32(pullIntervalSeconds * 1000), token);
                     }
                     _mres.Reset();
@@ -144,20 +144,20 @@ namespace Librarian.Angela.Services
             }
         }
 
-        public void AddPullApp(long internalID, bool updateParentAppName = false)
+        public void AddPullAppInfo(long internalID, bool updateParentAppName = false)
         {
-            _externalApps.Enqueue(new ExternalApp
+            _externalAppInfos.Enqueue(new ExternalAppInfo
             {
                 InternalID = internalID,
-                UpdateParentAppName = updateParentAppName
+                UpdateParentAppInfoName = updateParentAppName
             });
             _mres.Set();
         }
 
-        private class ExternalApp
+        private class ExternalAppInfo
         {
             public long InternalID { get; set; }
-            public bool UpdateParentAppName { get; set; }
+            public bool UpdateParentAppInfoName { get; set; }
         }
     }
 }
