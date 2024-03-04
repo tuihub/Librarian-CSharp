@@ -19,37 +19,37 @@ namespace Librarian.Sephirah.Services
             var typeFilters = request.TypeFilter;
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
-            // filter apps
-            IQueryable<Common.Models.AppInfo> apps;
-            if (containDetails == false) { apps = _dbContext.AppInfos.AsQueryable(); }
-            else { apps = _dbContext.AppInfos.Include(x => x.AppInfoDetails).AsQueryable(); }
+            // filter appInfos
+            IQueryable<Common.Models.AppInfo> appInfos;
+            if (containDetails == false) { appInfos = _dbContext.AppInfos.AsQueryable(); }
+            else { appInfos = _dbContext.AppInfos.Include(x => x.AppInfoDetails).AsQueryable(); }
             if (excludeInternal == true)
             {
-                apps = apps.Where(x => x.Source != Common.Constants.Proto.AppSourceInternal);
+                appInfos = appInfos.Where(x => x.IsInternal == false);
             }
             if (idFilters.Count > 0)
             {
-                apps = apps.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
+                appInfos = appInfos.Where(x => idFilters.Select(x => x.Id).Contains(x.Id));
             }
             if (typeFilters.Count > 0)
             {
-                apps = apps.Where(x => typeFilters.Contains(x.Type));
+                appInfos = appInfos.Where(x => typeFilters.Contains(x.Type));
             }
             if (sourceFilters.Count > 0)
             {
-                apps = apps.Where(x => sourceFilters.Contains(x.Source));
+                appInfos = appInfos.Where(x => sourceFilters.Contains(x.Source));
             }
-            apps = apps.ApplyPagingRequest(request.Paging);
+            appInfos = appInfos.ApplyPagingRequest(request.Paging);
             if (containDetails == false)
             {
-                apps = apps.Select(x => x.GetAppInfoWithoutDetails());
+                appInfos = appInfos.Select(x => x.GetAppInfoWithoutDetails());
             }
             // construct response
             var response = new ListAppInfosResponse
             {
-                Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = apps.Count() }
+                Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = appInfos.Count() }
             };
-            response.AppInfos.Add(apps.Select(x => x.ToProtoAppInfo()));
+            response.AppInfos.Add(appInfos.Select(x => x.ToProtoAppInfo()));
             return Task.FromResult(response);
         }
     }
