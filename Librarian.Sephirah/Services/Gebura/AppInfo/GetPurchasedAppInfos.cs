@@ -16,24 +16,28 @@ namespace Librarian.Sephirah.Services
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns>
-        /// Apps without details
+        /// AppInfos without details
         /// </returns>
         [Authorize]
-        public override Task<GetPurchasedAppsResponse> GetPurchasedApps(GetPurchasedAppsRequest request, ServerCallContext context)
+        public override Task<GetPurchasedAppInfosResponse> GetPurchasedAppInfos(GetPurchasedAppInfosRequest request, ServerCallContext context)
         {
+            var appInfoSource = request.Source;
             var userId = context.GetInternalIdFromHeader();
             // foreach for IEnumerable is not by reference
             // https://stackoverflow.com/questions/43055464/c-sharp-foreach-not-reference-to-original-objects-but-copies
-            var apps = _dbContext.Users.Include(x => x.Apps)
-                                       .ThenInclude(x => x.ChildApps)
-                                       .Single(x => x.Id == userId)
-                                       .Apps
-                                       .Select(x => x.Flatten().ToProtoAppMixed())
-                                       .ToList();
+            var appInfos = _dbContext.Users.Include(x => x.AppInfos)
+                .ThenInclude(x => x.ChildAppInfos)
+                .Single(x => x.Id == userId)
+                .AppInfos
+                .ToList();
+            if (string.IsNullOrEmpty(appInfoSource))
+            {
+                appInfos = appInfos.Where(x => x.Source == appInfoSource).ToList();
+            }
             // construct return value
-            var ret = new GetPurchasedAppsResponse();
-            ret.Apps.Add(apps);
-            return Task.FromResult(ret);
+            var response = new GetPurchasedAppInfosResponse();
+            response.AppInfos.AddRange(appInfos.Select(x => x.Flatten().ToProtoAppInfoMixed()));
+            return Task.FromResult(response);
         }
     }
 }
