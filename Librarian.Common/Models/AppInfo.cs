@@ -54,12 +54,12 @@ namespace Librarian.Common.Models
         // many-to-many relation(optional)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // computed
-        public bool IsInternal => Source == Constants.Proto.AppSourceInternal;
+        public bool IsInternal => Source == Constants.Proto.AppInfoSourceInternal;
         // func
         public AppInfo(long internalId, TuiHub.Protos.Librarian.V1.AppInfo appInfo)
         {
             Id = internalId;
-            Source = appInfo.Internal ? Constants.Proto.AppSourceInternal : appInfo.Source;
+            Source = appInfo.Internal ? Constants.Proto.AppInfoSourceInternal : appInfo.Source;
             SourceAppId = appInfo.Internal ? null : appInfo.SourceAppId;
             SourceUrl = string.IsNullOrEmpty(appInfo.SourceUrl) ? null : appInfo.SourceUrl;
             Name = appInfo.Name;
