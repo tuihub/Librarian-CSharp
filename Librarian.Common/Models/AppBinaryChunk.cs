@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,10 @@ namespace Librarian.Common.Models
         public long Id { get; set; }
         public long Sequence { get; set; }
         public long SizeBytes { get; set; }
+        [MaxLength(256)]
         public string PublicUrl { get; set; } = null!;
+        [MaxLength(32)]
+        [IsFixedLength]
         public byte[]? Sha256 { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

@@ -18,6 +18,7 @@ namespace Librarian.Common.Models
         public long Id { get; set; }
         public long InternalId { get; set; }
         public TokenStatus Status { get; set; } = TokenStatus.Normal;
+        [MaxLength(256)]
         public string Token { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
