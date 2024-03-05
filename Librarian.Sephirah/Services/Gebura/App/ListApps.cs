@@ -33,6 +33,7 @@ namespace Librarian.Sephirah.Services
             else
             {
                 apps = apps.Where(x => ownerIdFilter.Select(x => x.Id).Contains(x.UserId));
+                apps = apps.Where(x => x.IsPublic == true);
             }
             apps = apps.ApplyPagingRequest(request.Paging);
             var response = new ListAppsResponse
