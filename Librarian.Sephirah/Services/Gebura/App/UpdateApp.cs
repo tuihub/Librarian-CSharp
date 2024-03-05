@@ -20,7 +20,6 @@ namespace Librarian.Sephirah.Services
             }
             // update App
             app.UpdateFromProtoApp(appReq);
-            app.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }

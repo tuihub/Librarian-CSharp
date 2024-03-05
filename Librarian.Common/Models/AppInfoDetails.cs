@@ -71,6 +71,7 @@ namespace Librarian.Common.Models
             this.Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
             this.Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
             //this.ImageUrls = appInfoDetails.ImageUrls;
+            this.UpdatedAt = DateTime.UtcNow;
         }
 
         public void UpdateFromAppInfoDetails(AppInfoDetails appInfoDetails)
@@ -81,6 +82,7 @@ namespace Librarian.Common.Models
             this.Publisher = appInfoDetails.Publisher;
             this.Version = appInfoDetails.Version;
             //this.ImageUrls = appInfoDetails.ImageUrls;
+            this.UpdatedAt = DateTime.UtcNow;
         }
     }
 }

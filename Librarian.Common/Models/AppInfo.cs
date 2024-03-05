@@ -139,6 +139,7 @@ namespace Librarian.Common.Models
             if (appInfo.Details != null)
             {
                 this.AppInfoDetails ??= new AppInfoDetails();
+                this.AppInfoDetails.Id = this.Id;
                 this.AppInfoDetails.App ??= this;
                 this.AppInfoDetails.UpdateFromProtoAppInfoDetails(appInfo.Details);
             }

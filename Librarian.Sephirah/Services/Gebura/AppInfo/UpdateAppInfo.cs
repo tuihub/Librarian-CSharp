@@ -13,8 +13,8 @@ namespace Librarian.Sephirah.Services
         public override Task<UpdateAppInfoResponse> UpdateAppInfo(UpdateAppInfoRequest request, ServerCallContext context)
         {
             // ensure AppInfoSource == internal
-            var appReq = request.AppInfo;
-            if (!appReq.Internal)
+            var appInfoReq = request.AppInfo;
+            if (!appInfoReq.Internal)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfoSource must be internal."));
             }
@@ -22,30 +22,13 @@ namespace Librarian.Sephirah.Services
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check AppInfo exists
             var appInfo = _dbContext.AppInfos.Include(x => x.AppInfoDetails)
-                .SingleOrDefault(x => x.Id == appReq.Id.Id);
+                .SingleOrDefault(x => x.Id == appInfoReq.Id.Id);
             if (appInfo == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfo not exists."));
             }
-            // update AppInfo
-            if (!string.IsNullOrEmpty(appReq.Source) && appReq.Source != Common.Constants.Proto.AppInfoSourceUnspecified)
-            { 
-                appInfo.Source = appReq.Source;
-            }
-            if (appReq.SourceAppId != null) { appInfo.SourceAppId = appReq.SourceAppId; }
-            if (appReq.SourceUrl != null) { appInfo.SourceUrl = appReq.SourceUrl; }
-            if (appReq.Name != null) { appInfo.Name = appReq.Name; }
-            if (appReq.Type != AppType.Unspecified) { appInfo.Type = appReq.Type; }
-            if (appReq.ShortDescription != null) { appInfo.ShortDescription = appReq.ShortDescription; }
-            if (appReq.IconImageUrl != null) { appInfo.IconImageUrl = appReq.IconImageUrl; }
-            if (appReq.BackgroundImageUrl != null) { appInfo.BackgroundImageUrl = appReq.BackgroundImageUrl; }
-            if (appReq.CoverImageUrl != null) { appInfo.CoverImageUrl = appReq.CoverImageUrl; }
-            if (appReq.Details != null)
-            {
-                if (appInfo.AppInfoDetails == null) { appInfo.AppInfoDetails = new Common.Models.AppInfoDetails(appInfo.Id, appReq.Details); }
-                else appInfo.AppInfoDetails!.UpdateFromProtoAppInfoDetails(appReq.Details);
-            }
-            appInfo.UpdatedAt = DateTime.UtcNow;
+            // update AppInfo, full update
+            appInfo.UpdateFromProtoAppInfo(appInfoReq);
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppInfoResponse());
         }
