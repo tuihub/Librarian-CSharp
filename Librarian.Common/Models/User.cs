@@ -30,9 +30,9 @@ namespace Librarian.Common.Models
         public ICollection<Account> Accounts { get; } = new List<Account>();
         // one-to-many relation(required, to child)
         public ICollection<Sentinel> Sentinels { get; } = new List<Sentinel>();
-        // one-to-many relation(required, to child)
-        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
         // one-to-many relation(to child, only used in internal appInfo)
+        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
+        // one-to-many relation(required, to child)
         public ICollection<App> Apps { get; } = new List<App>();
         // many-to-many relation(required)
         public ICollection<Device> Devices { get; } = new List<Device>();

@@ -26,9 +26,9 @@ namespace Librarian.Common.Models
         public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
         // one-to-many relation(required, to child)
         public ICollection<AppSaveFile> AppSaveFiles { get; } = new List<AppSaveFile>();
-        // one-to-many relation(optional, to parent)
-        public long? UserId { get; set; }
-        public User? User { get; set; }
+        // one-to-many relation(required, to parent)
+        public long UserId { get; set; }
+        public User User { get; set; } = null!;
         // one-to-many relation(optional, to parent)
         public long? AppInfoId { get; set; }
         public AppInfo? AppInfo { get; set; }
@@ -44,6 +44,13 @@ namespace Librarian.Common.Models
             AppInfoId = app.AssignedAppInfoId?.Id;
         }
         public App() { }
+        public void UpdateFromProtoApp(TuiHub.Protos.Librarian.Sephirah.V1.App app)
+        {
+            Name = app.Name;
+            Description = string.IsNullOrEmpty(app.Description) ? null : app.Description;
+            IsPublic = app.Public;
+            AppInfoId = app.AssignedAppInfoId?.Id;
+        }
         public TuiHub.Protos.Librarian.Sephirah.V1.App ToProtoApp()
         {
             return new TuiHub.Protos.Librarian.Sephirah.V1.App
