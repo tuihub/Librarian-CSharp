@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Librarian.Common.Utils
 {
@@ -62,6 +63,14 @@ namespace Librarian.Common.Utils
             modelBuilder.Entity<AppInfo>()
                         .Property(e => e.IsInternal)
                         .HasComputedColumnSql($"Source = '{Constants.Proto.AppInfoSourceInternal}'");
+
+            // conversions
+            modelBuilder.Entity<AppInfoDetails>()
+                        .Property(e => e.ImageUrls)
+                        .HasConversion(
+                            v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                            v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default)
+                        );
 
             // applying custom attribute
             // from https://stackoverflow.com/questions/41664713/using-a-custom-attribute-in-ef7-core-onmodelcreating

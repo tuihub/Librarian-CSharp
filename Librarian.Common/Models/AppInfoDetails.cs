@@ -21,7 +21,7 @@ namespace Librarian.Common.Models
         public string? Publisher { get; set; }
         [MaxLength(128)]
         public string? Version { get; set; }
-        //public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
+        public List<string>? ImageUrls { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
@@ -43,7 +43,7 @@ namespace Librarian.Common.Models
             Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
             Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
             Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
-            //ImageUrls = appInfoDetails.ImageUrls;
+            ImageUrls = appInfoDetails.ImageUrls.ToList();
         }
         public AppInfoDetails() { }
         public TuiHub.Protos.Librarian.V1.AppInfoDetails ToProtoAppInfoDetails()
@@ -55,7 +55,7 @@ namespace Librarian.Common.Models
                 Developer = this.Developer ?? string.Empty,
                 Publisher = this.Publisher ?? string.Empty,
                 Version = this.Version ?? string.Empty,
-                //ImageUrls = { this.ImageUrls }
+                ImageUrls = { this.ImageUrls }
             };
         }
         public void UpdateFromProtoAppInfoDetails(TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
@@ -70,7 +70,7 @@ namespace Librarian.Common.Models
             this.Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
             this.Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
             this.Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
-            //this.ImageUrls = appInfoDetails.ImageUrls;
+            this.ImageUrls = appInfoDetails.ImageUrls.ToList();
             this.UpdatedAt = DateTime.UtcNow;
         }
 
@@ -81,7 +81,7 @@ namespace Librarian.Common.Models
             this.Developer = appInfoDetails.Developer;
             this.Publisher = appInfoDetails.Publisher;
             this.Version = appInfoDetails.Version;
-            //this.ImageUrls = appInfoDetails.ImageUrls;
+            this.ImageUrls = appInfoDetails.ImageUrls;
             this.UpdatedAt = DateTime.UtcNow;
         }
     }
