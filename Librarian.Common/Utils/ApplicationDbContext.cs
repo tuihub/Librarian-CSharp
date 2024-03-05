@@ -51,20 +51,14 @@ namespace Librarian.Common.Utils
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<AppPackageBinary>()
-            //            .Property(x => x.Sha256)
-            //            .IsFixedLength(true);
-            //modelBuilder.Entity<FileMetadata>()
-            //            .Property(x => x.Sha256)
-            //            .IsFixedLength(true);
-
+            // relations
             modelBuilder.Entity<AppInfo>()
                         .HasOne(e => e.ParentAppInfo)
                         .WithMany(e => e.ChildAppInfos)
                         .HasForeignKey(e => e.ParentAppInfoId)
                         .IsRequired(false);
 
-            // computed column
+            // computed columns
             modelBuilder.Entity<AppInfo>()
                         .Property(e => e.IsInternal)
                         .HasComputedColumnSql($"Source = '{Constants.Proto.AppInfoSourceInternal}'");
