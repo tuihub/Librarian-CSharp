@@ -64,6 +64,11 @@ namespace Librarian.Common.Utils
                         .HasForeignKey(e => e.ParentAppInfoId)
                         .IsRequired(false);
 
+            // computed column
+            modelBuilder.Entity<AppInfo>()
+                        .Property(e => e.IsInternal)
+                        .HasComputedColumnSql($"Source = '{Constants.Proto.AppInfoSourceInternal}'");
+
             // applying custom attribute
             // from https://stackoverflow.com/questions/41664713/using-a-custom-attribute-in-ef7-core-onmodelcreating
             //examine custom annotations for shaping the schema in the database.

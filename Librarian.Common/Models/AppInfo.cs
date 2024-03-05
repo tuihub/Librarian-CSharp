@@ -54,7 +54,8 @@ namespace Librarian.Common.Models
         // many-to-many relation(optional)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // computed
-        public bool IsInternal => Source == Constants.Proto.AppInfoSourceInternal;
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public bool IsInternal { get; private set; }
         // func
         public AppInfo(long internalId, TuiHub.Protos.Librarian.V1.AppInfo appInfo)
         {
