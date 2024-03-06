@@ -27,7 +27,7 @@ namespace Librarian.Common.Utils
         public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         // relation
-        public DbSet<UserAppInfo> UserAppInfos { get; set; } = null!;
+        public DbSet<UserApp> UserApps { get; set; } = null!;
         // internal
         public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
         public DbSet<Session> Sessions { get; set; } = null!;

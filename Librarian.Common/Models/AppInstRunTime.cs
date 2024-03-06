@@ -15,6 +15,7 @@ namespace Librarian.Common.Models
         [Key]
         public long Id { get; set; }
         public DateTime StartDateTime { get; set; }
+        public DateTime EndDateTime { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

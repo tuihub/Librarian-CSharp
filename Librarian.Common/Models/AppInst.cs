@@ -23,6 +23,8 @@ namespace Librarian.Common.Models
         // one-to-many relation(required, to parent)
         public long DeviceId { get; set; }
         public Device Device { get; set; } = null!;
+        // aggregations
+        public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
         // func
         public AppInst(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.AppInst appInst)
         {
