@@ -14,14 +14,16 @@ namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
-        // UNDONE: Current only support GameSaveFile download
+        // UNDONE: Current only support AppSaveFile download
         [Authorize(AuthenticationSchemes = "DownloadToken")]
         public override async Task SimpleDownloadFile(SimpleDownloadFileRequest request, IServerStreamWriter<SimpleDownloadFileResponse> responseStream, ServerCallContext context)
         {
             var internalId = context.GetInternalIdFromHeader();
-            var gameSaveFile = _dbContext.GameSaveFiles.Single(x => x.Id == internalId);
-            if (gameSaveFile.Status != AppSaveFileStatus.Stored)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested game save is not stored."));
+            var appSaveFile = _dbContext.AppSaveFiles.Single(x => x.FileMetadataId == internalId);
+            if (appSaveFile.Status != AppSaveFileStatus.Stored)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Requested AppSaveFile is not stored."));
+            }
             var fileMetadata = _dbContext.FileMetadatas.Single(x => x.Id == internalId);
             // get object from minio
             var minioClient = MinioClientUtil.GetMinioClient();
