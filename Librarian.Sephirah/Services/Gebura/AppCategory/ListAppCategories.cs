@@ -15,8 +15,8 @@ namespace Librarian.Sephirah.Services
         {
             var userId = context.GetInternalIdFromHeader();
             var appCategories = _dbContext.AppCategories
-                .Include(x => x.User)
                 .Where(x => x.UserId == userId)
+                .Include(x => x.User)
                 .Include(x => x.AppInfos)
                 .Include(x => x.Apps);
             return Task.FromResult(new ListAppCategoriesResponse

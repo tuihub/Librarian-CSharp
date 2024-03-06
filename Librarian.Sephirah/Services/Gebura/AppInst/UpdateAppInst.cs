@@ -30,7 +30,9 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "App not owned by user."));
             }
-            var device = _dbContext.Devices.Include(x => x.Users)
+            var device = _dbContext.Devices
+                .Where(x => x.Id == appInstReq.DeviceId.Id)
+                .Include(x => x.Users)
                 .SingleOrDefault(x => x.Id == appInstReq.DeviceId.Id);
             if (device == null)
             {

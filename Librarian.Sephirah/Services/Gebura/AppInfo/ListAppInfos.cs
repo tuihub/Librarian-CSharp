@@ -20,9 +20,7 @@ namespace Librarian.Sephirah.Services
             var idFilters = request.IdFilter;
             var containDetails = request.ContainDetails;
             // filter appInfos
-            IQueryable<Common.Models.AppInfo> appInfos;
-            if (containDetails == false) { appInfos = _dbContext.AppInfos.AsQueryable(); }
-            else { appInfos = _dbContext.AppInfos.Include(x => x.AppInfoDetails).AsQueryable(); }
+            var appInfos = _dbContext.AppInfos.AsQueryable();
             if (excludeInternal == true)
             {
                 appInfos = appInfos.Where(x => x.IsInternal == false);
@@ -40,7 +38,11 @@ namespace Librarian.Sephirah.Services
                 appInfos = appInfos.Where(x => sourceFilters.Contains(x.Source));
             }
             appInfos = appInfos.ApplyPagingRequest(request.Paging);
-            if (containDetails == false)
+            if (containDetails == true)
+            {
+                appInfos = appInfos.Include(x => x.AppInfoDetails);
+            }
+            else
             {
                 appInfos = appInfos.Select(x => x.GetAppInfoWithoutDetails());
             }

@@ -13,7 +13,9 @@ namespace Librarian.Sephirah.Services
         public override Task<GetAppInfoResponse> GetAppInfo(GetAppInfoRequest request, ServerCallContext context)
         {
             var appInfoId = request.AppInfoId.Id;
-            var appInfo = _dbContext.AppInfos.Include(x => x.AppInfoDetails)
+            var appInfo = _dbContext.AppInfos
+                .Where(x => x.Id == appInfoId)
+                .Include(x => x.AppInfoDetails)
                 .Include(x => x.ChildAppInfos)
                 .ThenInclude(x => x.AppInfoDetails)
                 .SingleOrDefault(x => x.Id == appInfoId);

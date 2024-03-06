@@ -21,7 +21,9 @@ namespace Librarian.Sephirah.Services
             // verify user type(admin)
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // check AppInfo exists
-            var appInfo = _dbContext.AppInfos.Include(x => x.AppInfoDetails)
+            var appInfo = _dbContext.AppInfos
+                .Where(x => x.Id == appInfoReq.Id.Id)
+                .Include(x => x.AppInfoDetails)
                 .SingleOrDefault(x => x.Id == appInfoReq.Id.Id);
             if (appInfo == null)
             {

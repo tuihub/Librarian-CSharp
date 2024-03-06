@@ -26,6 +26,7 @@ namespace Librarian.Angela.Providers
         public async Task PullAppInfoAsync(long internalID)
         {
             var appInfo = _dbContext.AppInfos
+                          .Where(x => x.Id == internalID)
                           .Include(x => x.AppInfoDetails)
                           .Single(x => x.Id == internalID);
             if (appInfo.Source != "vndb")

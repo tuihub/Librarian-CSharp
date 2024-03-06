@@ -24,8 +24,10 @@ namespace Librarian.Sephirah.Services
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppInfoId."));
                     }
-                    var appInfo = _dbContext.AppInfos.Include(x => x.ChildAppInfos)
-                                             .SingleOrDefault(x => x.Id == appId && x.Source == Common.Constants.Proto.AppInfoSourceInternal);
+                    var appInfo = _dbContext.AppInfos
+                        .Where(x => x.Id == appId && x.Source == Common.Constants.Proto.AppInfoSourceInternal)
+                        .Include(x => x.ChildAppInfos)
+                        .SingleOrDefault(x => x.Id == appId && x.Source == Common.Constants.Proto.AppInfoSourceInternal);
                     if (appInfo == null)
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfo not exists."));

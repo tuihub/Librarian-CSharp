@@ -25,7 +25,9 @@ namespace Librarian.Sephirah.Services
             var userId = context.GetInternalIdFromHeader();
             // foreach for IEnumerable is not by reference
             // https://stackoverflow.com/questions/43055464/c-sharp-foreach-not-reference-to-original-objects-but-copies
-            var appInfos = _dbContext.Users.Include(x => x.AppInfos)
+            var appInfos = _dbContext.Users
+                .Where(x => x.Id == userId)
+                .Include(x => x.AppInfos)
                 .ThenInclude(x => x.ChildAppInfos)
                 .Single(x => x.Id == userId)
                 .AppInfos

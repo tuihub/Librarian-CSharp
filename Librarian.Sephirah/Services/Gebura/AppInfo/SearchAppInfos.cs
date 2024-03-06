@@ -19,8 +19,8 @@ namespace Librarian.Sephirah.Services
             // TODO: update SearchAppInfos
             appInfos = appInfos.Where(a => a.Source == Common.Constants.Proto.AppInfoSourceInternal)
                        .Where(a => a.Name.Contains(query))
+                       .ApplyPagingRequest(request.Paging)
                        .Include(a => a.ChildAppInfos);
-            appInfos = appInfos.ApplyPagingRequest(request.Paging);
             // construct response
             var response = new SearchAppInfosResponse
             {
