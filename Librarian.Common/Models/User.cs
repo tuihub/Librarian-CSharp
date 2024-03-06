@@ -38,6 +38,8 @@ namespace Librarian.Common.Models
         public ICollection<Device> Devices { get; } = new List<Device>();
         // one-to-many relation(required, to child)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
+        // one-to-many relation(required, to child)
+        public ICollection<AppSaveFileCapacity> AppSaveFileCapacities { get; } = new List<AppSaveFileCapacity>();
 
         public TuiHub.Protos.Librarian.Sephirah.V1.User ToProtoUser(bool withPassword = false)
         {
