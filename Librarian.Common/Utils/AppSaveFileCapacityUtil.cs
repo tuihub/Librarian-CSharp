@@ -23,16 +23,10 @@ namespace Librarian.Common.Utils
             else
             {
                 // get ids
-                long appId, appInstId = -1;
+                long appId;
                 if (entityType == EntityType.App)
                 {
                     appId = entityId;
-                }
-                else if (entityType == EntityType.AppInst)
-                {
-                    appInstId = entityId;
-                    var appInst = db.AppInsts.Single(x => x.Id == entityId);
-                    appId = appInst.AppId;
                 }
                 else
                 {
@@ -45,16 +39,6 @@ namespace Librarian.Common.Utils
                     .Where(x => x.EntityInternalId == appId)
                     .FirstOrDefault();
                 asfc = asfc.UpdateInfo(appAsfc);
-                if (entityType == EntityType.App)
-                {
-                    return asfc ?? new AppSaveFileCapacity();
-                }
-                var appInstAsfc = db.AppSaveFileCapacities
-                    .Where(x => x.UserId == userId)
-                    .Where(x => x.EntityType == EntityType.AppInst)
-                    .Where(x => x.EntityInternalId == appInstId)
-                    .FirstOrDefault();
-                asfc = asfc.UpdateInfo(appInstAsfc);
                 return asfc ?? new AppSaveFileCapacity();
             }
         }

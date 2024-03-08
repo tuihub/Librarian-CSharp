@@ -39,23 +39,6 @@ namespace Librarian.Sephirah.Services
                 internalId = request.AppId.Id;
                 entityType = EntityType.App;
             }
-            else if (request.EntityCase == SetAppSaveFileCapacityRequest.EntityOneofCase.AppInstId && request.AppInstId.Id != 0)
-            {
-                var appInst = _dbContext.AppInsts
-                    .Where(x => x.Id == request.AppInstId.Id)
-                    .Include(x => x.App)
-                    .SingleOrDefault(x => x.Id == request.AppInstId.Id);
-                if (appInst == null)
-                {
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInst not exists."));
-                }
-                if (appInst.App.UserId != userId)
-                {
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "AppInst is not owned by user."));
-                }
-                internalId = request.AppInstId.Id;
-                entityType = EntityType.AppInst;
-            }
             else
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Entity is not correct."));

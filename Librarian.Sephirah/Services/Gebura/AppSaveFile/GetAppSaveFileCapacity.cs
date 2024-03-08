@@ -26,16 +26,16 @@ namespace Librarian.Sephirah.Services
                 entityType = EntityType.App;
                 internalId = request.AppId.Id;
             }
-            else if (request.EntityCase == GetAppSaveFileCapacityRequest.EntityOneofCase.AppInstId && request.AppInstId.Id != 0)
-            {
-                entityType = EntityType.AppInst;
-                internalId = request.AppInstId.Id;
-            }
             else
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Entity is not correct."));
             }
-            var appSaveFileCapacity = AppSaveFileCapacityUtil.GetAppSaveFileCapacity(_dbContext, userId, entityType, internalId);
+            var appSaveFileCapacity = _dbContext.AppSaveFileCapacities
+                .Where(x => x.UserId == userId)
+                .Where(x => x.EntityType == entityType)
+                .Where(x => x.EntityInternalId == internalId)
+                .FirstOrDefault();
+            appSaveFileCapacity ??= new AppSaveFileCapacity();
             return Task.FromResult(new GetAppSaveFileCapacityResponse
             {
                 Count = appSaveFileCapacity.Count ?? -1,

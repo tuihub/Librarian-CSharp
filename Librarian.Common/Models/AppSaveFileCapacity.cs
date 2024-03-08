@@ -48,7 +48,6 @@ namespace Librarian.Common.Models
         User,
         // only for internal appInfo
         AppInfo,
-        App,
-        AppInst
+        App
     }
 }
