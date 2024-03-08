@@ -23,6 +23,9 @@ namespace Librarian.Common.Models
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }
+        public long? AppAppSaveFileCapacityCountDefault { get; set; }
+        public long? AppAppSaveFileCapacitySizeBytesDefault { get; set; }
+        public AppSaveFileCapacityStrategy AppAppSaveFileCapacityStrategyDefault { get; set; } = AppSaveFileCapacityStrategy.Fail;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations
@@ -40,7 +43,10 @@ namespace Librarian.Common.Models
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // one-to-many relation(required, to child)
         public ICollection<AppSaveFileCapacity> AppSaveFileCapacities { get; } = new List<AppSaveFileCapacity>();
-
+        // aggregations
+        public long TotalAppSaveFileCount { get; set; }
+        public long TotalAppSaveFileSizeBytes { get; set; }
+        // func
         public TuiHub.Protos.Librarian.Sephirah.V1.User ToProtoUser(bool withPassword = false)
         {
             var ret = new TuiHub.Protos.Librarian.Sephirah.V1.User

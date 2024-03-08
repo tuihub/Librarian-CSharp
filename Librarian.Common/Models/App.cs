@@ -36,6 +36,8 @@ namespace Librarian.Common.Models
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
         // aggregations
         public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
+        public long TotalAppSaveFileCount { get; set; }
+        public long TotalAppSaveFileSizeBytes { get; set; }
         // func
         public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
