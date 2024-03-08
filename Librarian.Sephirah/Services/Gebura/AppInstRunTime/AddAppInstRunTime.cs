@@ -35,9 +35,8 @@ namespace Librarian.Sephirah.Services
             });
             // add to AppInst TotalRunTime
             appInst.TotalRunTime += timeRangeReq.Duration.ToTimeSpan();
-            // add to UserApp TotalRunTime
-            var userApp = _dbContext.UserApps.Single(x => x.UserId == userId && x.AppId == appInst.AppId);
-            userApp.TotalRunTime += timeRangeReq.Duration.ToTimeSpan();
+            // add to App TotalRunTime
+            appInst.App.TotalRunTime += timeRangeReq.Duration.ToTimeSpan();
             _dbContext.SaveChanges();
             return Task.FromResult(new AddAppInstRunTimeResponse());
         }

@@ -20,15 +20,15 @@ namespace Librarian.Sephirah.Services
                 .SingleOrDefault(x => x.Id == appInstReq.Id.Id);
             if (appInst == null)
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInst not exists."));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Original AppInst not exists."));
             }
             if (appInst.App == null)
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Original AppInst associcated App not exists."));
             }
             else if (appInst.App.UserId != userId)
             {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "App not owned by user."));
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Original AppInst associcated App not owned by user."));
             }
             var device = _dbContext.Devices
                 .Where(x => x.Id == appInstReq.DeviceId.Id)
@@ -42,10 +42,21 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Device not associated with user."));
             }
+            // get appReq App
+            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appInstReq.AppId.Id);
+            if (app == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "App from request not exists."));
+            }
+            if (app.UserId != userId)
+            {
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "App from request is not owned by user."));
+            }
             // update TotalRunTime
-            _dbContext.UserApps.Single(x => x.UserId == userId && x.AppId == appInst.AppId).TotalRunTime -= appInst.TotalRunTime;
-            _dbContext.UserApps.Single(x => x.UserId == userId && x.AppId == appInstReq.AppId.Id).TotalRunTime += appInst.TotalRunTime;
-            appInst.AppId = appInstReq.AppId.Id;
+            appInst.App.TotalRunTime -= appInst.TotalRunTime;
+            app.TotalRunTime += appInst.TotalRunTime;
+            // update AppInst
+            appInst.App = app;
             appInst.DeviceId = appInstReq.DeviceId.Id;
             appInst.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();

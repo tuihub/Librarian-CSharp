@@ -34,6 +34,8 @@ namespace Librarian.Common.Models
         public AppInfo? AppInfo { get; set; }
         // many-to-many relation(optional)
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
+        // aggregations
+        public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
         // func
         public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
