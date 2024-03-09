@@ -15,24 +15,24 @@ namespace Librarian.Sephirah.Services
         [Authorize]
         public override async Task<RemoveAppSaveFileResponse> RemoveAppSaveFile(RemoveAppSaveFileRequest request, ServerCallContext context)
         {
-            var fileId = request.FileId.Id;
+            var id = request.Id.Id;
             var userId = context.GetInternalIdFromHeader();
             var appSaveFile = await _dbContext.AppSaveFiles
-                .Where(x => x.FileMetadataId == fileId)
+                .Where(x => x.Id == id)
                 .Include(x => x.App)
-                .SingleAsync(x => x.FileMetadataId == fileId);
+                .SingleAsync(x => x.Id == id);
             if (appSaveFile.App.UserId != userId)
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "You do not have permission to remove this file."));
             }
-            var fileMetadata = await _dbContext.FileMetadatas.SingleAsync(x => x.Id == fileId);
+            var fileMetadata = await _dbContext.FileMetadatas.SingleAsync(x => x.Id == appSaveFile.FileMetadataId);
             // only remove in minio when status is Stored
             if (appSaveFile.Status == AppSaveFileStatus.Stored)
             {
                 var minioClient = MinioClientUtil.GetMinioClient();
                 var rmArgs = new RemoveObjectArgs()
                                  .WithBucket(GlobalContext.SystemConfig.MinioBucket)
-                                 .WithObject(fileId.ToString());
+                                 .WithObject(appSaveFile.FileMetadataId.ToString());
                 await minioClient.RemoveObjectAsync(rmArgs);
             }
             // update user and app capacity

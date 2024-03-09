@@ -27,6 +27,7 @@ namespace Librarian.Sephirah.Services
             {
                 Results = { appSaveFiles.Select(x => new ListAppSaveFilesResponse.Types.Result
                 {
+                    Id = new InternalID { Id = x.Id },
                     File = x.FileMetadata.ToProtoFileMetadata(),
                     Pinned = x.IsPinned
                 }) }
