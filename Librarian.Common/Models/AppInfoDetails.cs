@@ -21,7 +21,7 @@ namespace Librarian.Common.Models
         public string? Publisher { get; set; }
         [MaxLength(128)]
         public string? Version { get; set; }
-        public List<string>? ImageUrls { get; set; }
+        public List<string> ImageUrls { get; set; } = new List<string>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         // relations

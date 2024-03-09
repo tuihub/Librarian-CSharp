@@ -1,6 +1,7 @@
 ﻿using Librarian.Common.Configs;
 using Librarian.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -68,7 +69,11 @@ namespace Librarian.Common.Utils
                         .Property(e => e.ImageUrls)
                         .HasConversion(
                             v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                            v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default)
+                            v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default) ?? new List<string>(),
+                            new ValueComparer<List<string>>(
+                                (c1, c2) => c1!.SequenceEqual(c2!),
+                                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                                c => c.ToList())
                         );
 
             // applying custom attribute
