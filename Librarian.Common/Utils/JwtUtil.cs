@@ -119,12 +119,20 @@ namespace Librarian.Common.Utils
             var internalId = GetInternalIdFromJwtToken(token);
             return internalId;
         }
-        private static long GetInternalIdFromJwtToken(string token)
+        public static long GetInternalIdFromJwtToken(string token)
+        {
+            return long.Parse(GetClaimFromJwtToken(token, "internal_id")!);
+        }
+        public static Guid GetJtiFromJwtToken(this string token)
+        {
+            return Guid.Parse(GetClaimFromJwtToken(token, JwtRegisteredClaimNames.Jti)!);
+        }
+        private static string? GetClaimFromJwtToken(string token, string claim)
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
-            var internalId = long.Parse(jwtToken.Claims.Single(x => x.Type == "internal_id").Value);
-            return internalId;
+            var claimValue = jwtToken.Claims.Single(x => x.Type == claim).Value;
+            return claimValue;
         }
         public static DateTime GetTokenExpireTime(string token)
         {

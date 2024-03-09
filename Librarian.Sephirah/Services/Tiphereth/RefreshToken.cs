@@ -27,7 +27,7 @@ namespace Librarian.Sephirah.Services
             {
                 var token = context.GetBearerToken();
                 oldSession = _dbContext.Sessions
-                    .SingleOrDefault(x => x.Token == token
+                    .SingleOrDefault(x => x.TokenJti == token!.GetJtiFromJwtToken()
                         && x.ExpiredAt > DateTime.UtcNow
                         && x.UserId == internalId
                         && x.DeviceId == deviceId
@@ -47,7 +47,7 @@ namespace Librarian.Sephirah.Services
                 _dbContext.Sessions.Add(new Common.Models.Session
                 {
                     InternalId = oldSession!.InternalId,
-                    Token = refreshTokenNew,
+                    TokenJti = refreshTokenNew.GetJtiFromJwtToken(),
                     UserId = user.Id,
                     DeviceId = (long)deviceId,
                     CreatedAt = oldSession.CreatedAt,

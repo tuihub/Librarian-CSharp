@@ -46,7 +46,7 @@ namespace Librarian.Sephirah.Services
                     _dbContext.Sessions.Add(new Common.Models.Session
                     {
                         InternalId = _idGenerator.CreateId(),
-                        Token = refreshToken,
+                        TokenJti = refreshToken.GetJtiFromJwtToken(),
                         UserId = user.Id,
                         DeviceId = (long)deviceId,
                         ExpiredAt = JwtUtil.GetTokenExpireTime(refreshToken)
