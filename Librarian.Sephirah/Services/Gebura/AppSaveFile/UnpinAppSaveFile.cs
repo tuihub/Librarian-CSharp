@@ -1,0 +1,31 @@
+﻿using Grpc.Core;
+using Librarian.Common.Models;
+using Librarian.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Minio;
+using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.V1;
+
+namespace Librarian.Sephirah.Services
+{
+    public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
+    {
+        [Authorize]
+        public override Task<UnpinAppSaveFileResponse> UnpinAppSaveFile(UnpinAppSaveFileRequest request, ServerCallContext context)
+        {
+            var fileId = request.FileId.Id;
+            var appSaveFile = _dbContext.AppSaveFiles
+                .Where(x => x.FileMetadataId == fileId)
+                .Include(x => x.App)
+                .Single(x => x.FileMetadataId == fileId);
+            if (appSaveFile.App.UserId != context.GetInternalIdFromHeader())
+            {
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "You do not have permission to pin this file."));
+            }
+            appSaveFile.IsPinned = false;
+            _dbContext.SaveChanges();
+            return Task.FromResult(new UnpinAppSaveFileResponse());
+        }
+    }
+}
