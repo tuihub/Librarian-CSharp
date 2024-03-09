@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
@@ -9,6 +10,7 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         [Authorize]
+        [EnableRateLimiting("bcrypt_fixed")]
         public override Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
         {
             var userIdFromJwt = context.GetInternalIdFromHeader();

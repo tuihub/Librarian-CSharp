@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
@@ -9,6 +10,7 @@ namespace Librarian.Sephirah.Services
     {
         // TODO: add normal user support
         [Authorize]
+        [EnableRateLimiting("bcrypt_fixed")]
         public override Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
         {
             long internalId;

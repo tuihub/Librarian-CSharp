@@ -6,6 +6,7 @@ using Librarian.Angela.Services;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -53,6 +54,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer("DownloadToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.DownloadTokenAudience));
 builder.Services.AddAuthorization();
 
+// Add RateLimiter
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: "bcrypt_fixed", options =>
+    {
+        options.PermitLimit = 10;
+        options.Window = TimeSpan.FromSeconds(1);
+        options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 10;
+    }));
+
 var app = builder.Build();
 
 // Migrate DB
@@ -77,5 +88,8 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
 // Enable Auth
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Enable RateLimiter
+app.UseRateLimiter();
 
 app.Run();

@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
+using Microsoft.AspNetCore.RateLimiting;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
@@ -7,6 +8,7 @@ namespace Librarian.Sephirah.Services
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         // TODO: reduce token expiration time when DeviceId is not present
+        [EnableRateLimiting("bcrypt_fixed")]
         public override Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
         {
             string accessToken, refreshToken;
