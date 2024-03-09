@@ -18,6 +18,8 @@
         public double PullBangumiIntervalSeconds { get; set; }
         public double MetadataServiceRetrySeconds { get; set; }
         public int MetadataServiceMaxRetries { get; set; }
+        public long UserAppSaveFileCapacityCountMax { get; set; }
+        public long UserAppSaveFileCapacitySizeBytesMax { get; set; }
     }
     public enum ApplicationDbType
     {

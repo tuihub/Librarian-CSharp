@@ -3,7 +3,7 @@
     public static class HumanizeUtil
     {
         // https://stackoverflow.com/a/4975942
-        public static string BytesToString(long byteCount)
+        public static string SizeBytesToString(long byteCount)
         {
             string[] suf = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" }; //Longs run out around EB
             if (byteCount == 0)
