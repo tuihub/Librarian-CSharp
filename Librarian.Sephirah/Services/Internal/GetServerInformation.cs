@@ -10,11 +10,7 @@ namespace Librarian.Sephirah.Services
     {
         public override Task<GetServerInformationResponse> GetServerInformation(GetServerInformationRequest request, ServerCallContext context)
         {
-            var token = context.RequestHeaders
-                               .Single(x => x.Key == "authorization")
-                               .Value
-                               .Substring("Bearer ".Length)
-                               .Trim();
+            var token = context.GetBearerToken();
             var valid = JwtUtil.ValidateToken(token, GlobalContext.JwtConfig.AccessTokenAudience);
             var response = new GetServerInformationResponse
             {
@@ -29,7 +25,7 @@ namespace Librarian.Sephirah.Services
                     Version = Assembly.GetAssembly(typeof(TuiHub.Protos.Librarian.V1.InternalID))?.GetName().Version?.ToString() ?? "Unknown",
                 },
                 CurrentTime = DateTime.UtcNow.ToTimestamp(),
-                ServerInstanceSummary =
+                ServerInstanceSummary = new ServerInstanceSummary
                 {
                     Name = GlobalContext.InstanceConfig.Name,
                     Description = GlobalContext.InstanceConfig.Description,

@@ -88,8 +88,12 @@ namespace Librarian.Common.Utils
             var jwtToken = handler.WriteToken(token);
             return jwtToken;
         }
-        public static bool ValidateToken(string token, string audience)
+        public static bool ValidateToken(string? token, string audience)
         {
+            if (token == null)
+            {
+                return false;
+            }
             var key = Encoding.UTF8.GetBytes(GlobalContext.JwtConfig.Key);
             var handler = new JwtSecurityTokenHandler();
             var parameters = new TokenValidationParameters
