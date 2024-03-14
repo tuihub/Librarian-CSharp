@@ -38,8 +38,8 @@ namespace Librarian.Common.Models
                 Id = new InternalID { Id = InternalId },
                 UserId = new InternalID { Id = UserId },
                 DeviceInfo = Device.ToProtoDeviceInfo(),
-                CreateTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(CreatedAt),
-                ExpireTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(ExpiredAt)
+                CreateTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(CreatedAt.ToUniversalTime()),
+                ExpireTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(ExpiredAt.ToUniversalTime())
             };
         }
     }

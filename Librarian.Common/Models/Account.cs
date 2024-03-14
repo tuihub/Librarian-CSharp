@@ -45,7 +45,7 @@ namespace Librarian.Common.Models
                 Name = Name,
                 ProfileUrl = ProfileUrl,
                 AvatarUrl = AvatarUrl,
-                LatestUpdateTime = Timestamp.FromDateTime(UpdatedAt ?? CreatedAt)
+                LatestUpdateTime = Timestamp.FromDateTime((UpdatedAt ?? CreatedAt).ToUniversalTime())
             };
         }
     }
