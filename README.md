@@ -12,3 +12,15 @@ Librarian-CSharp is in early development stage, and it is **NOT** recommended to
 |------------------|-----------------|----------------------------|
 |0.1.0.2|-|0.1.0.1|
 |(WIP)|(WIP)|-|
+
+## TODO
+
+- v0.2
+  - [x] Login & Logout
+  - [ ] App
+  - [ ] Porter
+	- [ ] Basic plugining
+	- [ ] Integration test
+  - [ ] Code Style
+	- [ ] `SephirahService` Replace GlobalContext with DI
+	- [ ] Change `Utils` to `Helpers`
