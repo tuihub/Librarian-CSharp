@@ -1,5 +1,5 @@
-﻿using Librarian.Common.Models;
-using Librarian.ThirdParty.Contracts;
+﻿using Librarian.ThirdParty.Contracts;
+using Librarian.ThirdParty.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.ThirdParty.Bangumi
 {
@@ -68,15 +69,15 @@ namespace Librarian.ThirdParty.Bangumi
                 SourceAppId = respObj.id.ToString(),
                 SourceUrl = "https://bgm.tv/subject/" + respObj.id.ToString(),
                 Name = string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString(),
-                Type = respObj.type.ToString().Equals("4") ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
+                Type = respObj.type.ToString().Equals("4") ? AppType.Game : AppType.Unspecified,
                 ShortDescription = shortDescription,
                 IconImageUrl = respObj.images?.small?.ToString(),
                 CoverImageUrl = respObj.images?.large?.ToString(),
                 BackgroundImageUrl = respObj.images?.large?.ToString(),
-                AppInfoDetails = new AppInfoDetails
+                Details = new AppInfoDetails
                 {
                     Description = respObj.summary?.ToString(),
-                    ReleaseDate = releaseDate,
+                    ReleaseDate = releaseDate.ToUniversalTime().ToISO8601String(),
                     Developer = developer,
                     Publisher = null,
                     Version = null

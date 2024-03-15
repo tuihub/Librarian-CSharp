@@ -1,11 +1,12 @@
-﻿using Librarian.Common.Models;
-using Librarian.ThirdParty.Contracts;
+﻿using Librarian.ThirdParty.Contracts;
+using Librarian.ThirdParty.Helpers;
 using Librarian.ThirdParty.Vndb.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuiHub.Protos.Librarian.V1;
 using VndbSharp;
 
 namespace Librarian.ThirdParty.Vndb
@@ -46,14 +47,14 @@ namespace Librarian.ThirdParty.Vndb
                     SourceAppId = vn.Id.ToString(),
                     SourceUrl = "https://vndb.org/v" + vn.Id.ToString(),
                     Name = vn.OriginalName,
-                    Type = TuiHub.Protos.Librarian.V1.AppType.Game,
+                    Type = AppType.Game,
                     ShortDescription = shortDescription,
                     IconImageUrl = null,
                     CoverImageUrl = vn.Image,
-                    AppInfoDetails = new AppInfoDetails
+                    Details = new AppInfoDetails
                     {
                         Description = vn.Description,
-                        ReleaseDate = vn.Released.ToDateTime(),
+                        ReleaseDate = vn.Released.ToDateTime().ToUniversalTime().ToISO8601String(),
                         Developer = null,
                         Publisher = null,
                         Version = null

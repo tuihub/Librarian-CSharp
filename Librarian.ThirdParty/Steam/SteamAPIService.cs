@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
-using Librarian.Common.Models;
 using Librarian.ThirdParty.Contracts;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Librarian.ThirdParty.Helpers;
 using Steam.Models.DOTA2;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.ThirdParty.Steam
 {
@@ -47,10 +47,10 @@ namespace Librarian.ThirdParty.Steam
                 ShortDescription = appInfoDetails.ShortDescription,
                 IconImageUrl = null,
                 CoverImageUrl = appInfoDetails.HeaderImage,
-                AppInfoDetails = new AppInfoDetails
+                Details = new AppInfoDetails
                 {
                     Description = appInfoDetails.DetailedDescription,
-                    ReleaseDate = appReleaseDate,
+                    ReleaseDate = appReleaseDate.ToUniversalTime().ToISO8601String(),
                     Developer = string.Join(',', appInfoDetails.Developers),
                     Publisher = string.Join(',', appInfoDetails.Publishers),
                     Version = null
