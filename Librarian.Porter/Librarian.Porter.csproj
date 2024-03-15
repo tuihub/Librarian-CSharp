@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Librarian.Common\Librarian.Common.csproj" />
+    <ProjectReference Include="..\Librarian.ThirdParty\Librarian.ThirdParty.csproj" />
   </ItemGroup>
 
 </Project>

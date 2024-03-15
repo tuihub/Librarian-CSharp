@@ -1,8 +1,5 @@
 ﻿using Librarian.Angela.Interfaces;
 using Librarian.Common.Utils;
-using Librarian.ThirdParty.Bangumi;
-using Librarian.ThirdParty.Steam;
-using Librarian.ThirdParty.Vndb;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
