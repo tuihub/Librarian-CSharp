@@ -12,7 +12,13 @@ namespace Librarian.Porter.Services
     {
         public override Task<EnablePorterResponse> EnablePorter(EnablePorterRequest request, ServerCallContext context)
         {
-            return base.EnablePorter(request, context);
+            var sephirahId = request.SephirahId;
+            if (StaticContext.SephirahId != null && StaticContext.SephirahId != sephirahId)
+            {
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Wrong sephirah id."));
+            }
+            StaticContext.SephirahId = sephirahId;
+            return Task.FromResult(new EnablePorterResponse());
         }
     }
 }

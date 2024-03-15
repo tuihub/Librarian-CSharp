@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -11,10 +11,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Librarian.Common\Librarian.Common.csproj" />
     <ProjectReference Include="..\Librarian.ThirdParty\Librarian.ThirdParty.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\PorterService\" />
   </ItemGroup>
 
 </Project>
