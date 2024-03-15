@@ -14,6 +14,7 @@ builder.Services.AddGrpcReflection();
 // Add services
 builder.Services.AddSingleton<PorterConfig>();
 ServicesHelper.ConfigureThirdPartyServices(builder, porterConfig);
+builder.Services.AddSingleton<AppInfoServiceResolver>();
 
 var app = builder.Build();
 

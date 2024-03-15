@@ -14,11 +14,13 @@ namespace Librarian.Porter.Services
     {
         private readonly ILogger _logger;
         private readonly PorterConfig _porterConfig;
-
-        public PorterService(ILogger<PorterService> logger, PorterConfig porterConfig)
+        private readonly AppInfoServiceResolver _appInfoServiceResolver;
+        public PorterService(ILogger<PorterService> logger, PorterConfig porterConfig,
+            AppInfoServiceResolver appInfoServiceResolver)
         {
             _logger = logger;
             _porterConfig = porterConfig;
+            _appInfoServiceResolver = appInfoServiceResolver;
         }
     }
 }

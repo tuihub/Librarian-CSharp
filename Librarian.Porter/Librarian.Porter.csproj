@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Librarian.ThirdParty\Librarian.ThirdParty.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\PorterService\" />
+  </ItemGroup>
+
 </Project>

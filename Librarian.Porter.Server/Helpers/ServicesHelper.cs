@@ -1,5 +1,6 @@
 ﻿using Librarian.Porter.Configs;
 using Librarian.ThirdParty.Bangumi;
+using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Steam;
 using Librarian.ThirdParty.Vndb;
 
@@ -11,15 +12,15 @@ namespace Librarian.Porter.Server.Helpers
         {
             if (porterConfig.IsSteamEnabled)
             {
-                builder.Services.AddSingleton<SteamAPIService>(new SteamAPIService(porterConfig.SteamApiKey));
+                builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey));
             }
             if (porterConfig.IsBangumiEnabled)
             {
-                builder.Services.AddSingleton<BangumiAPIService>(new BangumiAPIService(porterConfig.BangumiApiKey));
+                builder.Services.AddSingleton(new BangumiAPIService(porterConfig.BangumiApiKey));
             }
             if (porterConfig.IsVndbEnabled)
             {
-                builder.Services.AddSingleton<VndbTcpAPIService>(new VndbTcpAPIService());
+                builder.Services.AddSingleton(new VndbTcpAPIService());
             }
         }
     }
