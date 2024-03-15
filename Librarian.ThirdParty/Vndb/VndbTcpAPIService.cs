@@ -1,4 +1,5 @@
 ﻿using Librarian.Common.Models;
+using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Vndb.Utils;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,14 @@ using VndbSharp;
 
 namespace Librarian.ThirdParty.Vndb
 {
-    public class VndbTcpAPIService
+    public class VndbTcpAPIService : IAppInfoService
     {
-        public async Task<AppInfo> GetAppInfoAsync(uint appId)
+        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken cts = default)
         {
+            if (!uint.TryParse(appIdStr, out uint appId))
+            {
+                throw new ArgumentException("appIdStr must be a valid unsigned integer.");
+            }
             var client = new VndbSharp.Vndb(useTls: true)
                                       .WithTimeout(new TimeSpan(0, 0, 30))
                                       .WithClientDetails("Librarian-CSharp", "0.1")

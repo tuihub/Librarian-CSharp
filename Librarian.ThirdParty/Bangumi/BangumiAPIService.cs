@@ -1,4 +1,5 @@
 ﻿using Librarian.Common.Models;
+using Librarian.ThirdParty.Contracts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Librarian.ThirdParty.Bangumi
 {
-    public class BangumiAPIService
+    public class BangumiAPIService : IAppInfoService
     {
         private readonly string _bangumiAPIKey;
 
@@ -25,8 +26,12 @@ namespace Librarian.ThirdParty.Bangumi
         }
 
         // TODO: Add AltName
-        public async Task<AppInfo> GetAppInfoAsync(int appInfoId, CancellationToken cts = default)
+        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken cts = default)
         {
+            if (!int.TryParse(appIdStr, out int appId))
+            {
+                throw new ArgumentException("appIdStr must be a valid integer.");
+            }
             var options = new RestClientOptions(_bangumiAPIBaseURL)
             {
                 Authenticator = new JwtAuthenticator(_bangumiAPIKey),
@@ -34,7 +39,7 @@ namespace Librarian.ThirdParty.Bangumi
             };
             var client = new RestClient(options);
             var request = new RestRequest("/v0/subjects/{subject_id}")
-                                .AddUrlSegment("subject_id", appInfoId);
+                                .AddUrlSegment("subject_id", appId);
             var response = await client.ExecuteGetAsync(request, cts);
             cts.ThrowIfCancellationRequested();
             if (response == null)
