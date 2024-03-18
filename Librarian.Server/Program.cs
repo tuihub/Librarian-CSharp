@@ -1,3 +1,4 @@
+using Consul;
 using IdGen.DependencyInjection;
 using Librarian.Angela;
 using Librarian.Angela.Interfaces;
@@ -5,12 +6,16 @@ using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
+using Librarian.Sephirah.Configs;
+using Librarian.Sephirah.Contracts;
+using Librarian.Sephirah.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
+using RabbitMQ.Client;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +30,8 @@ var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?
 GlobalContext.JwtConfig = jwtConfig;
 var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
 GlobalContext.InstanceConfig = instanceConfig;
+var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
+var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>() ?? throw new Exception("RabbitMqConfig parse failed");
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -63,6 +70,26 @@ builder.Services.AddRateLimiter(_ => _
         options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
         options.QueueLimit = 10;
     }));
+
+if (consulConfig.IsEnabled)
+{
+    builder.Services.AddSingleton<IConsulClient, ConsulClient>(c => new ConsulClient(c =>
+    {
+        c.Address = new Uri(consulConfig.ConsulAddress);
+    }));
+}
+if (rabbitMqConfig.IsEnabled)
+{
+    var connFactory = new ConnectionFactory
+    {
+        HostName = rabbitMqConfig.Hostname,
+        Port = rabbitMqConfig.Port,
+        UserName = rabbitMqConfig.Username,
+        Password = rabbitMqConfig.Password
+    };
+    builder.Services.AddSingleton<IConnection>(connFactory.CreateConnection());
+    builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
+}
 
 var app = builder.Build();
 

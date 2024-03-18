@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Consul" Version="1.7.14.3" />
     <PackageReference Include="Google.Protobuf" Version="3.25.3" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
     <PackageReference Include="IdGen" Version="3.0.5" />

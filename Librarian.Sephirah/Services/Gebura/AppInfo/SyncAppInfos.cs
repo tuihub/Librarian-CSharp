@@ -1,7 +1,9 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
+using Librarian.Sephirah.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
@@ -34,24 +36,31 @@ namespace Librarian.Sephirah.Services
                     }
                     foreach (var childAppInfo in appInfo.ChildAppInfos)
                     {
-                        _pullMetadataService.AddPullAppInfo(childAppInfo.Id);
+                        if (!string.IsNullOrWhiteSpace(childAppInfo.SourceAppId))
+                        {
+                            _messageQueueService.PublishMessage(childAppInfo.Source, JsonSerializer.Serialize(new AppIdMQ
+                            {
+                                AppId = childAppInfo.SourceAppId,
+                                UpdateInternalAppInfoName = false
+                            }));
+                        }
                     }
                 }
                 else
                 {
-                    var appInfoSource = protoAppInfoId.Source;
-                    var appInfoId = protoAppInfoId.SourceAppId;
-                    if (appInfoSource == Common.Constants.Proto.AppInfoSourceUnspecified ||
-                        appInfoSource == Common.Constants.Proto.AppInfoSourceInternal)
+                    var source = protoAppInfoId.Source;
+                    var sourceAppId = protoAppInfoId.SourceAppId;
+                    if (source == Common.Constants.Proto.AppInfoSourceUnspecified ||
+                        source == Common.Constants.Proto.AppInfoSourceInternal)
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppInfoSource."));
                     }
-                    if (string.IsNullOrWhiteSpace(appInfoId))
+                    if (string.IsNullOrWhiteSpace(sourceAppId))
                     {
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid AppInfoId."));
                     }
 
-                    var appInfo = _dbContext.AppInfos.SingleOrDefault(x => x.Source == appInfoSource && x.SourceAppId == appInfoId);
+                    var appInfo = _dbContext.AppInfos.SingleOrDefault(x => x.Source == source && x.SourceAppId == sourceAppId);
                     // external appInfo not exists
                     if (appInfo == null)
                     {
@@ -66,8 +75,8 @@ namespace Librarian.Sephirah.Services
                         var newExternalAppInfo = new Common.Models.AppInfo
                         {
                             Id = _idGenerator.CreateId(),
-                            Source = appInfoSource,
-                            SourceAppId = appInfoId,
+                            Source = source,
+                            SourceAppId = sourceAppId,
                             Name = string.Empty,
                             Type = TuiHub.Protos.Librarian.V1.AppType.Game,
                             ParentAppInfo = newInternalAppInfo
@@ -75,12 +84,20 @@ namespace Librarian.Sephirah.Services
                         _dbContext.AppInfos.Add(newInternalAppInfo);
                         _dbContext.AppInfos.Add(newExternalAppInfo);
                         await _dbContext.SaveChangesAsync();
-                        _pullMetadataService.AddPullAppInfo(newExternalAppInfo.Id, true);
+                        _messageQueueService.PublishMessage(source, JsonSerializer.Serialize(new AppIdMQ
+                        {
+                            AppId = sourceAppId,
+                            UpdateInternalAppInfoName = true
+                        }));
                     }
                     // external appInfo exists
                     else
                     {
-                        _pullMetadataService.AddPullAppInfo(appInfo.Id);
+                        _messageQueueService.PublishMessage(source, JsonSerializer.Serialize(new AppIdMQ
+                        {
+                            AppId = sourceAppId,
+                            UpdateInternalAppInfoName = false
+                        }));
                     }
                 }
             }
