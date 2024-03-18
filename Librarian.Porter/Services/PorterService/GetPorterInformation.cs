@@ -18,7 +18,8 @@ namespace Librarian.Porter.Services
             {
                 Name = _porterConfig.PorterName,
                 Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
-                GlobalName = "Librarian-Porter-CSharp"
+                GlobalName = "Librarian-Porter-CSharp",
+                FeatureSummary = new PorterFeatureSummary()
             };
             if (_porterConfig.IsSteamEnabled)
             {
