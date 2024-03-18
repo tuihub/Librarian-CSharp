@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Librarian.Angela", "Librari
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Porter.Server", "Librarian.Porter.Server\Librarian.Porter.Server.csproj", "{B5202639-F0D7-4A28-B37B-1D85FF7EAF44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Sephirah.Server", "Librarian.Sephirah.Server\Librarian.Sephirah.Server.csproj", "{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{B5202639-F0D7-4A28-B37B-1D85FF7EAF44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5202639-F0D7-4A28-B37B-1D85FF7EAF44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5202639-F0D7-4A28-B37B-1D85FF7EAF44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
