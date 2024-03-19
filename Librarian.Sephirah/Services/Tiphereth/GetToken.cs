@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.RateLimiting;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -37,10 +38,10 @@ namespace Librarian.Sephirah.Services
                         .Where(x => x.ExpiredAt > DateTime.UtcNow
                             && x.UserId == user.Id
                             && x.DeviceId == deviceId
-                            && x.Status == Common.Models.TokenStatus.Normal);
+                            && x.Status == TokenStatus.Normal);
                     foreach (var session in oldSessions)
                     {
-                        session.Status = Common.Models.TokenStatus.Revoked;
+                        session.Status = TokenStatus.Revoked;
                         session.UpdatedAt = DateTime.UtcNow;
                     }
                     _dbContext.Sessions.Add(new Common.Models.Session

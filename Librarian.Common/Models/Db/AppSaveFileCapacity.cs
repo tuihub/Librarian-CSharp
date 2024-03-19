@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(EntityType), nameof(EntityInternalId))]
     [Index(nameof(CreatedAt))]

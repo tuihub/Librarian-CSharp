@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace Librarian.Sephirah.Services
             var sessions = _dbContext.Sessions
                 .Where(s => s.ExpiredAt > DateTime.UtcNow
                     && s.UserId == userId
-                    && s.Status == Common.Models.TokenStatus.Normal)
+                    && s.Status == TokenStatus.Normal)
                 .Include(x => x.Device);
             var response = new ListUserSessionsResponse();
             response.Sessions.AddRange(sessions.Select(x => x.ToProtoUserSession()));

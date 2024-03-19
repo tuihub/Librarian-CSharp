@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using System;
@@ -19,12 +20,12 @@ namespace Librarian.Sephirah.Services
             var sessionId = request.SessionId.Id;
             var session = _dbContext.Sessions
                 .SingleOrDefault(x => x.Id == sessionId
-                    && x.Status == Common.Models.TokenStatus.Normal);
+                    && x.Status == TokenStatus.Normal);
             if (session == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Session not found"));
             }
-            session.Status = Common.Models.TokenStatus.Deleted;
+            session.Status = TokenStatus.Deleted;
             session.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             return Task.FromResult(new DeleteUserSessionResponse());

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(DeviceName))]
     [Index(nameof(SystemType))]
@@ -34,7 +34,7 @@ namespace Librarian.Common.Models
         // many-to-many relation(required)
         public ICollection<User> Users { get; } = new List<User>();
         // func
-        public Device(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo deviceInfo)
+        public Device(long internalId, DeviceInfo deviceInfo)
         {
             Id = internalId;
             DeviceName = deviceInfo.DeviceName;
@@ -45,9 +45,9 @@ namespace Librarian.Common.Models
             ClientVersion = string.IsNullOrEmpty(deviceInfo.ClientVersion) ? null : deviceInfo.ClientVersion;
         }
         public Device() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo ToProtoDeviceInfo()
+        public DeviceInfo ToProtoDeviceInfo()
         {
-            return new TuiHub.Protos.Librarian.Sephirah.V1.DeviceInfo
+            return new DeviceInfo
             {
                 DeviceId = new InternalID { Id = Id },
                 DeviceName = DeviceName,

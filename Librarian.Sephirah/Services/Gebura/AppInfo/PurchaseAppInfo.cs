@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         public override Task<PurchaseAppInfoResponse> PurchaseAppInfo(PurchaseAppInfoRequest request, ServerCallContext context)
         {
             var userId = context.GetInternalIdFromHeader();
-            Common.Models.AppInfo? appInfo;
+            Common.Models.Db.AppInfo? appInfo;
             if (request.AppInfoId.Internal)
             {
                 appInfo = _dbContext.AppInfos.SingleOrDefault(x =>

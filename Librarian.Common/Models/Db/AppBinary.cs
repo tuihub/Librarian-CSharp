@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(TokenServerUrl))]
     [Index(nameof(CreatedAt))]

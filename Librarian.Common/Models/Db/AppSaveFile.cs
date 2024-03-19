@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(Status))]
     [Index(nameof(IsPinned))]

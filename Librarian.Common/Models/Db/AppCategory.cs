@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]

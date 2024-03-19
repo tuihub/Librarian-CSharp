@@ -16,7 +16,7 @@ namespace Librarian.Sephirah.Services
             var deviceIdFilter = request.DeviceIdFilter;
             var idFilter = request.IdFilter;
             var appIdFilter = request.AppIdFilter;
-            IQueryable<Common.Models.AppInst> appInsts = _dbContext.AppInsts;
+            IQueryable<Common.Models.Db.AppInst> appInsts = _dbContext.AppInsts;
             if (idFilter.Count > 0)
             {
                 appInsts = appInsts.Where(x => idFilter.Select(x => x.Id).Contains(x.Id));

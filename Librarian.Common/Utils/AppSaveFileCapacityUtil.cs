@@ -1,4 +1,4 @@
-﻿using Librarian.Common.Models;
+﻿using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -86,7 +86,7 @@ namespace Librarian.Common.Utils
             return result;
         }
 
-        private static CheckCapacityResult CheckCapacityCount(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.App app)
+        private static CheckCapacityResult CheckCapacityCount(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.Db.App app)
         {
             if (asfc == null || asfc.Count == null)
             {
@@ -144,7 +144,7 @@ namespace Librarian.Common.Utils
             return result;
         }
 
-        private static CheckCapacityResult CheckCapacitySizeBytes(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.App app, long fileSizeBytes)
+        private static CheckCapacityResult CheckCapacitySizeBytes(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.Db.App app, long fileSizeBytes)
         {
             if (asfc == null || asfc.SizeBytes == null)
             {

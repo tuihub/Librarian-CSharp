@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(Platform), nameof(PlatformAccountId), IsUnique = true)]
     [Index(nameof(CreatedAt))]

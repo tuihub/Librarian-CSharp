@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
@@ -50,12 +50,12 @@ namespace Librarian.Common.Models
         {
             return new TuiHub.Protos.Librarian.V1.AppInfoDetails
             {
-                Description = this.Description ?? string.Empty,
-                ReleaseDate = (this.ReleaseDate ?? DateTime.MinValue).ToISO8601String(),
-                Developer = this.Developer ?? string.Empty,
-                Publisher = this.Publisher ?? string.Empty,
-                Version = this.Version ?? string.Empty,
-                ImageUrls = { this.ImageUrls }
+                Description = Description ?? string.Empty,
+                ReleaseDate = (ReleaseDate ?? DateTime.MinValue).ToISO8601String(),
+                Developer = Developer ?? string.Empty,
+                Publisher = Publisher ?? string.Empty,
+                Version = Version ?? string.Empty,
+                ImageUrls = { ImageUrls }
             };
         }
         public void UpdateFromProtoAppInfoDetails(TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
@@ -65,24 +65,24 @@ namespace Librarian.Common.Models
                 releaseDate = tmpDT;
             else
                 releaseDate = null;
-            this.Description = string.IsNullOrEmpty(appInfoDetails.Description) ? null : appInfoDetails.Description;
-            this.ReleaseDate = releaseDate;
-            this.Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
-            this.Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
-            this.Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
-            this.ImageUrls = appInfoDetails.ImageUrls.ToList();
-            this.UpdatedAt = DateTime.UtcNow;
+            Description = string.IsNullOrEmpty(appInfoDetails.Description) ? null : appInfoDetails.Description;
+            ReleaseDate = releaseDate;
+            Developer = string.IsNullOrEmpty(appInfoDetails.Developer) ? null : appInfoDetails.Developer;
+            Publisher = string.IsNullOrEmpty(appInfoDetails.Publisher) ? null : appInfoDetails.Publisher;
+            Version = string.IsNullOrEmpty(appInfoDetails.Version) ? null : appInfoDetails.Version;
+            ImageUrls = appInfoDetails.ImageUrls.ToList();
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void UpdateFromAppInfoDetails(AppInfoDetails appInfoDetails)
         {
-            this.Description = appInfoDetails.Description;
-            this.ReleaseDate = appInfoDetails.ReleaseDate;
-            this.Developer = appInfoDetails.Developer;
-            this.Publisher = appInfoDetails.Publisher;
-            this.Version = appInfoDetails.Version;
-            this.ImageUrls = appInfoDetails.ImageUrls;
-            this.UpdatedAt = DateTime.UtcNow;
+            Description = appInfoDetails.Description;
+            ReleaseDate = appInfoDetails.ReleaseDate;
+            Developer = appInfoDetails.Developer;
+            Publisher = appInfoDetails.Publisher;
+            Version = appInfoDetails.Version;
+            ImageUrls = appInfoDetails.ImageUrls;
+            UpdatedAt = DateTime.UtcNow;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
-namespace Librarian.Common.Models
+namespace Librarian.Common.Models.Db
 {
     [Index(nameof(Source), nameof(SourceAppId))]
     [Index(nameof(Name))]
@@ -76,37 +76,37 @@ namespace Librarian.Common.Models
         {
             return new AppInfo
             {
-                Id = this.Id,
-                Source = this.Source,
-                SourceAppId = this.SourceAppId,
-                SourceUrl = this.SourceUrl,
-                Name = this.Name,
-                Type = this.Type,
-                ShortDescription = this.ShortDescription,
-                IconImageUrl = this.IconImageUrl,
-                BackgroundImageUrl = this.BackgroundImageUrl,
-                CoverImageUrl = this.CoverImageUrl,
+                Id = Id,
+                Source = Source,
+                SourceAppId = SourceAppId,
+                SourceUrl = SourceUrl,
+                Name = Name,
+                Type = Type,
+                ShortDescription = ShortDescription,
+                IconImageUrl = IconImageUrl,
+                BackgroundImageUrl = BackgroundImageUrl,
+                CoverImageUrl = CoverImageUrl,
                 AppInfoDetails = null,
-                CreatedAt = this.CreatedAt,
-                UpdatedAt = this.UpdatedAt
+                CreatedAt = CreatedAt,
+                UpdatedAt = UpdatedAt
             };
         }
         public TuiHub.Protos.Librarian.V1.AppInfo ToProtoAppInfo()
         {
             return new TuiHub.Protos.Librarian.V1.AppInfo
             {
-                Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = this.Id },
-                Internal = this.IsInternal,
-                Source = this.Source,
-                SourceAppId = this.SourceAppId ?? string.Empty,
-                SourceUrl = this.SourceUrl ?? string.Empty,
-                Name = this.Name,
-                Type = this.Type,
-                ShortDescription = this.ShortDescription ?? string.Empty,
-                IconImageUrl = this.IconImageUrl ?? string.Empty,
-                BackgroundImageUrl = this.BackgroundImageUrl ?? string.Empty,
-                CoverImageUrl = this.CoverImageUrl ?? string.Empty,
-                Details = this.AppInfoDetails?.ToProtoAppInfoDetails()
+                Id = new InternalID { Id = Id },
+                Internal = IsInternal,
+                Source = Source,
+                SourceAppId = SourceAppId ?? string.Empty,
+                SourceUrl = SourceUrl ?? string.Empty,
+                Name = Name,
+                Type = Type,
+                ShortDescription = ShortDescription ?? string.Empty,
+                IconImageUrl = IconImageUrl ?? string.Empty,
+                BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
+                CoverImageUrl = CoverImageUrl ?? string.Empty,
+                Details = AppInfoDetails?.ToProtoAppInfoDetails()
             };
         }
 
@@ -114,56 +114,56 @@ namespace Librarian.Common.Models
         {
             return new AppInfoMixed
             {
-                Id = new InternalID { Id = this.Id },
-                Name = this.Name,
-                Type = this.Type,
-                ShortDescription = this.ShortDescription ?? string.Empty,
-                IconImageUrl = this.IconImageUrl ?? string.Empty,
-                BackgroundImageUrl = this.BackgroundImageUrl ?? string.Empty,
-                CoverImageUrl = this.CoverImageUrl ?? string.Empty,
-                Details = this.AppInfoDetails?.ToProtoAppInfoDetails()
+                Id = new InternalID { Id = Id },
+                Name = Name,
+                Type = Type,
+                ShortDescription = ShortDescription ?? string.Empty,
+                IconImageUrl = IconImageUrl ?? string.Empty,
+                BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
+                CoverImageUrl = CoverImageUrl ?? string.Empty,
+                Details = AppInfoDetails?.ToProtoAppInfoDetails()
             };
         }
 
         public void UpdateFromProtoAppInfo(TuiHub.Protos.Librarian.V1.AppInfo appInfo)
         {
-            this.Source = appInfo.Source;
-            this.SourceAppId = appInfo.SourceAppId;
-            this.SourceUrl = appInfo.SourceUrl;
-            this.Name = appInfo.Name;
-            this.Type = appInfo.Type;
-            this.ShortDescription = appInfo.ShortDescription;
-            this.IconImageUrl = appInfo.IconImageUrl;
-            this.BackgroundImageUrl = appInfo.BackgroundImageUrl;
-            this.CoverImageUrl = appInfo.CoverImageUrl;
-            this.UpdatedAt = DateTime.UtcNow;
+            Source = appInfo.Source;
+            SourceAppId = appInfo.SourceAppId;
+            SourceUrl = appInfo.SourceUrl;
+            Name = appInfo.Name;
+            Type = appInfo.Type;
+            ShortDescription = appInfo.ShortDescription;
+            IconImageUrl = appInfo.IconImageUrl;
+            BackgroundImageUrl = appInfo.BackgroundImageUrl;
+            CoverImageUrl = appInfo.CoverImageUrl;
+            UpdatedAt = DateTime.UtcNow;
             if (appInfo.Details != null)
             {
-                this.AppInfoDetails ??= new AppInfoDetails();
-                this.AppInfoDetails.Id = this.Id;
-                this.AppInfoDetails.App ??= this;
-                this.AppInfoDetails.UpdateFromProtoAppInfoDetails(appInfo.Details);
+                AppInfoDetails ??= new AppInfoDetails();
+                AppInfoDetails.Id = Id;
+                AppInfoDetails.App ??= this;
+                AppInfoDetails.UpdateFromProtoAppInfoDetails(appInfo.Details);
             }
         }
 
         public void UpdateFromAppInfo(AppInfo appInfo)
         {
-            this.Source = appInfo.Source;
-            this.SourceAppId = appInfo.SourceAppId;
-            this.SourceUrl = appInfo.SourceUrl;
-            this.Name = appInfo.Name;
-            this.Type = appInfo.Type;
-            this.ShortDescription = appInfo.ShortDescription;
-            this.IconImageUrl = appInfo.IconImageUrl;
-            this.BackgroundImageUrl = appInfo.BackgroundImageUrl;
-            this.CoverImageUrl = appInfo.CoverImageUrl;
-            this.UpdatedAt = DateTime.UtcNow;
+            Source = appInfo.Source;
+            SourceAppId = appInfo.SourceAppId;
+            SourceUrl = appInfo.SourceUrl;
+            Name = appInfo.Name;
+            Type = appInfo.Type;
+            ShortDescription = appInfo.ShortDescription;
+            IconImageUrl = appInfo.IconImageUrl;
+            BackgroundImageUrl = appInfo.BackgroundImageUrl;
+            CoverImageUrl = appInfo.CoverImageUrl;
+            UpdatedAt = DateTime.UtcNow;
             if (appInfo.AppInfoDetails != null)
             {
-                this.AppInfoDetails ??= new AppInfoDetails();
-                this.AppInfoDetails.Id = this.Id;
-                this.AppInfoDetails.App ??= this;
-                this.AppInfoDetails.UpdateFromAppInfoDetails(appInfo.AppInfoDetails);
+                AppInfoDetails ??= new AppInfoDetails();
+                AppInfoDetails.Id = Id;
+                AppInfoDetails.App ??= this;
+                AppInfoDetails.UpdateFromAppInfoDetails(appInfo.AppInfoDetails);
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Models;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -31,12 +31,12 @@ namespace Librarian.Sephirah.Services
                         && x.ExpiredAt > DateTime.UtcNow
                         && x.UserId == internalId
                         && x.DeviceId == deviceId
-                        && x.Status == Common.Models.TokenStatus.Normal);
+                        && x.Status == TokenStatus.Normal);
                 if (oldSession == null)
                 {
                     throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid refresh token."));
                 }
-                oldSession.Status = Common.Models.TokenStatus.Used;
+                oldSession.Status = TokenStatus.Used;
                 oldSession.UpdatedAt = DateTime.UtcNow;
             }
             // get new token

@@ -11,7 +11,7 @@ namespace Librarian.Sephirah.Services
         {
             // verify user type(admin)
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-            IQueryable<Common.Models.User> usersDb = _dbContext.Users;
+            IQueryable<Common.Models.Db.User> usersDb = _dbContext.Users;
             // exclude current user
             usersDb = usersDb.Where(u => u.Id != context.GetInternalIdFromHeader());
             if (request.TypeFilter.Count > 0)

@@ -1,5 +1,5 @@
 ﻿using Librarian.Common.Configs;
-using Librarian.Common.Models;
+using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
