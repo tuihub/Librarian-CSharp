@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
-using Librarian.Sephirah.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -65,14 +65,14 @@ namespace Librarian.Sephirah.Services
                     if (appInfo == null)
                     {
                         // create new internal appInfo
-                        var newInternalAppInfo = new Common.Models.AppInfo
+                        var newInternalAppInfo = new Common.Models.Db.AppInfo
                         {
                             Id = _idGenerator.CreateId(),
                             Source = Common.Constants.Proto.AppInfoSourceInternal,
                             Name = $"{protoAppInfoId.Source}_{protoAppInfoId.SourceAppId}",
                             Type = TuiHub.Protos.Librarian.V1.AppType.Game
                         };
-                        var newExternalAppInfo = new Common.Models.AppInfo
+                        var newExternalAppInfo = new Common.Models.Db.AppInfo
                         {
                             Id = _idGenerator.CreateId(),
                             Source = source,

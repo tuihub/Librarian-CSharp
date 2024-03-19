@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfoSource must be internal."));
             }
             var internalId = _idGenerator.CreateId();
-            var appInfo = new Common.Models.AppInfo(internalId, request.AppInfo);
+            var appInfo = new Common.Models.Db.AppInfo(internalId, request.AppInfo);
             _dbContext.AppInfos.Add(appInfo);
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppInfoResponse

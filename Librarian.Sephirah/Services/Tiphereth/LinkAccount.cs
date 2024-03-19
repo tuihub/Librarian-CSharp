@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Models;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using System;
@@ -29,7 +29,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Account already linked."));
             }
             var accountInternalId = _idGenerator.CreateId();
-            userDb.Accounts.Add(new Common.Models.Account
+            userDb.Accounts.Add(new Common.Models.Db.Account
             {
                 Id = accountInternalId,
                 Platform = accountId.Platform,

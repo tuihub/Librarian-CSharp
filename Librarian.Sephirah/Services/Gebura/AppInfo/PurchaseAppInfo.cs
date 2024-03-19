@@ -34,7 +34,7 @@ namespace Librarian.Sephirah.Services
                 var appInfoParent = appInfo.ParentAppInfo;
                 if (appInfoParent == null)
                 {
-                    appInfoParent = new Common.Models.AppInfo
+                    appInfoParent = new Common.Models.Db.AppInfo
                     {
                         Id = _idGenerator.CreateId(),
                         Source = Common.Constants.Proto.AppInfoSourceInternal,

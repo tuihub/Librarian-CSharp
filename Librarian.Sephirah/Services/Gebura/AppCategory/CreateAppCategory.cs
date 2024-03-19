@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
         {
             var userId = context.GetInternalIdFromHeader();
             var internalId = _idGenerator.CreateId();
-            var appCategory = new Common.Models.AppCategory(internalId, userId, request.AppCategory);
+            var appCategory = new Common.Models.Db.AppCategory(internalId, userId, request.AppCategory);
             _dbContext.AppCategories.Add(appCategory);
             _dbContext.SaveChanges();
             var ret = new CreateAppCategoryResponse

@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var userId = context.GetInternalIdFromHeader();
             var deviceInfo = request.DeviceInfo;
             var deviceId = _idGenerator.CreateId();
-            var device = new Common.Models.Device(deviceId, deviceInfo);
+            var device = new Common.Models.Db.Device(deviceId, deviceInfo);
             _dbContext.Devices.Add(device);
             _dbContext.Users.Single(x => x.Id == userId).Devices.Add(device);
             _dbContext.SaveChanges();

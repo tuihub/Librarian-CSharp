@@ -44,7 +44,7 @@ namespace Librarian.Sephirah.Services
             refreshTokenNew = JwtUtil.GenerateRefreshToken(internalId);
             if (deviceId != null)
             {
-                _dbContext.Sessions.Add(new Common.Models.Session
+                _dbContext.Sessions.Add(new Common.Models.Db.Session
                 {
                     InternalId = oldSession!.InternalId,
                     TokenJti = refreshTokenNew.GetJtiFromJwtToken(),

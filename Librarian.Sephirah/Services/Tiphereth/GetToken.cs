@@ -44,7 +44,7 @@ namespace Librarian.Sephirah.Services
                         session.Status = TokenStatus.Revoked;
                         session.UpdatedAt = DateTime.UtcNow;
                     }
-                    _dbContext.Sessions.Add(new Common.Models.Session
+                    _dbContext.Sessions.Add(new Common.Models.Db.Session
                     {
                         InternalId = _idGenerator.CreateId(),
                         TokenJti = refreshToken.GetJtiFromJwtToken(),

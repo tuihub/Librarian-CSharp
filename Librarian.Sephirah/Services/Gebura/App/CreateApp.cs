@@ -13,7 +13,7 @@ namespace Librarian.Sephirah.Services
         {
             // create app
             var internalId = _idGenerator.CreateId();
-            var app = new Common.Models.App(internalId, request.App);
+            var app = new Common.Models.Db.App(internalId, request.App);
             if (app.AppInfoId != null)
             {
                 var appInfo = _dbContext.AppInfos.SingleOrDefault(x => x.Id == app.AppInfoId);

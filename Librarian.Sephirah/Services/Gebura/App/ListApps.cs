@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Models;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;

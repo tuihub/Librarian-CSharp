@@ -24,7 +24,7 @@ namespace Librarian.Sephirah.Services
             }
             // create file metadata
             var fileMetadataId = _idGenerator.CreateId();
-            var fileMetadata = new Common.Models.FileMetadata(fileMetadataId, request.FileMetadata);
+            var fileMetadata = new Common.Models.Db.FileMetadata(fileMetadataId, request.FileMetadata);
             _dbContext.FileMetadatas.Add(fileMetadata);
             // create app save file
             var appSaveFileId = _idGenerator.CreateId();

@@ -18,7 +18,7 @@ namespace Librarian.Sephirah.Services
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
             // create user
             internalId = _idGenerator.CreateId();
-            var user = new Common.Models.User()
+            var user = new Common.Models.Db.User()
             {
                 Id = internalId,
                 Name = request.User.Username,

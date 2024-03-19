@@ -36,7 +36,7 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Device not associated with user."));
             }
-            var appInst = new Common.Models.AppInst(internalId, appInstReq);
+            var appInst = new Common.Models.Db.AppInst(internalId, appInstReq);
             _dbContext.AppInsts.Add(appInst);
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppInstResponse
