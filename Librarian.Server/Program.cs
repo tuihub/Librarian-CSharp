@@ -2,6 +2,7 @@ using Consul;
 using IdGen.DependencyInjection;
 using Librarian.Angela;
 using Librarian.Angela.Services;
+using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Contracts;
 using Librarian.Common.Services;

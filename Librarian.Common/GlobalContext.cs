@@ -1,6 +1,6 @@
 ﻿using Librarian.Common.Configs;
 
-namespace Librarian.Common.Utils
+namespace Librarian.Common
 {
     public static class GlobalContext
     {

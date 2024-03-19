@@ -2,6 +2,7 @@ using Consul;
 using IdGen.DependencyInjection;
 using Librarian.Angela;
 using Librarian.Angela.Services;
+using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Contracts;
 using Librarian.Common.Services;
@@ -31,6 +32,7 @@ var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<Inst
 GlobalContext.InstanceConfig = instanceConfig;
 var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>() ?? throw new Exception("RabbitMqConfig parse failed");
+
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();

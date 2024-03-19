@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Librarian.Common;
 using Librarian.Common.Utils;
 using System.Reflection;
 using TuiHub.Protos.Librarian.Sephirah.V1;

@@ -1,6 +1,7 @@
 ﻿using Grpc.Net.Client;
 using IdGen.DependencyInjection;
 using Librarian.Angela.Services;
+using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
