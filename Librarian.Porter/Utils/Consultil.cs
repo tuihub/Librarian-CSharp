@@ -1,9 +1,9 @@
 ﻿using Consul;
 using Librarian.Porter.Configs;
 
-namespace Librarian.Porter.Helpers
+namespace Librarian.Porter.Utils
 {
-    public static class ConsulHelper
+    public static class Consultil
     {
         public static void RegisterConsul(IConsulClient consulClient, ConsulConfig consulConfig)
         {

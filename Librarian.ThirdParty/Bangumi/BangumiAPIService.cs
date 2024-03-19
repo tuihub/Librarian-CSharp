@@ -1,5 +1,5 @@
 ﻿using Librarian.ThirdParty.Contracts;
-using Librarian.ThirdParty.Helpers;
+using Librarian.ThirdParty.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;

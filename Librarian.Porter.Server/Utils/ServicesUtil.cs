@@ -5,9 +5,9 @@ using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Steam;
 using Librarian.ThirdParty.Vndb;
 
-namespace Librarian.Porter.Server.Helpers
+namespace Librarian.Porter.Server.Utils
 {
-    public static class ServicesHelper
+    public static class ServicesUtil
     {
         public static void ConfigureThirdPartyServices(WebApplicationBuilder builder, PorterConfig porterConfig)
         {

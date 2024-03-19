@@ -1,7 +1,5 @@
 ﻿using Grpc.Net.Client;
 using IdGen.DependencyInjection;
-using Librarian.Angela.Interfaces;
-using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
@@ -78,8 +76,6 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                 builder.Services.AddGrpcReflection();
                 // Add services
                 builder.Services.AddSingleton<PullMetadataService>();
-                builder.Services.AddScoped<ISteamProvider, SteamProvider>();
-                builder.Services.AddScoped<IVndbProvider, VndbProvider>();
                 // Add Minio DI
                 builder.Services.AddMinio(c => c
                     .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)

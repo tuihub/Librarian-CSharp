@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Librarian.ThirdParty.Vndb.Utils
 {
-    public static class VndbSharpModelHelper
+    public static class VndbSharpModelUtil
     {
         public static DateTime ToDateTime(this VndbSharp.Models.Common.SimpleDate simpleDate)
         {

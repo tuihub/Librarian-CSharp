@@ -21,7 +21,7 @@ namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
             using (var scope = App.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                dbContext.Users.Add(new Common.Models.User
+                dbContext.Users.Add(new Common.Models.Db.User
                 {
                     Name = "test",
                     Password = PasswordHasher.HashPassword("test"),

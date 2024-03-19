@@ -1,7 +1,7 @@
 using Consul;
 using Librarian.Porter.Configs;
-using Librarian.Porter.Helpers;
-using Librarian.Porter.Server.Helpers;
+using Librarian.Porter.Utils;
+using Librarian.Porter.Server.Utils;
 using Librarian.Porter.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +25,7 @@ if (consulConfig.IsEnabled)
         c.Address = new Uri(consulConfig.ConsulAddress);
     }));
 }
-ServicesHelper.ConfigureThirdPartyServices(builder, porterConfig);
+ServicesUtil.ConfigureThirdPartyServices(builder, porterConfig);
 builder.Services.AddSingleton<AppInfoServiceResolver>();
 
 var app = builder.Build();
@@ -53,12 +53,12 @@ if (consulConfig.IsEnabled)
 
     var consulClient = app.Services.GetRequiredService<IConsulClient>();
     // Register to consul
-    ConsulHelper.RegisterConsul(consulClient, consulConfig);
+    Consultil.RegisterConsul(consulClient, consulConfig);
 
     // Deregister from consul when app is stopped
     app.Lifetime.ApplicationStopping.Register(() =>
     {
-        ConsulHelper.DeregisterConsul(consulClient);
+        Consultil.DeregisterConsul(consulClient);
     });
 }
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Librarian.ThirdParty.Contracts;
-using Librarian.ThirdParty.Helpers;
+using Librarian.ThirdParty.Utils;
 using Steam.Models.DOTA2;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;

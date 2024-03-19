@@ -1,5 +1,5 @@
 ﻿using Librarian.ThirdParty.Contracts;
-using Librarian.ThirdParty.Helpers;
+using Librarian.ThirdParty.Utils;
 using Librarian.ThirdParty.Vndb.Utils;
 using System;
 using System.Collections.Generic;
