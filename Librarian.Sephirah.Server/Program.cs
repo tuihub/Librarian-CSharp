@@ -1,13 +1,12 @@
 using Consul;
 using IdGen.DependencyInjection;
 using Librarian.Angela;
-using Librarian.Angela.Interfaces;
-using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
 using Librarian.Common.Configs;
+using Librarian.Common.Contracts;
+using Librarian.Common.Services;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Configs;
-using Librarian.Sephirah.Contracts;
 using Librarian.Sephirah.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -115,5 +114,8 @@ app.UseAuthorization();
 
 // Enable RateLimiter
 app.UseRateLimiter();
+
+// Start pull metadata service
+app.Services.GetRequiredService<PullMetadataService>().Start();
 
 app.Run();

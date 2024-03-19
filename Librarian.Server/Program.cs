@@ -1,8 +1,6 @@
 using Consul;
 using IdGen.DependencyInjection;
 using Librarian.Angela;
-using Librarian.Angela.Interfaces;
-using Librarian.Angela.Providers;
 using Librarian.Angela.Services;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
@@ -45,9 +43,6 @@ builder.Services.AddGrpcReflection();
 
 // Add services
 builder.Services.AddSingleton<PullMetadataService>();
-builder.Services.AddScoped<ISteamProvider, SteamProvider>();
-builder.Services.AddScoped<IVndbProvider, VndbProvider>();
-builder.Services.AddScoped<IBangumiProvider, BangumiProvider>();
 
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

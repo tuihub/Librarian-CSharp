@@ -1,5 +1,8 @@
-﻿using Librarian.Angela.Interfaces;
-using Librarian.Angela.Providers;
+﻿using Consul;
+using Grpc.Net.Client;
+using Librarian.Angela.Services.Workers;
+using Librarian.Common.Contracts;
+using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,28 +10,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.V1;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Librarian.Angela.Services
 {
     public class PullMetadataService
     {
         private readonly ILogger _logger;
+        private readonly IConsulClient _consulClient;
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly CancellationTokenSource _cts = new();
-        private readonly ManualResetEventSlim _mres = new(false);
+        private readonly CancellationTokenSource _cts;
+        private readonly Thread _mainPullMetadataThread;
+        private readonly Dictionary<(string, string), PullAppInfoMetadataWorker> _pullAppInfoMetadataWorkers;
 
-        private readonly Queue<ExternalAppInfo> _externalAppInfos = new();
-
-        public PullMetadataService(ILogger<PullMetadataService> logger, IServiceProvider serviceProvider)
+        public PullMetadataService(ILogger<PullMetadataService> logger, IConsulClient consulClient, IServiceProvider serviceProvider)
         {
             _logger = logger;
+            _consulClient = consulClient;
             _serviceProvider = serviceProvider;
 
-            Task.Run(() => MainPullMetadataThread(_cts.Token));
+            _cts = new CancellationTokenSource();
+            _mainPullMetadataThread = new Thread(() => MainPullMetadataThread(_cts.Token));
+            _pullAppInfoMetadataWorkers = new Dictionary<(string, string), PullAppInfoMetadataWorker>();
         }
 
         ~PullMetadataService()
@@ -36,128 +42,64 @@ namespace Librarian.Angela.Services
             _cts.Cancel();
         }
 
-        private async void MainPullMetadataThread(CancellationToken token)
+        public void Start()
         {
-            try
+            _mainPullMetadataThread.Start();
+        }
+
+        private void MainPullMetadataThread(CancellationToken ct)
+        {
+            _logger.LogInformation("PullMetadataService started");
+            var consulQueryOptions = new QueryOptions
             {
-                while (true)
+                WaitTime = TimeSpan.FromSeconds(120)
+            };
+            var serviceName = "porter";
+            while (true)
+            {
+                var response = _consulClient.Health.Service(serviceName, null, true, consulQueryOptions, ct).Result;
+                if (ct.IsCancellationRequested)
                 {
-                    _mres.Wait(token);
-                    while (_externalAppInfos.Count > 0)
+                    foreach (var worker in _pullAppInfoMetadataWorkers.Values)
                     {
-                        var externalAppInfo = _externalAppInfos.Dequeue();
-                        _logger.LogDebug("Pulling appInfo {Id}, UpdateParentAppInfoName = {UpdateParentAppInfoName}," +
-                            " _externalAppInfos.Count = {Count}", 
-                            externalAppInfo.InternalID, externalAppInfo.UpdateParentAppInfoName.ToString(), _externalAppInfos.Count);
-                        string appInfoSource;
-                        long? parentAppInfoId;
-                        using (var scope = _serviceProvider.CreateScope())
-                        {
-                            using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-                            {
-                                var appInfo = dbContext.AppInfos.Single(x => x.Id == externalAppInfo.InternalID);
-                                appInfoSource = appInfo.Source;
-                                parentAppInfoId = appInfo.ParentAppInfoId;
-                            }
-                        }
-                        var retries = 0;
-                        while (retries < GlobalContext.SystemConfig.MetadataServiceMaxRetries)
-                        {
-                            try
-                            {
-                                if (appInfoSource == "steam")
-                                {
-                                    using var scope = _serviceProvider.CreateScope();
-                                    var steamProvider = scope.ServiceProvider.GetRequiredService<ISteamProvider>();
-                                    await steamProvider.PullAppInfoAsync(externalAppInfo.InternalID);
-                                }
-                                else if (appInfoSource == "vndb")
-                                {
-                                    using var scope = _serviceProvider.CreateScope();
-                                    var vndbProvider = scope.ServiceProvider.GetRequiredService<IVndbProvider>();
-                                    await vndbProvider.PullAppInfoAsync(externalAppInfo.InternalID);
-                                }
-                                else if (appInfoSource == "bangumi")
-                                {
-                                    using var scope = _serviceProvider.CreateScope();
-                                    var bangumiProvider = scope.ServiceProvider.GetRequiredService<IBangumiProvider>();
-                                    await bangumiProvider.PullAppInfoAsync(externalAppInfo.InternalID);
-                                }
-                                else
-                                {
-                                    _logger.LogWarning("Unsupported appInfo Id = {Id}, appInfoSource {AppInfoSource}", externalAppInfo.InternalID, appInfoSource);
-                                    break;
-                                }
-
-                                // update parent app name
-                                if (externalAppInfo.UpdateParentAppInfoName == true)
-                                {
-                                    if (parentAppInfoId == null)
-                                    {
-                                        _logger.LogWarning("Parent app Id is null, skipping");
-                                    }
-                                    else
-                                    {
-                                        _logger.LogDebug("Updating internal appInfo(Id = {Id}) using external appInfo(Id = {ExtId})", parentAppInfoId, externalAppInfo.InternalID);
-                                        using (var scope = _serviceProvider.CreateScope())
-                                        {
-                                            using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-                                            {
-                                                var appInfo = dbContext.AppInfos.Single(x => x.Id == parentAppInfoId);
-                                                appInfo.Name = dbContext.AppInfos.Single(x => x.Id == externalAppInfo.InternalID).Name;
-                                                await dbContext.SaveChangesAsync();
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // break out of retry loop
-                                break;
-                            }
-                            catch (Exception ex)
-                            {
-                                retries++;
-                                _logger.LogWarning(ex, "Failed to pull appInfo {Id}, retries = {retries}, retrying in {RetrySeconds} seconds",
-                                    externalAppInfo.InternalID, retries, GlobalContext.SystemConfig.MetadataServiceRetrySeconds);
-                                await Task.Delay(Convert.ToInt32(GlobalContext.SystemConfig.MetadataServiceRetrySeconds * 1000), token);
-                            }
-                        }
-
-                        if (token.IsCancellationRequested)
-                            throw new OperationCanceledException(token);
-                        var pullIntervalSeconds = appInfoSource switch
-                        {
-                            "steam" => GlobalContext.SystemConfig.PullSteamIntervalSeconds,
-                            "vndb" => GlobalContext.SystemConfig.PullVndbIntervalSeconds,
-                            "bangumi" => GlobalContext.SystemConfig.PullBangumiIntervalSeconds,
-                            _ => throw new NotImplementedException()
-                        };
-                        _logger.LogDebug("Waiting for {IntervalSeconds} seconds, _externalAppInfos.Count = {Count}", pullIntervalSeconds, _externalAppInfos.Count);
-                        await Task.Delay(Convert.ToInt32(pullIntervalSeconds * 1000), token);
+                        worker.Cancel();
                     }
-                    _mres.Reset();
+                    break;
+                }
+                _logger.LogInformation($"Got {serviceName}, WaitIndex = {consulQueryOptions.WaitIndex}, LastIndex = {response.LastIndex}");
+                if (response.LastIndex != consulQueryOptions.WaitIndex)
+                {
+                    consulQueryOptions.WaitIndex = response.LastIndex;
+
+                    var existingWorkers = _pullAppInfoMetadataWorkers.Keys.ToList();
+                    var serviceTags = response.Response
+                        .Select(x => x.Service)
+                        .SelectMany(s => s.Tags,
+                            (s, t) => (s.ID, t))
+                        .ToList();
+                    var workersToRemove = existingWorkers.Except(serviceTags).ToList();
+                    foreach (var workerToRemove in workersToRemove)
+                    {
+                        _logger.LogInformation($"Cancelling worker for ({workerToRemove.Item1}, {workerToRemove.Item2})");
+                        var worker = _pullAppInfoMetadataWorkers[workerToRemove];
+                        worker.Cancel();
+                        _pullAppInfoMetadataWorkers.Remove(workerToRemove);
+                    }
+                    var workersToAdd = serviceTags.Except(existingWorkers).ToList();
+                    foreach (var workerToAdd in workersToAdd)
+                    {
+                        _logger.LogInformation($"Adding worker for ({workerToAdd.Item1}, {workerToAdd.Item2})");
+                        var service = response.Response.Where(x => x.Service.ID == workerToAdd.Item1).First().Service;
+                        var serviceUrl = $"http://{service.Address}:{service.Port}";
+                        var worker = new PullAppInfoMetadataWorker(
+                            _serviceProvider,
+                            GrpcChannel.ForAddress(serviceUrl),
+                            workerToAdd.Item1,
+                            workerToAdd.Item2);
+                        _pullAppInfoMetadataWorkers[workerToAdd] = worker;
+                    }
                 }
             }
-            catch (OperationCanceledException ex)
-            {
-                _logger.LogDebug(ex, "OperationCanceledException caught, exiting");
-            }
-        }
-
-        public void AddPullAppInfo(long internalID, bool updateParentAppName = false)
-        {
-            _externalAppInfos.Enqueue(new ExternalAppInfo
-            {
-                InternalID = internalID,
-                UpdateParentAppInfoName = updateParentAppName
-            });
-            _mres.Set();
-        }
-
-        private class ExternalAppInfo
-        {
-            public long InternalID { get; set; }
-            public bool UpdateParentAppInfoName { get; set; }
         }
     }
 }
