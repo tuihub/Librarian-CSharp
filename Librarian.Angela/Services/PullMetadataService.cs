@@ -1,6 +1,7 @@
 ﻿using Consul;
 using Grpc.Net.Client;
 using Librarian.Angela.Services.Workers;
+using Librarian.Common;
 using Librarian.Common.Contracts;
 using Librarian.Common.Models;
 using Librarian.Common.Utils;
@@ -20,16 +21,18 @@ namespace Librarian.Angela.Services
     {
         private readonly ILogger _logger;
         private readonly IConsulClient _consulClient;
+        private readonly SephirahContext _sephirahContext;
         private readonly IServiceProvider _serviceProvider;
 
         private readonly CancellationTokenSource _cts;
         private readonly Thread _mainPullMetadataThread;
         private readonly Dictionary<(string, string), PullAppInfoMetadataWorker> _pullAppInfoMetadataWorkers;
 
-        public PullMetadataService(ILogger<PullMetadataService> logger, IConsulClient consulClient, IServiceProvider serviceProvider)
+        public PullMetadataService(ILogger<PullMetadataService> logger, SephirahContext sephirahContext, IConsulClient consulClient, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _consulClient = consulClient;
+            _sephirahContext = sephirahContext;
             _serviceProvider = serviceProvider;
 
             _cts = new CancellationTokenSource();
@@ -37,17 +40,20 @@ namespace Librarian.Angela.Services
             _pullAppInfoMetadataWorkers = new Dictionary<(string, string), PullAppInfoMetadataWorker>();
         }
 
-        ~PullMetadataService()
-        {
-            _cts.Cancel();
-        }
-
         public void Start()
         {
             _mainPullMetadataThread.Start();
         }
+        public void Cancel()
+        {
+            _cts.Cancel();
+        }
+        public void EnablePorter(string porterServiceId)
+        {
+            _pullAppInfoMetadataWorkers.Where(x => x.Key.Item1 == porterServiceId).ToList().ForEach(x => x.Value.Start());
+        }
 
-        private void MainPullMetadataThread(CancellationToken ct)
+        private async void MainPullMetadataThread(CancellationToken ct)
         {
             _logger.LogInformation("PullMetadataService started");
             var consulQueryOptions = new QueryOptions
@@ -57,8 +63,12 @@ namespace Librarian.Angela.Services
             var serviceName = "porter";
             while (true)
             {
-                var response = _consulClient.Health.Service(serviceName, null, true, consulQueryOptions, ct).Result;
-                if (ct.IsCancellationRequested)
+                QueryResult<ServiceEntry[]> response;
+                try
+                {
+                    response = await _consulClient.Health.Service(serviceName, null, true, consulQueryOptions, ct);
+                }
+                catch (TaskCanceledException)
                 {
                     foreach (var worker in _pullAppInfoMetadataWorkers.Values)
                     {
@@ -71,6 +81,7 @@ namespace Librarian.Angela.Services
                 {
                     consulQueryOptions.WaitIndex = response.LastIndex;
 
+                    // update workers
                     var existingWorkers = _pullAppInfoMetadataWorkers.Keys.ToList();
                     var serviceTags = response.Response
                         .Select(x => x.Service)
@@ -98,6 +109,9 @@ namespace Librarian.Angela.Services
                             workerToAdd.Item2);
                         _pullAppInfoMetadataWorkers[workerToAdd] = worker;
                     }
+
+                    // update SephirahContext
+                    _sephirahContext.PorterServices = response.Response.Select(x => x.Service).ToList();
                 }
             }
         }

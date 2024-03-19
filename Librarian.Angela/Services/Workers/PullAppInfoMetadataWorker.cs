@@ -2,6 +2,7 @@
 using Grpc.Core;
 using Grpc.Net.Client;
 using Librarian.Common.Contracts;
+using Librarian.Common.Models;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -58,9 +59,13 @@ namespace Librarian.Angela.Services.Workers
 
         public void Start()
         {
-            _worker.Start();
+            if (_worker.ThreadState == ThreadState.Unstarted)
+            {
+                _worker.Start();
+            }
         }
 
+        // TODO: unregister MQ consumer
         public void Cancel()
         {
             _cts.Cancel();
@@ -69,12 +74,18 @@ namespace Librarian.Angela.Services.Workers
         private void Worker(CancellationToken ct)
         {
             _logger.LogInformation($"Worker for ({ServiceId}, {Platform}) started");
-            _messageQueueService.SubscribeQueue($"{Platform}", async appIdMq =>
+            var workerFunc = new Func<AppIdMQ, CancellationToken, Task>(WorkerFunc);
+            _messageQueueService.SubscribeQueue($"{Platform}", workerFunc, ct);
+        }
+
+        private async Task WorkerFunc(AppIdMQ appIdMq, CancellationToken ct = default)
+        {
+            _logger.LogDebug($"Worker ({ServiceId}, {Platform}) got message: {appIdMq}");
+            var client = new LibrarianPorterService.LibrarianPorterServiceClient(_grpcChannel);
+            TuiHub.Protos.Librarian.V1.AppInfo? appInfoResp = null;
+            try
             {
-                _logger.LogDebug($"Worker ({ServiceId}, {Platform}) got message: {appIdMq}");
-                var client = new LibrarianPorterService.LibrarianPorterServiceClient(_grpcChannel);
-                TuiHub.Protos.Librarian.V1.AppInfo? appInfoResp = null;
-                await _retryPolicy.ExecuteAsync(async () =>
+                await _retryPolicy.ExecuteAsync(async (ct) =>
                 {
                     var response = await client.PullAppInfoAsync(new PullAppInfoRequest
                     {
@@ -87,34 +98,34 @@ namespace Librarian.Angela.Services.Workers
                     }, cancellationToken: ct);
                     _logger.LogDebug($"Got response: {response}");
                     appInfoResp = response.AppInfo;
-                });
-                if (ct.IsCancellationRequested)
-                {
-                    _logger.LogInformation("Cancelling subscription");
-                    return;
-                }
-                using var scope = _serviceProvider.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                if (appIdMq.UpdateInternalAppInfoName)
-                {
-                    var appInfo = db.AppInfos
-                        .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
-                        .Include(x => x.AppInfoDetails)
-                        .Include(x => x.ParentAppInfo)
-                        .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
-                    appInfo.ParentAppInfo!.Name = appInfoResp!.Name;
-                    appInfo.UpdateFromProtoAppInfo(appInfoResp);
-                }
-                else
-                {
-                    var appInfo = db.AppInfos
-                        .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
-                        .Include(x => x.AppInfoDetails)
-                        .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
-                    appInfo.UpdateFromProtoAppInfo(appInfoResp!);
-                }
-                await db.SaveChangesAsync();
-            }, ct);
+                }, cancellationToken: ct);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogInformation("Cancelling subscription");
+                return;
+            }
+            using var scope = _serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            if (appIdMq.UpdateInternalAppInfoName)
+            {
+                var appInfo = db.AppInfos
+                    .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
+                    .Include(x => x.AppInfoDetails)
+                    .Include(x => x.ParentAppInfo)
+                    .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
+                appInfo.ParentAppInfo!.Name = appInfoResp!.Name;
+                appInfo.UpdateFromProtoAppInfo(appInfoResp);
+            }
+            else
+            {
+                var appInfo = db.AppInfos
+                    .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
+                    .Include(x => x.AppInfoDetails)
+                    .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
+                appInfo.UpdateFromProtoAppInfo(appInfoResp!);
+            }
+            await db.SaveChangesAsync();
         }
     }
 }

@@ -33,6 +33,8 @@ GlobalContext.InstanceConfig = instanceConfig;
 var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>() ?? throw new Exception("RabbitMqConfig parse failed");
 
+// Add SephirahContext DI
+builder.Services.AddSingleton<SephirahContext>();
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -83,7 +85,8 @@ if (rabbitMqConfig.IsEnabled)
         HostName = rabbitMqConfig.Hostname,
         Port = rabbitMqConfig.Port,
         UserName = rabbitMqConfig.Username,
-        Password = rabbitMqConfig.Password
+        Password = rabbitMqConfig.Password,
+        DispatchConsumersAsync = true
     };
     builder.Services.AddSingleton<IConnection>(connFactory.CreateConnection());
     builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
@@ -119,5 +122,10 @@ app.UseRateLimiter();
 
 // Start pull metadata service
 app.Services.GetRequiredService<PullMetadataService>().Start();
+
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    app.Services.GetRequiredService<PullMetadataService>().Cancel();
+});
 
 app.Run();

@@ -35,9 +35,11 @@ namespace Librarian.Common.Services
                                  basicProperties: null,
                                  body: Encoding.UTF8.GetBytes(message));
         }
-        public void SubscribeQueue(string queueName, Func<AppIdMQ, Task> callback, CancellationToken cts = default)
+        public void SubscribeQueue(string queueName, Func<AppIdMQ, CancellationToken, Task> callback, CancellationToken ct = default)
         {
-            using var channel = _connection.CreateModel();
+            _logger.LogDebug($"Registering {queueName}");
+            var channel = _connection.CreateModel();
+            channel.BasicQos(0, 1, false);
             channel.QueueDeclare(queue: queueName,
                                  durable: false,
                                  exclusive: false,
@@ -46,7 +48,8 @@ namespace Librarian.Common.Services
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (ch, ea) =>
             {
-                if (cts.IsCancellationRequested)
+                _logger.LogDebug($"{ch} received {ea.Body}");
+                if (ct.IsCancellationRequested)
                 {
                     _logger.LogInformation("Cancelling subscription");
                     return;
@@ -61,7 +64,7 @@ namespace Librarian.Common.Services
                 }
                 else
                 {
-                    try { await callback(appIdMQ); }
+                    try { await callback(appIdMQ, ct); }
                     catch (Exception ex)
                     {
                         _logger.LogWarning(ex, "Error processing message: {message}", message);
@@ -73,14 +76,15 @@ namespace Librarian.Common.Services
             channel.BasicConsume(queue: queueName,
                                  autoAck: false,
                                  consumer: consumer);
+            _logger.LogDebug($"Registeration for {queueName} complete");
         }
-        public void SubscribeQueue(string queueName, Action<AppIdMQ> callback, CancellationToken cts = default)
+        public void SubscribeQueue(string queueName, Action<AppIdMQ, CancellationToken> callback, CancellationToken ct = default)
         {
-            SubscribeQueue(queueName, (appIdMQ) =>
+            SubscribeQueue(queueName, (appIdMQ, ct) =>
             {
-                callback(appIdMQ);
+                callback(appIdMQ, ct);
                 return Task.CompletedTask;
-            }, cts);
+            }, ct);
         }
     }
 }
