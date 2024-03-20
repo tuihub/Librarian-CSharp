@@ -10,10 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.Porter.V1;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -30,6 +32,10 @@ namespace Librarian.Angela.Services.Workers
         private readonly CancellationTokenSource _cts;
         private readonly Thread _worker;
         private readonly AsyncRetryPolicy _retryPolicy;
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
+
+        private bool _isStarted = false;
 
         public string ServiceId { get; set; } = null!;
         public string Platform { get; set; } = null!;
@@ -55,6 +61,8 @@ namespace Librarian.Angela.Services.Workers
                             _logger.LogWarning(ex, "Failed to connect to porter service. Retrying in {time}", time);
                         }
                     });
+            _connection = _serviceProvider.GetRequiredService<IConnection>();
+            _channel = _connection.CreateModel();
         }
 
         public void Start()
@@ -63,19 +71,27 @@ namespace Librarian.Angela.Services.Workers
             {
                 _worker.Start();
             }
+            _isStarted = true;
         }
 
-        // TODO: unregister MQ consumer
         public void Cancel()
         {
+            _logger.LogInformation($"Cancelling worker ({ServiceId}, {Platform})");
+            if (_isStarted) { _messageQueueService.UnsubscribeQueue(_channel, Platform); }
             _cts.Cancel();
         }
 
         private void Worker(CancellationToken ct)
         {
             _logger.LogInformation($"Worker for ({ServiceId}, {Platform}) started");
+            _channel.BasicQos(0, 1, false);
+            _channel.QueueDeclare(queue: Platform,
+                                  durable: false,
+                                  exclusive: false,
+                                  autoDelete: false,
+                                  arguments: null);
             var workerFunc = new Func<AppIdMQ, CancellationToken, Task>(WorkerFunc);
-            _messageQueueService.SubscribeQueue($"{Platform}", workerFunc, ct);
+            _messageQueueService.SubscribeQueue(_channel, Platform, workerFunc, ct);
         }
 
         private async Task WorkerFunc(AppIdMQ appIdMq, CancellationToken ct = default)

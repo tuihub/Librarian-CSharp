@@ -35,25 +35,22 @@ namespace Librarian.Common.Services
                                  basicProperties: null,
                                  body: Encoding.UTF8.GetBytes(message));
         }
-        public void SubscribeQueue(string queueName, Func<AppIdMQ, CancellationToken, Task> callback, CancellationToken ct = default)
+        public void PublishMessage(object? channelObj, string queueName, string message)
         {
-            _logger.LogDebug($"Registering {queueName}");
-            var channel = _connection.CreateModel();
-            channel.BasicQos(0, 1, false);
-            channel.QueueDeclare(queue: queueName,
-                                 durable: false,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+            var channel = (channelObj as IModel)!;
+            channel.BasicPublish(exchange: "",
+                                 routingKey: queueName,
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(message));
+        }
+        public void SubscribeQueue(object? channelObj, string queueName, Func<AppIdMQ, CancellationToken, Task> callback, CancellationToken ct = default)
+        {
+            var channel = (channelObj as IModel)!;
+            _logger.LogDebug($"Registering {queueName} for channel {channel}");
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (ch, ea) =>
             {
                 _logger.LogDebug($"{ch} received {ea.Body}");
-                if (ct.IsCancellationRequested)
-                {
-                    _logger.LogInformation("Cancelling subscription");
-                    return;
-                }
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var appIdMQ = JsonSerializer.Deserialize<AppIdMQ>(message);
@@ -78,13 +75,26 @@ namespace Librarian.Common.Services
                                  consumer: consumer);
             _logger.LogDebug($"Registeration for {queueName} complete");
         }
-        public void SubscribeQueue(string queueName, Action<AppIdMQ, CancellationToken> callback, CancellationToken ct = default)
+        public void SubscribeQueue(object? channelObj, string queueName, Action<AppIdMQ, CancellationToken> callback, CancellationToken ct = default)
         {
-            SubscribeQueue(queueName, (appIdMQ, ct) =>
+            var channel = (channelObj as IModel)!;
+            SubscribeQueue(channel, queueName, (appIdMQ, ct) =>
             {
                 callback(appIdMQ, ct);
                 return Task.CompletedTask;
             }, ct);
+        }
+        public void UnsubscribeQueue(object? channelObj, string queueName)
+        {
+            try
+            {
+                var channel = (channelObj as IModel)!;
+                channel.BasicCancel(queueName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to unsubscribe from {queueName}", queueName);
+            }
         }
     }
 }
