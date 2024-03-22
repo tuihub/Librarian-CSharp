@@ -4,6 +4,7 @@ using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
+using Librarian.Sephirah.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -48,18 +49,15 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
         }
 
         // https://q.cnblogs.com/q/142563/
+        // TODO: fix tests
         private void EnsureServer()
         {
             if (_app == null)
             {
                 var builder = WebApplication.CreateBuilder();
-                // Get Configuration
-                var systemConfig = builder.Configuration.GetSection("SystemConfig").Get<SystemConfig>() ?? throw new Exception("SystemConfig parse failed");
-                GlobalContext.SystemConfig = systemConfig;
-                var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? throw new Exception("JwtConfig parse failed");
-                GlobalContext.JwtConfig = jwtConfig;
-                var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
-                GlobalContext.InstanceConfig = instanceConfig;
+
+                StartUp.ConfigureServices(builder);
+                
                 // Change to dev db
                 GlobalContext.SystemConfig.DbType = ApplicationDbType.MySQL;
                 GlobalContext.SystemConfig.DbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR") ??
@@ -68,51 +66,13 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                 using var dbContext = new ApplicationDbContext();
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.Migrate();
-                // Add ApplicationDbContext DI
-                builder.Services.AddDbContext<ApplicationDbContext>();
-                // Add IdGen DI
-                builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
-                // Add services to the container.
-                builder.Services.AddGrpc();
-                builder.Services.AddGrpcReflection();
-                // Add services
-                builder.Services.AddSingleton<PullMetadataService>();
-                // Add Minio DI
-                builder.Services.AddMinio(c => c
-                    .WithEndpoint(GlobalContext.SystemConfig.MinioEndpoint)
-                    .WithCredentials(
-                        GlobalContext.SystemConfig.MinioAccessKey,
-                        GlobalContext.SystemConfig.MinioSecretKey)
-                    .WithSSL(GlobalContext.SystemConfig.MinioWithSSL));
-                // Add Auth
-                builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    // AccessToken Auth (Default)
-                    .AddJwtBearer(options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.AccessTokenAudience))
-                    // RefreshToken Auth
-                    .AddJwtBearer("RefreshToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.RefreshTokenAudience))
-                    // UploadToken Auth
-                    .AddJwtBearer("UploadToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.UploadTokenAudience))
-                    // DownloadToken Auth
-                    .AddJwtBearer("DownloadToken", options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.DownloadTokenAudience));
-                builder.Services.AddAuthorization();
+                
                 // Use TestServer
                 builder.WebHost.UseTestServer();
                 _app = builder.Build();
-                // Configure the HTTP request pipeline.
-                _app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
-                // add server reflection when env is dev
-                IWebHostEnvironment env = _app.Environment;
-                if (env.IsDevelopment())
-                {
-                    _app.MapGrpcReflectionService();
-                }
-                //app.MapGrpcService<GreeterService>();
-                //app.MapGrpcService<FileGrpcService>();
-                //app.MapGrpcService<UserService>();
-                _app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-                // Enable Auth
-                _app.UseAuthentication();
-                _app.UseAuthorization();
+
+                StartUp.Configure(_app);
+                
                 _app.Start();
                 _client = _app.GetTestClient();
             }
