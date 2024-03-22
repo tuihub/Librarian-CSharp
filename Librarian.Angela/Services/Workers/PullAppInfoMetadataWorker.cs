@@ -118,7 +118,7 @@ namespace Librarian.Angela.Services.Workers
             }
             catch (TaskCanceledException)
             {
-                _logger.LogInformation("Cancelling subscription");
+                _logger.LogInformation("Cancelling worker");
                 return;
             }
             using var scope = _serviceProvider.CreateScope();
