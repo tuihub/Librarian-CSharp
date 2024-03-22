@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="SteamWebAPI2" Version="4.4.1" />
-    <PackageReference Include="TuiHub.Protos" Version="0.4.7" />
+    <PackageReference Include="TuiHub.Protos" Version="0.4.9" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 
