@@ -23,4 +23,15 @@ Librarian-CSharp is in early development stage, and it is **NOT** recommended to
 	- [ ] Integration test
   - [ ] Code Style
 	- [ ] `SephirahService` Replace GlobalContext with DI
-	- [ ] Change `Utils` to `Helpers`
+  - [ ] CI/CD
+
+## Related Projects
+
+- [Waiter-Avalonia](https://github.com/tuihub/Waiter-Avalonia): (**WIP**) .NET client implementation of TuiHub.
+- ~~[Waiter-WPF](https://github.com/tuihub/Waiter-WPF): (**DEPRECATED**) old WPF client implementation of TuiHub.~~
+- [Sentinel-CSharp](https://github.com/tuihub/Sentinel-CSharp): (**WIP**) .NET file scanner implementation of TuiHub.
+- [tuihub-datasets](https://github.com/tuihub/tuihub-datasets): Datasets used in the TuiHub project.
+- [GameEngineDetector](https://github.com/tuihub/GameEngineDetector): (**WIP**) .NET game engine detector implementation of TuiHub.
+- [ArchiveFileTools](https://github.com/Tabing010102/ArchiveFileTools): Archive files checking tools.
+- [SavedataManager-CSharp](https://github.com/tuihub/SavedataManager-CSharp): .NET game savedata manager library of TuiHub.
+- [ProcessTimeMonitor](https://github.com/tuihub/ProcessTimeMonitor): .NET process time monitor library of TuiHub.
