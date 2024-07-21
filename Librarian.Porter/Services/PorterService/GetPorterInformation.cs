@@ -21,23 +21,24 @@ namespace Librarian.Porter.Services
                 GlobalName = "Librarian-Porter-CSharp",
                 FeatureSummary = new PorterFeatureSummary()
             };
-            if (_porterConfig.IsSteamEnabled)
-            {
-                response.FeatureSummary.SupportedAccounts.Add(new PorterFeatureSummary.Types.Account
-                {
-                    Platform = WellKnownAccountPlatform.Steam,
-                    AppRelationTypes = { TuiHub.Protos.Librarian.V1.AccountAppRelationType.Own }
-                });
-                response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Steam);
-            }
-            if (_porterConfig.IsBangumiEnabled)
-            {
-                response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
-            }
-            if (_porterConfig.IsVndbEnabled)
-            {
-                response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Vndb);
-            }
+            // TODO: update to FeatureFlag
+            //if (_porterConfig.IsSteamEnabled)
+            //{
+            //    response.FeatureSummary.SupportedAccounts.Add(new PorterFeatureSummary.Types.Account
+            //    {
+            //        Platform = WellKnownAccountPlatform.Steam,
+            //        AppRelationTypes = { TuiHub.Protos.Librarian.V1.AccountAppRelationType.Own }
+            //    });
+            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Steam);
+            //}
+            //if (_porterConfig.IsBangumiEnabled)
+            //{
+            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
+            //}
+            //if (_porterConfig.IsVndbEnabled)
+            //{
+            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Vndb);
+            //}
             return Task.FromResult(response);
         }
     }

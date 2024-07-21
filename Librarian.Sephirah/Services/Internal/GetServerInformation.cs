@@ -37,13 +37,14 @@ namespace Librarian.Sephirah.Services
             };
             if (valid)
             {
-                response.FeatureSummary = new ServerFeatureSummary
-                {
-                    SupportedAccountPlatforms = { },
-                    SupportedAppInfoSources = { "steam", "bangumi", "vndb" },
-                    SupportedFeedSources = { },
-                    SupportedNotifyDestinations = { }
-                };
+                // TODO: update to FeatureFlag
+                //response.FeatureSummary = new ServerFeatureSummary
+                //{
+                //    SupportedAccountPlatforms = { },
+                //    SupportedAppInfoSources = { "steam", "bangumi", "vndb" },
+                //    SupportedFeedSources = { },
+                //    SupportedNotifyDestinations = { }
+                //};
             }
             return Task.FromResult(response);
         }
