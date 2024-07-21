@@ -27,6 +27,10 @@ namespace Librarian.Common.Utils
         public DbSet<Sentinel> Sentinels { get; set; } = null!;
         public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
+        public DbSet<Porter> Porters { get; set; } = null!;
+        public DbSet<PorterContext> PorterContexts { get; set; } = null!;
+        public DbSet<FeatureFlag> FeatureFlags { get; set; } = null!;
+        public DbSet<FeatureRequest> FeatureRequests { get; set; } = null!;
         // relation
         // internal
         public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
