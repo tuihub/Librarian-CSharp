@@ -15,16 +15,16 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string DeviceName { get; set; } = null!;
         public SystemType SystemType { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? SystemVersion { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string? ClientName { get; set; }
-        [MaxLength(512)]
+        [MaxLength(4095)]
         public string? ClientSourceCodeAddress { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? ClientVersion { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

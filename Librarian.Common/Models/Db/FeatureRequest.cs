@@ -13,11 +13,12 @@ namespace Librarian.Common.Models.Db
     [Index(nameof(UpdatedAt))]
     public class FeatureRequest
     {
+        // not InternalId, database generated
         [Key]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Region { get; set; } = null!;
-        [MaxLength(1024)]
+        [MaxLength(65535)]
         public string ConfigJson { get; set; } = null!;
         public long ContextId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -15,15 +15,14 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
         public long SizeBytes { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string PublicUrl { get; set; } = null!;
-        [MaxLength(32)]
-        [IsFixedLength]
+        [IsFixedLength, MaxLength(32)]
         public byte[]? Sha256 { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string TokenServerUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

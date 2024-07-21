@@ -16,15 +16,15 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Platform { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string PlatformAccountId { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string ProfileUrl { get; set; } = null!;
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string AvatarUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

@@ -16,11 +16,11 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(1024)] 
+        [MaxLength(4095)] 
         public string Description { get; set; } = null!;
-        [MaxLength(1024)]
+        [MaxLength(65535)]
         public string ContextJson { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

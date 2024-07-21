@@ -17,9 +17,9 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Password { get; set; } = null!;
         public UserType Type { get; set; }
         public UserStatus Status { get; set; }

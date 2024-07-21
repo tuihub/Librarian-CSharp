@@ -18,12 +18,11 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string? Name { get; set; }
         public long SizeBytes { get; set; }
         public FileType Type { get; set; }
-        [MaxLength(32)]
-        [IsFixedLength]
+        [IsFixedLength, MaxLength(32)]
         public byte[] Sha256 { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

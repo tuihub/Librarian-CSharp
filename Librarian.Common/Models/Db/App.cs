@@ -14,9 +14,9 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(1024)]
+        [MaxLength(4095)]
         public string? Description { get; set; }
         public bool IsPublic { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

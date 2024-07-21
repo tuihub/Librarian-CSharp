@@ -19,10 +19,9 @@ namespace Librarian.Common.Models.Db
         public long Id { get; set; }
         public long Sequence { get; set; }
         public long SizeBytes { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string PublicUrl { get; set; } = null!;
-        [MaxLength(32)]
-        [IsFixedLength]
+        [IsFixedLength, MaxLength(32)]
         public byte[]? Sha256 { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

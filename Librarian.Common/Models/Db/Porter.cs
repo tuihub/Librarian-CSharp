@@ -17,15 +17,15 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Version { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string GlobalName { get; set; } = null!;
-        [MaxLength(1024)]
+        [MaxLength(4095)]
         public string FeatureSummary { get; set; } = null!;
-        [MaxLength(1024)]
+        [MaxLength(65535)]
         public string? ContextJsonSchema { get; set; }
         public UserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

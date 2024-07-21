@@ -15,22 +15,22 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(64)]
+        [MaxLength(255)]
         public string Source { get; set; } = string.Empty;
-        [MaxLength(64)]
+        [MaxLength(255)]
         public string? SourceAppId { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? SourceUrl { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string Name { get; set; } = null!;
         public AppType Type { get; set; }
-        [MaxLength(1024)]
+        [MaxLength(4095)]
         public string? ShortDescription { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? IconImageUrl { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? BackgroundImageUrl { get; set; }
-        [MaxLength(256)]
+        [MaxLength(255)]
         public string? CoverImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

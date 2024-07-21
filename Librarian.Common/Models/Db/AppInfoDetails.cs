@@ -15,11 +15,11 @@ namespace Librarian.Common.Models.Db
         public long Id { get; set; }
         public string? Description { get; set; }
         public DateTime? ReleaseDate { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string? Developer { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string? Publisher { get; set; }
-        [MaxLength(128)]
+        [MaxLength(255)]
         public string? Version { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
