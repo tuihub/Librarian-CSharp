@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Utils;
 using Librarian.Porter.Constants;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,18 @@ namespace Librarian.Porter.Services
         {
             var response = new GetPorterInformationResponse
             {
-                Name = _porterConfig.PorterName,
-                Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
-                GlobalName = "Librarian-Porter-CSharp",
-                FeatureSummary = new PorterFeatureSummary()
+                BinarySummary = new TuiHub.Protos.Librarian.V1.PorterBinarySummary
+                {
+                    SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
+                    BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
+                    BuildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToISO8601String(),
+                    Name = _porterConfig.PorterName,
+                    Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
+                    Description = string.Empty,
+                },
+                GlobalName = _porterConfig.PorterName,
+                Region = _porterConfig.Region,
+                FeatureSummary = new TuiHub.Protos.Librarian.V1.FeatureSummary()
             };
             // TODO: update to FeatureFlag
             //if (_porterConfig.IsSteamEnabled)

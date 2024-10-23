@@ -9,6 +9,7 @@ namespace Librarian.Porter.Configs
     public partial class PorterConfig
     {
         public string PorterName { get; set; } = null!;
+        public string Region { get; set; } = null!;
         public bool IsSteamEnabled { get; set; }
         public string SteamApiKey { get; set; } = null!;
         public bool IsBangumiEnabled { get; set; }
@@ -19,6 +20,7 @@ namespace Librarian.Porter.Configs
         public void SetConfig(PorterConfig config)
         {
             PorterName = config.PorterName;
+            Region = config.Region;
             IsSteamEnabled = config.IsSteamEnabled;
             SteamApiKey = config.SteamApiKey;
             IsBangumiEnabled = config.IsBangumiEnabled;

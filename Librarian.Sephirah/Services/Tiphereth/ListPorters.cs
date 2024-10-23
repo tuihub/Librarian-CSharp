@@ -21,13 +21,13 @@ namespace Librarian.Sephirah.Services
                 var porterInfo = client.GetPorterInformation(new GetPorterInformationRequest());
                 response.Porters.Add(new Porter
                 {
-                    Id = new InternalID { Id = -1 },
-                    Name = porterInfo.Name,
-                    Version = porterInfo.Version,
-                    GlobalName = porterInfo.GlobalName,
-                    FeatureSummary = JsonSerializer.Serialize(service.Tags),
-                    Status = UserStatus.Active,
-                    ConnectionStatus = PorterConnectionStatus.Active
+                    //Id = new InternalID { Id = -1 },
+                    //Name = porterInfo.Name,
+                    //Version = porterInfo.Version,
+                    //GlobalName = porterInfo.GlobalName,
+                    //FeatureSummary = JsonSerializer.Serialize(service.Tags),
+                    //Status = UserStatus.Active,
+                    //ConnectionStatus = PorterConnectionStatus.Active
                 });
                 _pullMetadataService.EnablePorter(service.ID);
             }
