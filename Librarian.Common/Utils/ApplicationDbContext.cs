@@ -31,6 +31,9 @@ namespace Librarian.Common.Utils
         public DbSet<PorterContext> PorterContexts { get; set; } = null!;
         public DbSet<FeatureFlag> FeatureFlags { get; set; } = null!;
         public DbSet<FeatureRequest> FeatureRequests { get; set; } = null!;
+        public DbSet<FeedActionSet> FeedActions { get; set; } = null!;
+        public DbSet<FeedConfig> FeedConfigs { get; set; } = null!;
+        public DbSet<FeedItemCollection> FeedItemCollections { get; set; } = null!;
         // relation
         // internal
         public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
@@ -62,6 +65,10 @@ namespace Librarian.Common.Utils
                         .WithMany(e => e.ChildAppInfos)
                         .HasForeignKey(e => e.ParentAppInfoId)
                         .IsRequired(false);
+            modelBuilder.Entity<Porter>()
+                .HasOne(p => p.PorterContext)
+                .WithOne(pc => pc.Porter)
+                .HasForeignKey<PorterContext>(pc => pc.PorterId);
 
             // computed columns
             modelBuilder.Entity<AppInfo>()
