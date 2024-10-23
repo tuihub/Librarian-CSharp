@@ -30,7 +30,6 @@ namespace Librarian.Angela.Services.Workers
         private readonly ILogger _logger;
         private readonly IMessageQueueService _messageQueueService;
         private readonly CancellationTokenSource _cts;
-        private readonly Thread _worker;
         private readonly AsyncRetryPolicy _retryPolicy;
         private readonly IConnection _connection;
         private readonly IModel _channel;
@@ -50,7 +49,6 @@ namespace Librarian.Angela.Services.Workers
             _logger = _serviceProvider.GetRequiredService<ILogger<PullAppInfoMetadataWorker>>();
             _messageQueueService = _serviceProvider.GetRequiredService<IMessageQueueService>();
             _cts = new CancellationTokenSource();
-            _worker = new Thread(() => Worker(_cts.Token));
             _retryPolicy = Polly.Policy
                 .Handle<RpcException>(ex => ex.StatusCode == StatusCode.ResourceExhausted)
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(10 * Math.Pow(2, retryAttempt)),
@@ -67,11 +65,11 @@ namespace Librarian.Angela.Services.Workers
 
         public void Start()
         {
-            if (_worker.ThreadState == ThreadState.Unstarted)
+            if (!_isStarted)
             {
-                _worker.Start();
+                Worker(_cts.Token);
+                _isStarted = true;
             }
-            _isStarted = true;
         }
 
         public void Cancel()
@@ -141,7 +139,7 @@ namespace Librarian.Angela.Services.Workers
                     .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
                 appInfo.UpdateFromProtoAppInfo(appInfoResp!);
             }
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(_cts.Token);
         }
     }
 }
