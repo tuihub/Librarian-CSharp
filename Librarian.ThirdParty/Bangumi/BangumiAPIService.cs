@@ -43,26 +43,29 @@ namespace Librarian.ThirdParty.Bangumi
                                 .AddUrlSegment("subject_id", appId);
             var response = await client.ExecuteGetAsync(request, cts);
             cts.ThrowIfCancellationRequested();
-            if (response == null)
-                throw new Exception("Bangumi API returned null response.");
-            if (response.IsSuccessStatusCode == false)
-                throw new Exception("Bangumi API returned non-success status code: " + response.StatusCode.ToString());
-            if (response.Content == null)
-                throw new Exception("Bangumi API returned null content.");
+            if (response == null) { throw new Exception("Bangumi API returned null response."); }
+            if (response.IsSuccessStatusCode == false) { throw new Exception("Bangumi API returned non-success status code: " + response.StatusCode.ToString()); }
+            if (response.Content == null) { throw new Exception("Bangumi API returned null content."); }
             dynamic respObj = JObject.Parse(response.Content);
-            if (respObj is null)
-                throw new Exception("Bangumi API response deserialization returned null object.");
-            if (DateTime.TryParse(respObj.date.ToString(), out DateTime releaseDate) == false)
-                releaseDate = DateTime.MinValue;
+            if (respObj is null) { throw new Exception("Bangumi API response deserialization returned null object."); }
+            if (DateTime.TryParse(respObj.date.ToString(), out DateTime releaseDate) == false) { releaseDate = DateTime.MinValue; }
             var shortDescription = ((string?)respObj.summary?.ToString())?.Length > 97 ?
                 ((string?)respObj.summary?.ToString())?[..97] + "..." : respObj.summary?.ToString();
             var infobox = respObj.infobox as JArray;
             string? developer = null;
             if (infobox != null)
+            {
                 foreach (JObject parsedObject in infobox.Children<JObject>())
+                {
                     foreach (JProperty parsedProperty in parsedObject.Properties())
+                    {
                         if (parsedProperty.Value.ToString().Equals("开发"))
+                        {
                             developer = parsedProperty?.Parent?.Last?.First?.ToString();
+                        }
+                    }
+                }
+            }
             return new AppInfo
             {
                 Source = "bangumi",

@@ -36,7 +36,9 @@ namespace Librarian.ThirdParty.Steam
             var webInterface = _webInterfaceFactory.CreateSteamStoreInterface(new HttpClient());
             var appInfoDetails = await webInterface.GetStoreAppDetailsAsync(appId, CurrencyCode, Language);
             if (DateTime.TryParse(appInfoDetails.ReleaseDate.Date, out DateTime appReleaseDate) == false)
+            {
                 appReleaseDate = DateTime.MinValue;
+            }
             return new AppInfo
             {
                 Source = "steam",
