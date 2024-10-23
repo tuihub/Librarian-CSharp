@@ -3,7 +3,7 @@ using Librarian.Porter.Configs;
 
 namespace Librarian.Porter.Utils
 {
-    public static class Consultil
+    public static class ConsulUtil
     {
         public static void RegisterConsul(IConsulClient consulClient, ConsulConfig consulConfig)
         {

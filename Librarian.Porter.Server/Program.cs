@@ -53,12 +53,12 @@ if (consulConfig.IsEnabled)
 
     var consulClient = app.Services.GetRequiredService<IConsulClient>();
     // Register to consul
-    Consultil.RegisterConsul(consulClient, consulConfig);
+    ConsulUtil.RegisterConsul(consulClient, consulConfig);
 
     // Deregister from consul when app is stopped
     app.Lifetime.ApplicationStopping.Register(() =>
     {
-        Consultil.DeregisterConsul(consulClient);
+        ConsulUtil.DeregisterConsul(consulClient);
     });
 }
 
