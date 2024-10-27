@@ -25,7 +25,7 @@ if (consulConfig.IsEnabled)
         c.Address = new Uri(consulConfig.ConsulAddress);
     }));
 }
-ServicesUtil.ConfigureThirdPartyServices(builder, porterConfig);
+ServicesUtil.ConfigureThirdPartyServices(builder, porterConfig, LoggerFactory.Create(b => { b.AddConsole(); b.AddDebug(); }).CreateLogger("startup"));
 builder.Services.AddSingleton<AppInfoServiceResolver>();
 
 var app = builder.Build();

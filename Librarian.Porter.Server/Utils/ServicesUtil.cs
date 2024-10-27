@@ -10,7 +10,7 @@ namespace Librarian.Porter.Server.Utils
 {
     public static class ServicesUtil
     {
-        public static void ConfigureThirdPartyServices(WebApplicationBuilder builder, PorterConfig porterConfig, ILogger? logger)
+        public static void ConfigureThirdPartyServices(WebApplicationBuilder builder, PorterConfig porterConfig, ILogger? logger = null)
         {
             if (porterConfig.IsSteamEnabled)
             {
