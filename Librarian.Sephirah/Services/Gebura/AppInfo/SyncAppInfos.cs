@@ -39,11 +39,11 @@ namespace Librarian.Sephirah.Services
                     {
                         if (!string.IsNullOrWhiteSpace(childAppInfo.SourceAppId))
                         {
-                            _messageQueueService.PublishMessage(childAppInfo.Source, JsonSerializer.Serialize(new AppIdMQ
+                            _messageQueueService.PublishMessage(childAppInfo.Source, new AppIdMQ
                             {
                                 AppId = childAppInfo.SourceAppId,
                                 UpdateInternalAppInfoName = false
-                            }));
+                            });
                         }
                     }
                 }
@@ -85,20 +85,20 @@ namespace Librarian.Sephirah.Services
                         _dbContext.AppInfos.Add(newInternalAppInfo);
                         _dbContext.AppInfos.Add(newExternalAppInfo);
                         await _dbContext.SaveChangesAsync();
-                        _messageQueueService.PublishMessage(source, JsonSerializer.Serialize(new AppIdMQ
+                        _messageQueueService.PublishMessage(source, new AppIdMQ
                         {
                             AppId = sourceAppId,
                             UpdateInternalAppInfoName = true
-                        }));
+                        });
                     }
                     // external appInfo exists
                     else
                     {
-                        _messageQueueService.PublishMessage(source, JsonSerializer.Serialize(new AppIdMQ
+                        _messageQueueService.PublishMessage(source, new AppIdMQ
                         {
                             AppId = sourceAppId,
                             UpdateInternalAppInfoName = false
-                        }));
+                        });
                     }
                 }
             }

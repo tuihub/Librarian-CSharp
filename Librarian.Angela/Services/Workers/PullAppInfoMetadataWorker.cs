@@ -88,12 +88,18 @@ namespace Librarian.Angela.Services.Workers
                                   exclusive: false,
                                   autoDelete: false,
                                   arguments: null);
-            var workerFunc = new Func<AppIdMQ, CancellationToken, Task>(WorkerFunc);
-            _messageQueueService.SubscribeQueue(_channel, Platform, workerFunc, ct);
+            var workerFunc = new Func<object, CancellationToken, Task>(WorkerFunc);
+            _messageQueueService.SubscribeQueue(_channel, Platform, workerFunc, typeof(AppIdMQ), ct);
         }
 
-        private async Task WorkerFunc(AppIdMQ appIdMq, CancellationToken ct = default)
+        private async Task WorkerFunc(object appIdMqObj, CancellationToken ct = default)
         {
+            if (appIdMqObj is not AppIdMQ)
+            {
+                _logger.LogWarning("Cannot convert {appIdMqObj} to AppIdMQ", appIdMqObj);
+                return;
+            }
+            var appIdMq = (AppIdMQ)appIdMqObj;
             _logger.LogDebug($"Worker ({ServiceId}, {Platform}) got message: {appIdMq}");
             var client = new LibrarianPorterService.LibrarianPorterServiceClient(_grpcChannel);
             TuiHub.Protos.Librarian.V1.AppInfo? appInfoResp = null;

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Librarian.Common.Services
 {
+    // TODO: Implement caching for RabbitMQ connections
     public class RabbitMqService : IMessageQueueService
     {
         private readonly ILogger _logger;
@@ -22,8 +23,17 @@ namespace Librarian.Common.Services
             _connection = connection;
         }
 
-        public void PublishMessage(string queueName, string message)
+        public void PublishMessage(string queueName, object message)
         {
+            byte[] bodyBytes;
+            if (message is string messageStr)
+            {
+                bodyBytes = Encoding.UTF8.GetBytes(messageStr);
+            }
+            else
+            {
+                bodyBytes = JsonSerializer.SerializeToUtf8Bytes(message);
+            }
             using var channel = _connection.CreateModel();
             channel.QueueDeclare(queue: queueName,
                                  durable: false,
@@ -33,17 +43,28 @@ namespace Librarian.Common.Services
             channel.BasicPublish(exchange: "",
                                  routingKey: queueName,
                                  basicProperties: null,
-                                 body: Encoding.UTF8.GetBytes(message));
+                                 body: bodyBytes);
         }
-        public void PublishMessage(object? channelObj, string queueName, string message)
+
+        public void PublishMessage(object? channelObj, string queueName, object message)
         {
             var channel = (channelObj as IModel)!;
+            byte[] bodyBytes;
+            if (message is string messageStr)
+            {
+                bodyBytes = Encoding.UTF8.GetBytes(messageStr);
+            }
+            else
+            {
+                bodyBytes = JsonSerializer.SerializeToUtf8Bytes(message);
+            }
             channel.BasicPublish(exchange: "",
                                  routingKey: queueName,
                                  basicProperties: null,
-                                 body: Encoding.UTF8.GetBytes(message));
+                                 body: bodyBytes);
         }
-        public void SubscribeQueue(object? channelObj, string queueName, Func<AppIdMQ, CancellationToken, Task> callback, CancellationToken ct = default)
+
+        public void SubscribeQueue(object? channelObj, string queueName, Func<object, CancellationToken, Task> callback, Type objType, CancellationToken ct = default)
         {
             var channel = (channelObj as IModel)!;
             _logger.LogDebug($"Registering {queueName} for channel {channel}");
@@ -53,15 +74,15 @@ namespace Librarian.Common.Services
                 _logger.LogDebug($"{ch} received {ea.Body}");
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var appIdMQ = JsonSerializer.Deserialize<AppIdMQ>(message);
-                if (appIdMQ == null)
+                var obj = JsonSerializer.Deserialize(message, objType);
+                if (obj == null)
                 {
                     _logger.LogWarning("Failed to deserialize message: {message}", message);
                     channel.BasicNack(ea.DeliveryTag, false, false);
                 }
                 else
                 {
-                    try { await callback(appIdMQ, ct); }
+                    try { await callback(obj, ct); }
                     catch (Exception ex)
                     {
                         _logger.LogWarning(ex, "Error processing message: {message}", message);
@@ -75,15 +96,17 @@ namespace Librarian.Common.Services
                                  consumer: consumer);
             _logger.LogDebug($"Registeration for {queueName} complete");
         }
-        public void SubscribeQueue(object? channelObj, string queueName, Action<AppIdMQ, CancellationToken> callback, CancellationToken ct = default)
+
+        public void SubscribeQueue(object? channelObj, string queueName, Action<object, CancellationToken> callback, Type objType, CancellationToken ct = default)
         {
             var channel = (channelObj as IModel)!;
             SubscribeQueue(channel, queueName, (appIdMQ, ct) =>
             {
                 callback(appIdMQ, ct);
                 return Task.CompletedTask;
-            }, ct);
+            }, objType, ct);
         }
+
         public void UnsubscribeQueue(object? channelObj, string queueName)
         {
             try

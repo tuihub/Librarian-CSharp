@@ -9,10 +9,10 @@ namespace Librarian.Common.Contracts
 {
     public interface IMessageQueueService
     {
-        public void PublishMessage(string queueName, string message);
-        public void PublishMessage(object? channel, string queueName, string message);
-        public void SubscribeQueue(object? channel, string queueName, Action<AppIdMQ, CancellationToken> callback, CancellationToken cts = default);
-        public void SubscribeQueue(object? channel, string queueName, Func<AppIdMQ, CancellationToken, Task> callback, CancellationToken cts = default);
+        public void PublishMessage(string queueName, object message);
+        public void PublishMessage(object? channelObj, string queueName, object message);
+        public void SubscribeQueue(object? channelObj, string queueName, Action<object, CancellationToken> callback, Type objType, CancellationToken cts = default);
+        public void SubscribeQueue(object? channelObj, string queueName, Func<object, CancellationToken, Task> callback, Type objType, CancellationToken cts = default);
         public void UnsubscribeQueue(object? channelObj, string queueName);
     }
 }

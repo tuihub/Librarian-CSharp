@@ -29,8 +29,9 @@ namespace Librarian.Sephirah.Server
             GlobalContext.JwtConfig = jwtConfig;
             var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
             GlobalContext.InstanceConfig = instanceConfig;
+            var messageQueueConfig = builder.Configuration.GetSection("messageQueueConfig").Get<MessageQueueConfig>() ?? throw new Exception("MessageQueueConfig parse failed");
+            GlobalContext.MessageQueueConfig = messageQueueConfig;
             var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
-            var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>() ?? throw new Exception("RabbitMqConfig parse failed");
 
             // Add SephirahContext DI
             builder.Services.AddSingleton<SephirahContext>();
@@ -77,8 +78,13 @@ namespace Librarian.Sephirah.Server
                     c.Address = new Uri(consulConfig.ConsulAddress);
                 }));
             }
-            if (rabbitMqConfig.IsEnabled)
+            if (GlobalContext.MessageQueueConfig.MessageQueueType == MessageQueueType.InMemoryMq)
             {
+                builder.Services.AddSingleton<IMessageQueueService, InMemoryMqService>();
+            }
+            else if (GlobalContext.MessageQueueConfig.MessageQueueType == MessageQueueType.RabbitMq)
+            {
+                var rabbitMqConfig = GlobalContext.MessageQueueConfig.RabbitMqConfig;
                 var connFactory = new ConnectionFactory
                 {
                     HostName = rabbitMqConfig.Hostname,
