@@ -12,13 +12,19 @@ namespace Librarian.Porter.Services
     {
         public override Task<EnablePorterResponse> EnablePorter(EnablePorterRequest request, ServerCallContext context)
         {
+            var instanceContext = _globalContext.InstanceContext;
             var sephirahId = request.SephirahId;
-            if (StaticContext.SephirahId != null && StaticContext.SephirahId != sephirahId)
+            if (instanceContext.SephirahId != null && instanceContext.SephirahId != sephirahId)
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Wrong sephirah id."));
             }
-            StaticContext.SephirahId = sephirahId;
-            return Task.FromResult(new EnablePorterResponse());
+            instanceContext.SephirahId = sephirahId;
+            return Task.FromResult(new EnablePorterResponse()
+            {
+                StatusMessage = "Porter enabled with sephirah id: " + sephirahId,
+                NeedRefreshToken = false,
+                EnablesSummary = new PorterEnablesSummary()
+            });
         }
     }
 }

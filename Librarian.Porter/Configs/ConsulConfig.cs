@@ -14,15 +14,5 @@ namespace Librarian.Porter.Configs
         public string ServiceAddress { get; set; } = null!;
         public int ServicePort { get; set; }
         public string HealthCheckUrl { get; set; } = null!;
-
-        public void SetConfig(ConsulConfig config)
-        {
-            IsEnabled = config.IsEnabled;
-            ConsulAddress = config.ConsulAddress;
-            ServiceName = config.ServiceName;
-            ServiceAddress = config.ServiceAddress;
-            ServicePort = config.ServicePort;
-            HealthCheckUrl = config.HealthCheckUrl;
-        }
     }
 }

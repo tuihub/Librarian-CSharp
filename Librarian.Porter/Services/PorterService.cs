@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Librarian.Porter.Configs;
+using Librarian.Porter.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,13 @@ namespace Librarian.Porter.Services
     public partial class PorterService : LibrarianPorterService.LibrarianPorterServiceBase
     {
         private readonly ILogger _logger;
-        private readonly PorterConfig _porterConfig;
+        private readonly GlobalContext _globalContext;
         private readonly AppInfoServiceResolver _appInfoServiceResolver;
-        public PorterService(ILogger<PorterService> logger, PorterConfig porterConfig,
+        public PorterService(ILogger<PorterService> logger, GlobalContext globalContext,
             AppInfoServiceResolver appInfoServiceResolver)
         {
             _logger = logger;
-            _porterConfig = porterConfig;
+            _globalContext = globalContext;
             _appInfoServiceResolver = appInfoServiceResolver;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Librarian.Porter.Configs;
 using Librarian.Porter.Constants;
+using Librarian.Porter.Models;
 using Librarian.ThirdParty.Bangumi;
 using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Steam;
@@ -10,8 +11,10 @@ namespace Librarian.Porter.Server.Utils
 {
     public static class ServicesUtil
     {
-        public static void ConfigureThirdPartyServices(WebApplicationBuilder builder, PorterConfig porterConfig, ILogger? logger = null)
+        public static void ConfigureThirdPartyServices(WebApplicationBuilder builder, GlobalContext globalContext, ILogger? logger = null)
         {
+            var porterConfig = globalContext.PorterConfig;
+            var instanceContext = globalContext.InstanceContext;
             if (porterConfig.IsSteamEnabled)
             {
                 if (string.IsNullOrEmpty(porterConfig.SteamApiKey))
@@ -21,7 +24,7 @@ namespace Librarian.Porter.Server.Utils
                 else
                 {
                     builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey));
-                    StaticContext.PorterTags.Add(WellKnownAppInfoSource.Steam);
+                    instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Steam);
                 }
             }
             if (porterConfig.IsBangumiEnabled)
@@ -33,13 +36,13 @@ namespace Librarian.Porter.Server.Utils
                 else
                 {
                     builder.Services.AddSingleton(new BangumiAPIService(porterConfig.BangumiApiKey));
-                    StaticContext.PorterTags.Add(WellKnownAppInfoSource.Bangumi);
+                    instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
                 }
             }
             if (porterConfig.IsVndbEnabled)
             {
                 builder.Services.AddSingleton(new VndbTcpAPIService());
-                StaticContext.PorterTags.Add(WellKnownAppInfoSource.Vndb);
+                instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Vndb);
             }
         }
     }

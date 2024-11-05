@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.Porter.V1;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Porter.Services
 {
@@ -15,6 +16,15 @@ namespace Librarian.Porter.Services
     {
         public override Task<GetPorterInformationResponse> GetPorterInformation(GetPorterInformationRequest request, ServerCallContext context)
         {
+            var featureSummary = new FeatureSummary();
+            featureSummary.AppInfoSources.AddRange(_globalContext.InstanceContext.AppInfoSources.Select(s => new FeatureFlag()
+            {
+                Id = s,
+                Name = string.Empty,
+                Description = string.Empty,
+                ConfigJsonSchema = string.Empty,
+                RequireContext = false
+            }));
             var response = new GetPorterInformationResponse
             {
                 BinarySummary = new TuiHub.Protos.Librarian.V1.PorterBinarySummary
@@ -22,32 +32,15 @@ namespace Librarian.Porter.Services
                     SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
                     BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
                     BuildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToISO8601String(),
-                    Name = _porterConfig.PorterName,
+                    Name = _globalContext.PorterConfig.PorterName,
                     Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
                     Description = string.Empty,
                 },
-                GlobalName = _porterConfig.PorterName,
-                Region = _porterConfig.Region,
-                FeatureSummary = new TuiHub.Protos.Librarian.V1.FeatureSummary()
+                GlobalName = _globalContext.PorterConfig.PorterName,
+                Region = _globalContext.PorterConfig.Region,
+                FeatureSummary = featureSummary,
+                ContextJsonSchema = string.Empty
             };
-            // TODO: update to FeatureFlag
-            //if (_porterConfig.IsSteamEnabled)
-            //{
-            //    response.FeatureSummary.SupportedAccounts.Add(new PorterFeatureSummary.Types.Account
-            //    {
-            //        Platform = WellKnownAccountPlatform.Steam,
-            //        AppRelationTypes = { TuiHub.Protos.Librarian.V1.AccountAppRelationType.Own }
-            //    });
-            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Steam);
-            //}
-            //if (_porterConfig.IsBangumiEnabled)
-            //{
-            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
-            //}
-            //if (_porterConfig.IsVndbEnabled)
-            //{
-            //    response.FeatureSummary.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Vndb);
-            //}
             return Task.FromResult(response);
         }
     }

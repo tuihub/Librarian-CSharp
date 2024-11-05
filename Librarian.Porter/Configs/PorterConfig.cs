@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Librarian.Porter.Configs
 {
-    public partial class PorterConfig
+    public class PorterConfig
     {
         public string PorterName { get; set; } = null!;
         public string Region { get; set; } = null!;
@@ -16,17 +16,5 @@ namespace Librarian.Porter.Configs
         public string BangumiApiKey { get; set; } = null!;
         public bool IsVndbEnabled { get; set; }
         public string VndbApiKey { get; set; } = null!;
-
-        public void SetConfig(PorterConfig config)
-        {
-            PorterName = config.PorterName;
-            Region = config.Region;
-            IsSteamEnabled = config.IsSteamEnabled;
-            SteamApiKey = config.SteamApiKey;
-            IsBangumiEnabled = config.IsBangumiEnabled;
-            BangumiApiKey = config.BangumiApiKey;
-            IsVndbEnabled = config.IsVndbEnabled;
-            VndbApiKey = config.VndbApiKey;
-        }
     }
 }

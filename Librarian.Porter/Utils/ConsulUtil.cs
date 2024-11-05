@@ -1,19 +1,22 @@
 ﻿using Consul;
 using Librarian.Porter.Configs;
+using Librarian.Porter.Models;
 
 namespace Librarian.Porter.Utils
 {
     public static class ConsulUtil
     {
-        public static void RegisterConsul(IConsulClient consulClient, ConsulConfig consulConfig)
+        public static void RegisterConsul(IConsulClient consulClient, GlobalContext globalContext)
         {
+            var consulConfig = globalContext.ConsulConfig;
+            var instanceContext = globalContext.InstanceContext;
             var registration = new AgentServiceRegistration()
             {
-                ID = StaticContext.ConsulRegId.ToString(),
+                ID = instanceContext.ConsulRegId.ToString(),
                 Name = consulConfig.ServiceName,
                 Address = consulConfig.ServiceAddress,
                 Port = consulConfig.ServicePort,
-                Tags = StaticContext.PorterTags.ToArray(),
+                Tags = instanceContext.AppInfoSources.ToArray(),
                 Check = new AgentServiceCheck
                 {
                     HTTP = consulConfig.HealthCheckUrl,
@@ -23,9 +26,9 @@ namespace Librarian.Porter.Utils
             };
             consulClient.Agent.ServiceRegister(registration).Wait();
         }
-        public static void DeregisterConsul(IConsulClient consulClient)
+        public static void DeregisterConsul(IConsulClient consulClient, GlobalContext globalContext)
         {
-            consulClient.Agent.ServiceDeregister(StaticContext.ConsulRegId.ToString()).Wait();
+            consulClient.Agent.ServiceDeregister(globalContext.InstanceContext.ConsulRegId.ToString()).Wait();
         }
     }
 }
