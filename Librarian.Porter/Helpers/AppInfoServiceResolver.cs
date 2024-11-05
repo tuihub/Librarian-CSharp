@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Librarian.Porter.Services
+namespace Librarian.Porter.Helpers
 {
     public class AppInfoServiceResolver
     {
@@ -29,7 +29,7 @@ namespace Librarian.Porter.Services
             }
             return source switch
             {
-                WellKnownAppInfoSource.Steam => 
+                WellKnownAppInfoSource.Steam =>
                     (IAppInfoService)_serviceProvider.GetRequiredService(typeof(SteamAPIService)),
                 WellKnownAppInfoSource.Bangumi =>
                     (IAppInfoService)_serviceProvider.GetRequiredService(typeof(SteamAPIService)),
