@@ -10,6 +10,7 @@ namespace Librarian.Porter.Models
     {
         public long? SephirahId { get; set; }
         public Guid ConsulRegId { get; } = Guid.NewGuid();
-        public List<string> AppInfoSources { get; } = new List<string>();
+        public List<string> SupportedAccountPlatforms { get; } = new List<string>();
+        public List<string> SupportedAppInfoSources { get; } = new List<string>();
     }
 }

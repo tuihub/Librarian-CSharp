@@ -17,7 +17,7 @@ namespace Librarian.Porter.Services
         public override Task<GetPorterInformationResponse> GetPorterInformation(GetPorterInformationRequest request, ServerCallContext context)
         {
             var featureSummary = new FeatureSummary();
-            featureSummary.AppInfoSources.AddRange(_globalContext.InstanceContext.AppInfoSources.Select(s => new FeatureFlag()
+            featureSummary.AppInfoSources.AddRange(_globalContext.InstanceContext.SupportedAppInfoSources.Select(s => new FeatureFlag()
             {
                 Id = s,
                 Name = string.Empty,

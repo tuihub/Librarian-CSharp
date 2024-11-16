@@ -1,6 +1,6 @@
 ﻿using Librarian.ThirdParty.Contracts;
-using Librarian.ThirdParty.Utils;
-using Librarian.ThirdParty.Vndb.Utils;
+using Librarian.ThirdParty.Helpers;
+using Librarian.ThirdParty.Vndb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

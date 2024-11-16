@@ -16,7 +16,7 @@ namespace Librarian.Porter.Utils
                 Name = consulConfig.ServiceName,
                 Address = consulConfig.ServiceAddress,
                 Port = consulConfig.ServicePort,
-                Tags = instanceContext.AppInfoSources.ToArray(),
+                Tags = instanceContext.SupportedAppInfoSources.ToArray(),
                 Check = new AgentServiceCheck
                 {
                     HTTP = consulConfig.HealthCheckUrl,

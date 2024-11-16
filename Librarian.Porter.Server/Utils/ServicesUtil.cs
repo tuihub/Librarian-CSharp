@@ -23,8 +23,10 @@ namespace Librarian.Porter.Server.Utils
                 }
                 else
                 {
-                    builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey));
-                    instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Steam);
+                    builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey,
+                        TimeSpan.FromSeconds(porterConfig.SteamMinRequestIntervalSeconds)));
+                    instanceContext.SupportedAccountPlatforms.Add(WellKnownAccountPlatform.Steam);
+                    instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Steam);
                 }
             }
             if (porterConfig.IsBangumiEnabled)
@@ -36,13 +38,13 @@ namespace Librarian.Porter.Server.Utils
                 else
                 {
                     builder.Services.AddSingleton(new BangumiAPIService(porterConfig.BangumiApiKey));
-                    instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
+                    instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
                 }
             }
             if (porterConfig.IsVndbEnabled)
             {
                 builder.Services.AddSingleton(new VndbTcpAPIService());
-                instanceContext.AppInfoSources.Add(WellKnownAppInfoSource.Vndb);
+                instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Vndb);
             }
         }
     }

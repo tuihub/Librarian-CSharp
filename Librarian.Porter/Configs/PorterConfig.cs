@@ -12,6 +12,7 @@ namespace Librarian.Porter.Configs
         public string Region { get; set; } = null!;
         public bool IsSteamEnabled { get; set; }
         public string SteamApiKey { get; set; } = null!;
+        public int SteamMinRequestIntervalSeconds { get; set; }
         public bool IsBangumiEnabled { get; set; }
         public string BangumiApiKey { get; set; } = null!;
         public bool IsVndbEnabled { get; set; }

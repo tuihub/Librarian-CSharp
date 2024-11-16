@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Librarian.ThirdParty.Vndb.Utils
+namespace Librarian.ThirdParty.Vndb.Helpers
 {
-    public static class VndbSharpModelUtil
+    public static class VndbSharpModelHelper
     {
         public static DateTime ToDateTime(this VndbSharp.Models.Common.SimpleDate simpleDate)
         {

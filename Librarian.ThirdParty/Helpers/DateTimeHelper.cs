@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Librarian.ThirdParty.Utils
+namespace Librarian.ThirdParty.Helpers
 {
-    public static class DateTimeUtil
+    public static class DateTimeHelper
     {
         public static string ToISO8601String(this DateTime dateTime)
         {
