@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="SteamWebAPI2" Version="4.4.1" />
-    <PackageReference Include="System.Threading.RateLimiting" Version="8.0.0" />
-    <PackageReference Include="TuiHub.Protos" Version="0.4.23" />
+    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.0" />
+    <PackageReference Include="TuiHub.Protos" Version="0.4.28" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 
