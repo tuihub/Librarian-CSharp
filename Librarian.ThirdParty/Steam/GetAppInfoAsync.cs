@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.ThirdParty.Contracts;
+﻿using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Helpers;
-using Steam.Models.DOTA2;
-using SteamWebAPI2.Interfaces;
-using SteamWebAPI2.Utilities;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.ThirdParty.Steam
@@ -33,7 +24,7 @@ namespace Librarian.ThirdParty.Steam
                 SourceAppId = appInfoDetails.SteamAppId.ToString(),
                 SourceUrl = "https://store.steampowered.com/app/" + appInfoDetails.SteamAppId.ToString(),
                 Name = appInfoDetails.Name,
-                Type = appInfoDetails.Type == "game" ? TuiHub.Protos.Librarian.V1.AppType.Game : TuiHub.Protos.Librarian.V1.AppType.Unspecified,
+                Type = appInfoDetails.Type == "game" ? AppType.Game : AppType.Unspecified,
                 ShortDescription = appInfoDetails.ShortDescription,
                 IconImageUrl = null,
                 CoverImageUrl = appInfoDetails.HeaderImage,

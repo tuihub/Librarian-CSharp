@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Net;
-using System.Text;
 using System.Threading.RateLimiting;
-using System.Threading.Tasks;
 
 namespace Librarian.ThirdParty.Handlers
 {
     // https://learn.microsoft.com/zh-cn/dotnet/core/extensions/http-ratelimiter
-    internal sealed class ClientSideRateLimitedHandler(
+    public sealed class ClientSideRateLimitedHandler(
     RateLimiter limiter, bool blockWaiting = false, TimeSpan? pooledConnectionLifetime = null)
     : DelegatingHandler(CreateSocketsHttpHandler(pooledConnectionLifetime ?? TimeSpan.FromMinutes(2))), IAsyncDisposable
     {

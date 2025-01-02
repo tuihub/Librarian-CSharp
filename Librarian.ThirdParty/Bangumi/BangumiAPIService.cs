@@ -1,15 +1,8 @@
 ﻿using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Helpers;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.ThirdParty.Bangumi
@@ -19,7 +12,7 @@ namespace Librarian.ThirdParty.Bangumi
         private readonly string _bangumiAPIKey;
 
         private readonly string _bangumiAPIBaseURL = "https://api.bgm.tv/";
-        private readonly string _bangumiAPIUserAgent = "Librarian-CSharp/0.1 (https://github.com/tuihub/Librarian-CSharp)";
+        private readonly string _bangumiAPIUserAgent = "Librarian-CSharp/0.2 (https://github.com/tuihub/Librarian-CSharp)";
 
         public BangumiAPIService(string apiKey)
         {
@@ -27,7 +20,7 @@ namespace Librarian.ThirdParty.Bangumi
         }
 
         // TODO: Add AltName
-        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken cts = default)
+        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken ct = default)
         {
             if (!int.TryParse(appIdStr, out int appId))
             {
@@ -41,8 +34,8 @@ namespace Librarian.ThirdParty.Bangumi
             var client = new RestClient(options);
             var request = new RestRequest("/v0/subjects/{subject_id}")
                                 .AddUrlSegment("subject_id", appId);
-            var response = await client.ExecuteGetAsync(request, cts);
-            cts.ThrowIfCancellationRequested();
+            var response = await client.ExecuteGetAsync(request, ct);
+            ct.ThrowIfCancellationRequested();
             if (response == null) { throw new Exception("Bangumi API returned null response."); }
             if (response.IsSuccessStatusCode == false) { throw new Exception("Bangumi API returned non-success status code: " + response.StatusCode.ToString()); }
             if (response.Content == null) { throw new Exception("Bangumi API returned null content."); }

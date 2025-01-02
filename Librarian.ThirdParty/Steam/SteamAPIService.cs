@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.RateLimiting;
-using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.ThirdParty.Contracts;
+﻿using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Handlers;
-using Librarian.ThirdParty.Helpers;
-using Steam.Models.DOTA2;
-using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
-using TuiHub.Protos.Librarian.V1;
+using System.Threading.RateLimiting;
 
 namespace Librarian.ThirdParty.Steam
 {
-    public partial class SteamAPIService: IAppInfoService
+    public partial class SteamAPIService : IAppInfoService
     {
         private readonly string _steamAPIKey;
         private readonly SteamWebInterfaceFactory _webInterfaceFactory;
