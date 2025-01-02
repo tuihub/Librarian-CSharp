@@ -51,7 +51,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new TuiHub.Protos.Librarian.V1.PagingResponse { TotalSize = appInfos.Count() }
             };
-            response.AppInfos.Add(appInfos.Select(x => x.ToProtoAppInfo()));
+            response.AppInfos.Add(appInfos.Select(x => x.ToProto()));
             return Task.FromResult(response);
         }
     }

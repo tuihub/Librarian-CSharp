@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
             }
             return Task.FromResult(new GetAppInfoResponse
             {
-                AppInfo = appInfo.Flatten().ToProtoAppInfo()
+                AppInfo = appInfo.Flatten().ToProto()
             });
         }
     }

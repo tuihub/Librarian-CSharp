@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
             usersDb = usersDb.ApplyPagingRequest(request.Paging);
             var users = usersDb.ToList();
             var response = new ListUsersResponse();
-            response.Users.AddRange(users.Select(u => u.ToProtoUser()));
+            response.Users.AddRange(users.Select(u => u.ToProto()));
             response.Paging = new PagingResponse { TotalSize = users.Count };
             return Task.FromResult(response);
         }

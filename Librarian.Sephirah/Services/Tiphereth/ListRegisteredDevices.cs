@@ -18,7 +18,7 @@ namespace Librarian.Sephirah.Services
             var userId = context.GetInternalIdFromHeader();
             var devices = _dbContext.Users.Single(x => x.Id == userId).Devices;
             var response = new ListRegisteredDevicesResponse();
-            response.Devices.AddRange(devices.Select(x => x.ToProtoDeviceInfo()));
+            response.Devices.AddRange(devices.Select(x => x.ToProto()));
             return Task.FromResult(response);
         }
     }

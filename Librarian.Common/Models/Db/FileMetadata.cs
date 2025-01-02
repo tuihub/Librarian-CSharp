@@ -26,6 +26,8 @@ namespace Librarian.Common.Models.Db
         public byte[] Sha256 { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
+        // functions
         public FileMetadata(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata metadata)
         {
             Id = internalId;
@@ -36,7 +38,7 @@ namespace Librarian.Common.Models.Db
             CreatedAt = metadata.CreateTime.ToDateTime();
         }
         public FileMetadata() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata ToProtoFileMetadata()
+        public TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata ToProto()
         {
             return new TuiHub.Protos.Librarian.Sephirah.V1.FileMetadata
             {

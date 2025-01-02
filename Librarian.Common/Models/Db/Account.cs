@@ -1,6 +1,4 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.Common.Utils;
+﻿using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,6 +26,7 @@ namespace Librarian.Common.Models.Db
         public string AvatarUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation(to child, only used in non-internal appInfo)
         public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
@@ -35,7 +34,8 @@ namespace Librarian.Common.Models.Db
         public long UserId { get; set; }
         public User User { get; set; } = null!;
 
-        public TuiHub.Protos.Librarian.V1.Account ToProtoAccount()
+        // functions
+        public TuiHub.Protos.Librarian.V1.Account ToProto()
         {
             return new TuiHub.Protos.Librarian.V1.Account
             {

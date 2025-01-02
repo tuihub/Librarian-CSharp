@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -28,6 +26,7 @@ namespace Librarian.Common.Models.Db
         public AppSaveFileCapacityStrategy AppAppSaveFileCapacityStrategyDefault { get; set; } = AppSaveFileCapacityStrategy.Fail;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation(required, to child)
         public ICollection<Account> Accounts { get; } = new List<Account>();
@@ -46,8 +45,9 @@ namespace Librarian.Common.Models.Db
         // aggregations
         public long TotalAppSaveFileCount { get; set; }
         public long TotalAppSaveFileSizeBytes { get; set; }
-        // func
-        public TuiHub.Protos.Librarian.Sephirah.V1.User ToProtoUser(bool withPassword = false)
+
+        // functions
+        public TuiHub.Protos.Librarian.Sephirah.V1.User ToProto(bool withPassword = false)
         {
             var ret = new TuiHub.Protos.Librarian.Sephirah.V1.User
             {

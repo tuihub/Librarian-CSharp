@@ -1,11 +1,5 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.Common.Utils;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {

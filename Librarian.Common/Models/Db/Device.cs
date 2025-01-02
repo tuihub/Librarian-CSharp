@@ -47,7 +47,7 @@ namespace Librarian.Common.Models.Db
             ClientVersion = string.IsNullOrEmpty(deviceInfo.ClientVersion) ? null : deviceInfo.ClientVersion;
         }
         public Device() { }
-        public DeviceInfo ToProtoDeviceInfo()
+        public DeviceInfo ToProto()
         {
             return new DeviceInfo
             {

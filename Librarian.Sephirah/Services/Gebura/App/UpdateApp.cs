@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             }
             // update App
-            app.UpdateFromProtoApp(appReq);
+            app.UpdateFromProto(appReq);
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }

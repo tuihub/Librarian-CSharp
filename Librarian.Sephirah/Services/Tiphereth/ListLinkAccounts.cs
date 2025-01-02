@@ -20,7 +20,7 @@ namespace Librarian.Sephirah.Services
             var user = _dbContext.Users.Single(u => u.Id == userId);
             var accounts = user.Accounts;
             var response = new ListLinkAccountsResponse();
-            response.Accounts.AddRange(accounts.Select(a => a.ToProtoAccount()));
+            response.Accounts.AddRange(accounts.Select(a => a.ToProto()));
             return Task.FromResult(response);
         }
     }

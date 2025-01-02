@@ -25,7 +25,7 @@ namespace Librarian.Sephirah.Services
                     && s.Status == TokenStatus.Normal)
                 .Include(x => x.Device);
             var response = new ListUserSessionsResponse();
-            response.Sessions.AddRange(sessions.Select(x => x.ToProtoUserSession()));
+            response.Sessions.AddRange(sessions.Select(x => x.ToProto()));
             return Task.FromResult(response);
         }
     }

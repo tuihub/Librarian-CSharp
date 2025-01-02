@@ -24,11 +24,13 @@ namespace Librarian.Common.Models.Db
         public List<string> ImageUrls { get; set; } = new List<string>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-one relation(required, to parent)
         public long AppId { get; set; }
         public AppInfo App { get; set; } = null!;
-        // func
+
+        // functions
         public AppInfoDetails(long appInfoId, TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
         {
             DateTime? releaseDate;
@@ -46,7 +48,7 @@ namespace Librarian.Common.Models.Db
             ImageUrls = appInfoDetails.ImageUrls.ToList();
         }
         public AppInfoDetails() { }
-        public TuiHub.Protos.Librarian.V1.AppInfoDetails ToProtoAppInfoDetails()
+        public TuiHub.Protos.Librarian.V1.AppInfoDetails ToProto()
         {
             return new TuiHub.Protos.Librarian.V1.AppInfoDetails
             {
@@ -58,7 +60,7 @@ namespace Librarian.Common.Models.Db
                 ImageUrls = { ImageUrls }
             };
         }
-        public void UpdateFromProtoAppInfoDetails(TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
+        public void UpdateFromProto(TuiHub.Protos.Librarian.V1.AppInfoDetails appInfoDetails)
         {
             DateTime? releaseDate;
             if (DateTime.TryParse(appInfoDetails.ReleaseDate, out DateTime tmpDT) == true)
@@ -73,7 +75,6 @@ namespace Librarian.Common.Models.Db
             ImageUrls = appInfoDetails.ImageUrls.ToList();
             UpdatedAt = DateTime.UtcNow;
         }
-
         public void UpdateFromAppInfoDetails(AppInfoDetails appInfoDetails)
         {
             Description = appInfoDetails.Description;

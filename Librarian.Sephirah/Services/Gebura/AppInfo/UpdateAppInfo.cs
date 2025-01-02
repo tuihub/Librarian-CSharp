@@ -30,7 +30,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "AppInfo not exists."));
             }
             // update AppInfo, full update
-            appInfo.UpdateFromProtoAppInfo(appInfoReq);
+            appInfo.UpdateFromProto(appInfoReq);
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppInfoResponse());
         }

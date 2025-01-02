@@ -34,6 +34,7 @@ namespace Librarian.Common.Models.Db
         public string? CoverImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation to self(optional)
         public ICollection<AppInfo> ChildAppInfos { get; } = new List<AppInfo>();
@@ -56,7 +57,8 @@ namespace Librarian.Common.Models.Db
         // computed
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public bool IsInternal { get; private set; }
-        // func
+
+        // functions
         public AppInfo(long internalId, TuiHub.Protos.Librarian.V1.AppInfo appInfo)
         {
             Id = internalId;
@@ -91,7 +93,7 @@ namespace Librarian.Common.Models.Db
                 UpdatedAt = UpdatedAt
             };
         }
-        public TuiHub.Protos.Librarian.V1.AppInfo ToProtoAppInfo()
+        public TuiHub.Protos.Librarian.V1.AppInfo ToProto()
         {
             return new TuiHub.Protos.Librarian.V1.AppInfo
             {
@@ -106,10 +108,9 @@ namespace Librarian.Common.Models.Db
                 IconImageUrl = IconImageUrl ?? string.Empty,
                 BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
                 CoverImageUrl = CoverImageUrl ?? string.Empty,
-                Details = AppInfoDetails?.ToProtoAppInfoDetails()
+                Details = AppInfoDetails?.ToProto()
             };
         }
-
         public AppInfoMixed ToProtoAppInfoMixed()
         {
             return new AppInfoMixed
@@ -121,11 +122,10 @@ namespace Librarian.Common.Models.Db
                 IconImageUrl = IconImageUrl ?? string.Empty,
                 BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
                 CoverImageUrl = CoverImageUrl ?? string.Empty,
-                Details = AppInfoDetails?.ToProtoAppInfoDetails()
+                Details = AppInfoDetails?.ToProto()
             };
         }
-
-        public void UpdateFromProtoAppInfo(TuiHub.Protos.Librarian.V1.AppInfo appInfo)
+        public void UpdateFromProto(TuiHub.Protos.Librarian.V1.AppInfo appInfo)
         {
             Source = appInfo.Source;
             SourceAppId = appInfo.SourceAppId;
@@ -142,10 +142,9 @@ namespace Librarian.Common.Models.Db
                 AppInfoDetails ??= new AppInfoDetails();
                 AppInfoDetails.Id = Id;
                 AppInfoDetails.App ??= this;
-                AppInfoDetails.UpdateFromProtoAppInfoDetails(appInfo.Details);
+                AppInfoDetails.UpdateFromProto(appInfo.Details);
             }
         }
-
         public void UpdateFromAppInfo(AppInfo appInfo)
         {
             Source = appInfo.Source;
@@ -166,7 +165,6 @@ namespace Librarian.Common.Models.Db
                 AppInfoDetails.UpdateFromAppInfoDetails(appInfo.AppInfoDetails);
             }
         }
-
         public AppInfo Flatten()
         {
             var sourcePriorities = new List<string>

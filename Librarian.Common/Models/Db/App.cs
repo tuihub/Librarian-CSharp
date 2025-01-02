@@ -50,14 +50,14 @@ namespace Librarian.Common.Models.Db
             AppInfoId = app.AssignedAppInfoId?.Id;
         }
         public App() { }
-        public void UpdateFromProtoApp(TuiHub.Protos.Librarian.Sephirah.V1.App app)
+        public void UpdateFromProto(TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
             Name = app.Name;
             Description = string.IsNullOrEmpty(app.Description) ? null : app.Description;
             IsPublic = app.Public;
             AppInfoId = app.AssignedAppInfoId?.Id;
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.App ToProtoApp()
+        public TuiHub.Protos.Librarian.Sephirah.V1.App ToProto()
         {
             return new TuiHub.Protos.Librarian.Sephirah.V1.App
             {

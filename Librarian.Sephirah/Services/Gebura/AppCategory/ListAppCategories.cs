@@ -21,7 +21,7 @@ namespace Librarian.Sephirah.Services
                 .Include(x => x.Apps);
             return Task.FromResult(new ListAppCategoriesResponse
             {
-                AppCategories = { appCategories.Select(x => x.ToProtoAppCategory()) }
+                AppCategories = { appCategories.Select(x => x.ToProtoApp()) }
             });
         }
     }

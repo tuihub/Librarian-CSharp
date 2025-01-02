@@ -34,16 +34,16 @@ namespace Librarian.Sephirah.Services
             var response = new GetBoundAppInfosResponse();
             if (appInfo.IsInternal)
             {
-                response.AppInfos.Add(appInfo.ToProtoAppInfo());
-                response.AppInfos.AddRange(appInfo.ChildAppInfos.Select(x => x.ToProtoAppInfo()));
+                response.AppInfos.Add(appInfo.ToProto());
+                response.AppInfos.AddRange(appInfo.ChildAppInfos.Select(x => x.ToProto()));
             }
             else
             {
                 if (appInfo.ParentAppInfo != null)
                 {
-                    response.AppInfos.Add(appInfo.ParentAppInfo.ToProtoAppInfo());
+                    response.AppInfos.Add(appInfo.ParentAppInfo.ToProto());
                 }
-                response.AppInfos.Add(appInfo.ToProtoAppInfo());
+                response.AppInfos.Add(appInfo.ToProto());
             }
             return Task.FromResult(response);
         }

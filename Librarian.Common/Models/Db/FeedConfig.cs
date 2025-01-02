@@ -1,11 +1,7 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.Common.Utils;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -32,6 +28,7 @@ namespace Librarian.Common.Models.Db
         // computed
         [NotMapped]
         public string Category { get; set; } = null!;
+
         // relations
         // one-to-many relation(required, to parent)
         public long SourceId { get; set; }

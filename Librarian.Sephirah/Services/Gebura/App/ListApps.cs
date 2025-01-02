@@ -40,7 +40,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new PagingResponse { TotalSize = apps.Count() }
             };
-            response.Apps.Add(apps.Select(x => x.ToProtoApp()));
+            response.Apps.Add(apps.Select(x => x.ToProto()));
             return Task.FromResult(response);
         }
     }

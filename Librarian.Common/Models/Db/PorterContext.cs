@@ -1,11 +1,6 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using Librarian.Common.Utils;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -18,12 +13,13 @@ namespace Librarian.Common.Models.Db
         public long Id { get; set; }
         [MaxLength(255)]
         public string Name { get; set; } = null!;
-        [MaxLength(4095)] 
+        [MaxLength(4095)]
         public string Description { get; set; } = null!;
         [MaxLength(65535)]
         public string ContextJson { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-one relation(optional, to parent)
         public long PorterId { get; set; }

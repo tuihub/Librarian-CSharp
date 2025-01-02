@@ -135,7 +135,7 @@ namespace Librarian.Angela.Services.Workers
                     .Include(x => x.ParentAppInfo)
                     .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
                 appInfo.ParentAppInfo!.Name = appInfoResp!.Name;
-                appInfo.UpdateFromProtoAppInfo(appInfoResp);
+                appInfo.UpdateFromProto(appInfoResp);
             }
             else
             {
@@ -143,7 +143,7 @@ namespace Librarian.Angela.Services.Workers
                     .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
                     .Include(x => x.AppInfoDetails)
                     .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
-                appInfo.UpdateFromProtoAppInfo(appInfoResp!);
+                appInfo.UpdateFromProto(appInfoResp!);
             }
             await db.SaveChangesAsync(_cts.Token);
         }

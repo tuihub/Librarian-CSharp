@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
 namespace Librarian.Common.Models.Db
 {
@@ -18,6 +17,8 @@ namespace Librarian.Common.Models.Db
         public bool IsPinned { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
+        // relations
         // one-to-one relation(required)
         public long FileMetadataId { get; set; }
         public FileMetadata FileMetadata { get; set; } = null!;
@@ -25,6 +26,7 @@ namespace Librarian.Common.Models.Db
         public long AppId { get; set; }
         public App App { get; set; } = null!;
     }
+
     public enum AppSaveFileStatus
     {
         Pending,
