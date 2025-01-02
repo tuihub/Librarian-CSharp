@@ -1,15 +1,13 @@
-﻿using Google.Protobuf;
-using Librarian.Common.Utils;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
-    [Index(nameof(TokenServerUrl))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
+    [Index(nameof(SentinelGeneratedId))]
     public class AppBinary
     {
         [Key]
@@ -18,36 +16,33 @@ namespace Librarian.Common.Models.Db
         [MaxLength(255)]
         public string Name { get; set; } = null!;
         public long SizeBytes { get; set; }
+        public bool NeedToken { get; set; }
         [MaxLength(255)]
-        public string PublicUrl { get; set; } = null!;
-        [IsFixedLength, MaxLength(32)]
-        public byte[]? Sha256 { get; set; }
-        [MaxLength(255)]
-        public string TokenServerUrl { get; set; } = null!;
+        public string? SentinelGeneratedId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation(required, to child)
-        public ICollection<AppBinaryChunk> AppBinaryChunks { get; } = new List<AppBinaryChunk>();
+        public ICollection<AppBinaryFile> AppBinaryFiles { get; } = new List<AppBinaryFile>();
         // one-to-many relation(required, to parent)
         public long AppInfoId { get; set; }
         public AppInfo AppInfo { get; set; } = null!;
         // one-to-many relation(required, to parent)
-        public long SentinelId { get; set; }
-        public Sentinel Sentinel { get; set; } = null!;
+        public long SentinelLibraryId { get; set; }
+        public SentinelLibrary SentinelLibrary { get; set; } = null!;
 
-        public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary ToProtoAppPackageBinary()
+        // functions
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary ToProto()
         {
             var protoAppPackageBinary = new TuiHub.Protos.Librarian.Sephirah.V1.AppBinary
             {
                 Id = new InternalID { Id = Id },
                 Name = Name,
                 SizeBytes = SizeBytes,
-                PublicUrl = PublicUrl,
-                Sha256 = UnsafeByteOperations.UnsafeWrap(Sha256.AsMemory()),
-                TokenServerUrl = TokenServerUrl
+                NeedToken = NeedToken
             };
-            protoAppPackageBinary.Chunks.AddRange(AppBinaryChunks.Select(x => x.ToProtoAppPackageBinaryChunk()));
+            protoAppPackageBinary.Files.AddRange(AppBinaryFiles.Select(x => x.ToProto()));
             return protoAppPackageBinary;
         }
     }

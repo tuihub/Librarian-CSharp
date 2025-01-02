@@ -28,11 +28,13 @@ namespace Librarian.Common.Models.Db
         public string? ClientVersion { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
-        // one-to-many relation(required, to child)
-        public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
         // many-to-many relation(required)
         public ICollection<User> Users { get; } = new List<User>();
+        // one-to-many relation(required, to child)
+        public ICollection<AppRunTime> AppRunTimes { get; } = new List<AppRunTime>();
+
         // func
         public Device(long internalId, DeviceInfo deviceInfo)
         {

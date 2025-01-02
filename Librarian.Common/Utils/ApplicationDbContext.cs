@@ -16,11 +16,9 @@ namespace Librarian.Common.Utils
         public DbSet<AppInfo> AppInfos { get; set; } = null!;
         public DbSet<AppInfoDetails> AppInfoDetails { get; set; } = null!;
         public DbSet<AppBinary> AppBinaries { get; set; } = null!;
-        public DbSet<AppBinaryChunk> AppBinaryChunks { get; set; } = null!;
         public DbSet<App> Apps { get; set; } = null!;
         public DbSet<AppSaveFile> AppSaveFiles { get; set; } = null!;
-        public DbSet<AppInst> AppInsts { get; set; } = null!;
-        public DbSet<AppInstRunTime> AppInstRunTimes { get; set; } = null!;
+        public DbSet<AppRunTime> AppRunTimes { get; set; } = null!;
         public DbSet<AppCategory> AppCategories { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Account> Accounts { get; set; } = null!;

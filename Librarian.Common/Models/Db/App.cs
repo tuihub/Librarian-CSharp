@@ -21,9 +21,10 @@ namespace Librarian.Common.Models.Db
         public bool IsPublic { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation(required, to child)
-        public ICollection<AppInst> AppInsts { get; } = new List<AppInst>();
+        public ICollection<AppRunTime> AppRunTimes { get; } = new List<AppRunTime>();
         // one-to-many relation(required, to child)
         public ICollection<AppSaveFile> AppSaveFiles { get; } = new List<AppSaveFile>();
         // one-to-many relation(required, to parent)
@@ -38,7 +39,8 @@ namespace Librarian.Common.Models.Db
         public TimeSpan TotalRunTime { get; set; } = TimeSpan.Zero;
         public long TotalAppSaveFileCount { get; set; }
         public long TotalAppSaveFileSizeBytes { get; set; }
-        // func
+
+        // functions
         public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
             Id = internalId;

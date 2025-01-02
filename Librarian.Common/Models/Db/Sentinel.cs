@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Librarian.Common.Models.Db
 {
@@ -13,21 +8,22 @@ namespace Librarian.Common.Models.Db
     [Index(nameof(UpdatedAt))]
     public class Sentinel
     {
+        // same as UserId
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
+        public ICollection<string> Hostnames { get; set; } = new List<string>();
+        public Constants.ServerScheme Scheme { get; set; }
         [MaxLength(255)]
-        public string Name { get; set; } = null!;
-        [MaxLength(4095)]
-        public string? Description { get; set; }
+        public string? GetTokenUrlPath { get; set; }
         [MaxLength(255)]
-        public string Token { get; set; } = null!;
-        //public ICollection<string> CdnUrls { get; set; } = new List<string>();
+        public string DownloadFileUrlPath { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
         // relations
         // one-to-many relation(required, to child)
-        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
+        public ICollection<SentinelLibrary> SentinelLibraries { get; } = new List<SentinelLibrary>();
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
