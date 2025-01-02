@@ -37,17 +37,34 @@ namespace Librarian.Sephirah.Server
             builder.Services.AddSingleton<SephirahContext>();
 
             // Add ApplicationDbContext DI
-            builder.Services.AddDbContext<ApplicationDbContext>();
+            builder.Services.AddDbContext<ApplicationDbContext>(o =>
+            {
+                var dbType = GlobalContext.SystemConfig.DbType;
+                var dbConnStr = GlobalContext.SystemConfig.DbConnStr;
+                if (dbType == ApplicationDbType.SQLite)
+                {
+                    o.UseSqlite(dbConnStr);
+                }
+                else if (dbType == ApplicationDbType.MySQL)
+                {
+                    o.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr));
+                }
+                else if (dbType == ApplicationDbType.PostgreSQL)
+                {
+                    o.UseNpgsql(dbConnStr);
+                }
+                else throw new ArgumentException("DbType Error.");
+            });
 
             // Add IdGen DI
             builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
             // Add services to the container.
             builder.Services.AddGrpc();
-            builder.Services.AddGrpcReflection();
-
-            // Add services
-            builder.Services.AddSingleton<PullMetadataService>();
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddGrpcReflection();
+            }
 
             // Add Auth
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -77,6 +94,8 @@ namespace Librarian.Sephirah.Server
                 {
                     c.Address = new Uri(consulConfig.ConsulAddress);
                 }));
+                // Add pull metadata service
+                builder.Services.AddSingleton<PullMetadataService>();
             }
             if (GlobalContext.MessageQueueConfig.MessageQueueType == MessageQueueType.InMemoryMq)
             {
@@ -111,8 +130,7 @@ namespace Librarian.Sephirah.Server
             app.MapGrpcService<SephirahService>();
 
             // add server reflection when env is dev
-            IWebHostEnvironment env = app.Environment;
-            if (env.IsDevelopment())
+            if (app.Environment.IsDevelopment())
             {
                 app.MapGrpcReflectionService();
             }
@@ -126,13 +144,14 @@ namespace Librarian.Sephirah.Server
             // Enable RateLimiter
             app.UseRateLimiter();
 
-            // Start pull metadata service
-            app.Services.GetRequiredService<PullMetadataService>().Start();
+            // TODO: refactor pull metadata service
+            //// Start pull metadata service
+            //app.Services.GetRequiredService<PullMetadataService>().Start();
 
-            app.Lifetime.ApplicationStopping.Register(() =>
-            {
-                app.Services.GetRequiredService<PullMetadataService>().Cancel();
-            });
+            //app.Lifetime.ApplicationStopping.Register(() =>
+            //{
+            //    app.Services.GetRequiredService<PullMetadataService>().Cancel();
+            //});
         }
     }
 }

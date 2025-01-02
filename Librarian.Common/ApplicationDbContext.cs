@@ -36,24 +36,6 @@ namespace Librarian.Common
         public DbSet<AppSaveFileCapacity> AppSaveFileCapacities { get; set; } = null!;
         public DbSet<Session> Sessions { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var dbType = GlobalContext.SystemConfig.DbType;
-            var dbConnStr = GlobalContext.SystemConfig.DbConnStr;
-            if (dbType == ApplicationDbType.SQLite)
-            {
-                optionsBuilder.UseSqlite(dbConnStr);
-            }
-            else if (dbType == ApplicationDbType.MySQL)
-            {
-                optionsBuilder.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr));
-            }
-            else if (dbType == ApplicationDbType.PostgreSQL)
-            {
-                optionsBuilder.UseNpgsql(dbConnStr);
-            }
-            else throw new Exception("DbType Error.");
-        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // relations

@@ -75,18 +75,18 @@ if (consulConfig.IsEnabled)
         c.Address = new Uri(consulConfig.ConsulAddress);
     }));
 }
-if (rabbitMqConfig.IsEnabled)
-{
-    var connFactory = new ConnectionFactory
-    {
-        HostName = rabbitMqConfig.Hostname,
-        Port = rabbitMqConfig.Port,
-        UserName = rabbitMqConfig.Username,
-        Password = rabbitMqConfig.Password
-    };
-    builder.Services.AddSingleton<IConnection>(connFactory.CreateConnection());
-    builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
-}
+//if (rabbitMqConfig.IsEnabled)
+//{
+//    var connFactory = new ConnectionFactory
+//    {
+//        HostName = rabbitMqConfig.Hostname,
+//        Port = rabbitMqConfig.Port,
+//        UserName = rabbitMqConfig.Username,
+//        Password = rabbitMqConfig.Password
+//    };
+//    builder.Services.AddSingleton<IConnection>(connFactory.CreateConnection());
+//    builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
+//}
 
 var app = builder.Build();
 
