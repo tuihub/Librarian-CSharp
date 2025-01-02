@@ -353,3 +353,4 @@ MigrationBackup/
 *.db*
 appsettings.Development.json
 launchSettings.json
+*.runsettings

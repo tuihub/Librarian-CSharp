@@ -1,27 +1,12 @@
 ﻿using Grpc.Net.Client;
-using IdGen.DependencyInjection;
-using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
-using Librarian.Common.Utils;
 using Librarian.Sephirah.Server;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Minio;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-using static Google.Protobuf.Compiler.CodeGeneratorResponse.Types;
 
 namespace LibrarianTests.IntegrationTests.Services.Sephirah
 {
@@ -49,30 +34,37 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
         }
 
         // https://q.cnblogs.com/q/142563/
-        // TODO: fix tests
         private void EnsureServer()
         {
             if (_app == null)
             {
                 var builder = WebApplication.CreateBuilder();
 
-                StartUp.ConfigureServices(builder);
-                
-                // Change to dev db
-                GlobalContext.SystemConfig.DbType = ApplicationDbType.MySQL;
-                GlobalContext.SystemConfig.DbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR") ??
-                    "server=librarian_test;port=3306;Database=librarian_test;Uid=librarian_test;Pwd=librarian_test;";
-                // Apply migration
-                using var dbContext = new ApplicationDbContext();
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.Migrate();
-                
+                // Get test db
+                var dbType = Environment.GetEnvironmentVariable("DB_TYPE")!.ToLower() switch
+                {
+                    "sqlite" => ApplicationDbType.SQLite,
+                    "mysql" => ApplicationDbType.MySQL,
+                    "postgresql" => ApplicationDbType.PostgreSQL,
+                    _ => throw new ArgumentException($"DB_TYPE is not supported.")
+                };
+                var dbConnStr = Environment.GetEnvironmentVariable("DB_CONN_STR")!;
+                StartUp.ConfigureServices(builder, (dbType, dbConnStr));
+
                 // Use TestServer
                 builder.WebHost.UseTestServer();
                 _app = builder.Build();
 
+                using (var scope = _app.Services.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Ensure create db
+                    dbContext.Database.EnsureDeleted();
+                    dbContext.Database.EnsureCreated();
+                }
+
                 StartUp.Configure(_app);
-                
+
                 _app.Start();
                 _client = _app.GetTestClient();
             }

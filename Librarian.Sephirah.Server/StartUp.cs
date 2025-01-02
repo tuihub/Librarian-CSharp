@@ -17,7 +17,7 @@ namespace Librarian.Sephirah.Server
 {
     public static class StartUp
     {
-        public static void ConfigureServices(WebApplicationBuilder builder)
+        public static void ConfigureServices(WebApplicationBuilder builder, (ApplicationDbType dbType, string dbConnStr)? testDb)
         {
             // Additional configuration is required to successfully run gRPC on macOS.
             // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
@@ -39,8 +39,18 @@ namespace Librarian.Sephirah.Server
             // Add ApplicationDbContext DI
             builder.Services.AddDbContext<ApplicationDbContext>(o =>
             {
-                var dbType = GlobalContext.SystemConfig.DbType;
-                var dbConnStr = GlobalContext.SystemConfig.DbConnStr;
+                ApplicationDbType dbType;
+                string dbConnStr;
+                if (testDb != null)
+                {
+                    dbType = testDb.Value.dbType;
+                    dbConnStr = testDb.Value.dbConnStr;
+                }
+                else
+                {
+                    dbType = GlobalContext.SystemConfig.DbType;
+                    dbConnStr = GlobalContext.SystemConfig.DbConnStr;
+                }
                 if (dbType == ApplicationDbType.SQLite)
                 {
                     o.UseSqlite(dbConnStr);
@@ -115,6 +125,11 @@ namespace Librarian.Sephirah.Server
                 builder.Services.AddSingleton(connFactory.CreateConnection());
                 builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
             }
+        }
+
+        public static void ConfigureServices(WebApplicationBuilder builder)
+        {
+            ConfigureServices(builder, null);
         }
 
         public static void Configure(WebApplication app)
