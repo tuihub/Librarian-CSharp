@@ -1,5 +1,4 @@
 ﻿using Google.Protobuf;
-using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -30,6 +29,18 @@ namespace Librarian.Common.Models.Db
         public AppBinary AppBinary { get; set; } = null!;
 
         // functions
+        public AppBinaryFile() { }
+        public AppBinaryFile(TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFile protoAppBinaryFile)
+        {
+            Name = protoAppBinaryFile.Name;
+            SizeBytes = protoAppBinaryFile.SizeBytes;
+            Sha256 = protoAppBinaryFile.Sha256.ToByteArray();
+            ServerFilePath = protoAppBinaryFile.ServerFilePath;
+            foreach (var protoAppBinaryFileChunk in protoAppBinaryFile.Chunks)
+            {
+                AppBinaryFileChunks.Add(new AppBinaryFileChunk(protoAppBinaryFileChunk));
+            }
+        }
         public TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFile ToProto()
         {
             var protoAppBinaryFile = new TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFile

@@ -25,6 +25,13 @@ namespace Librarian.Common.Models.Db
         public AppBinaryFile AppBinaryFile { get; set; } = null!;
 
         // functions
+        public AppBinaryFileChunk() { }
+        public AppBinaryFileChunk(TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFileChunk protoAppBinaryFileChunk)
+        {
+            OffsetBytes = protoAppBinaryFileChunk.OffsetBytes;
+            SizeBytes = protoAppBinaryFileChunk.SizeBytes;
+            Sha256 = protoAppBinaryFileChunk.Sha256.ToByteArray();
+        }
         public TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFileChunk ToProto()
         {
             return new TuiHub.Protos.Librarian.Sephirah.V1.AppBinaryFileChunk

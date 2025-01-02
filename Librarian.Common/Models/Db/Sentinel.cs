@@ -24,8 +24,5 @@ namespace Librarian.Common.Models.Db
         // relations
         // one-to-many relation(required, to child)
         public ICollection<SentinelLibrary> SentinelLibraries { get; } = new List<SentinelLibrary>();
-        // one-to-many relation(required, to parent)
-        public long UserId { get; set; }
-        public User User { get; set; } = null!;
     }
 }

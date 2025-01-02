@@ -9,6 +9,7 @@ using Grpc.Core;
 using LibrarianTests.IntegrationTests.Services.Sephirah;
 using Microsoft.Extensions.DependencyInjection;
 using Librarian.Common.Utils;
+using Librarian.Common;
 
 namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
 {

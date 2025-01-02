@@ -2,12 +2,10 @@
 using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Librarian.Common.Utils
+namespace Librarian.Common
 {
     public class ApplicationDbContext : DbContext
     {
@@ -23,6 +21,7 @@ namespace Librarian.Common.Utils
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Account> Accounts { get; set; } = null!;
         public DbSet<Sentinel> Sentinels { get; set; } = null!;
+        public DbSet<SentinelLibrary> SentinelLibraries { get; set; } = null!;
         public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<Porter> Porters { get; set; } = null!;

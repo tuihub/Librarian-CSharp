@@ -1,10 +1,10 @@
 ﻿using Consul;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Librarian.Common;
 using Librarian.Common.Contracts;
 using Librarian.Common.Models;
 using Librarian.Common.Models.Db;
-using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

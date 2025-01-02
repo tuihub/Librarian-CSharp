@@ -26,13 +26,27 @@ namespace Librarian.Common.Models.Db
         // one-to-many relation(required, to child)
         public ICollection<AppBinaryFile> AppBinaryFiles { get; } = new List<AppBinaryFile>();
         // one-to-many relation(required, to parent)
-        public long AppInfoId { get; set; }
-        public AppInfo AppInfo { get; set; } = null!;
+        public long? AppInfoId { get; set; }
+        public AppInfo? AppInfo { get; set; }
         // one-to-many relation(required, to parent)
         public long SentinelLibraryId { get; set; }
         public SentinelLibrary SentinelLibrary { get; set; } = null!;
 
         // functions
+        public AppBinary() { }
+        public AppBinary(TuiHub.Protos.Librarian.Sephirah.V1.AppBinary protoAppBinary, long internalId, long sentinelLibraryId, string? sentinelGeneratedId = null)
+        {
+            Id = internalId;
+            Name = protoAppBinary.Name;
+            SizeBytes = protoAppBinary.SizeBytes;
+            NeedToken = protoAppBinary.NeedToken;
+            SentinelGeneratedId = sentinelGeneratedId;
+            foreach (var protoAppBinaryFile in protoAppBinary.Files)
+            {
+                AppBinaryFiles.Add(new AppBinaryFile(protoAppBinaryFile));
+            }
+            SentinelLibraryId = sentinelLibraryId;
+        }
         public TuiHub.Protos.Librarian.Sephirah.V1.AppBinary ToProto()
         {
             var protoAppPackageBinary = new TuiHub.Protos.Librarian.Sephirah.V1.AppBinary
