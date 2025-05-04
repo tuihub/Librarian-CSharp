@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Librarian.Common.Constants;
 using TuiHub.Protos.Librarian.V1;
+using Librarian.Common.Converters;
 
 namespace Librarian.Common.Models.Db
 {
@@ -15,37 +17,32 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(255)]
-        public string Source { get; set; } = string.Empty;
-        [MaxLength(255)]
-        public string? SourceAppId { get; set; }
-        [MaxLength(255)]
-        public string? SourceUrl { get; set; }
-        [MaxLength(255)]
-        public string Name { get; set; } = null!;
-        public AppType Type { get; set; }
-        [MaxLength(4095)]
-        public string? ShortDescription { get; set; }
-        [MaxLength(255)]
-        public string? IconImageUrl { get; set; }
-        [MaxLength(255)]
-        public string? BackgroundImageUrl { get; set; }
-        [MaxLength(255)]
-        public string? CoverImageUrl { get; set; }
+        public WellKnownAppInfoSource Source { get; set; }
+        [MaxLength(255)] public string SourceAppId { get; set; } = string.Empty;
+        [MaxLength(255)] public string SourceUrl { get; set; } = string.Empty;
+        [MaxLength(255)] public string Name { get; set; } = null!;
+        public Enums.AppType Type { get; set; }
+        [MaxLength(4095)] public string Description { get; set; } = string.Empty;
+        [MaxLength(255)] public string IconImageUrl { get; set; } = string.Empty;
+        public long IconImageId { get; set; }
+        [MaxLength(255)] public string BackgroundImageUrl { get; set; } = string.Empty;
+        public long BackgroundImageId { get; set; }
+        [MaxLength(255)] public string CoverImageUrl { get; set; } = string.Empty;
+        public long CoverImageId { get; set; }
+        [MaxLength(255)] public string Developer { get; set; } = string.Empty;
+        [MaxLength(255)] public string Publisher { get; set; } = string.Empty;
+        public List<string> AltNames { get; set; } = [];
+        public List<string> Tags { get; set; } = [];
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
         // relations
-        // one-to-many relation to self(optional)
-        public ICollection<AppInfo> ChildAppInfos { get; } = new List<AppInfo>();
-        public long? ParentAppInfoId { get; set; }
-        public AppInfo? ParentAppInfo { get; set; }
         // one-to-one relation(required, to child)
         public AppInfoDetails? AppInfoDetails { get; set; }
         // one-to-many relation(required, to child)
-        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
+        public ICollection<AppBinary> AppBinaries { get; } = [];
         // one-to-many relation(optional, to child)
-        public ICollection<App> Apps { get; } = new List<App>();
+        public ICollection<App> Apps { get; } = [];
         // one-to-many relation(to parent, only used in internal appInfo)
         public long? UserId { get; set; }
         public User? User { get; set; }
@@ -59,111 +56,49 @@ namespace Librarian.Common.Models.Db
         public bool IsInternal { get; private set; }
 
         // functions
-        public AppInfo(long internalId, TuiHub.Protos.Librarian.V1.AppInfo appInfo)
+        public AppInfo(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
         {
             Id = internalId;
-            Source = appInfo.Internal ? Constants.Proto.AppInfoSourceInternal : appInfo.Source;
-            SourceAppId = appInfo.Internal ? null : appInfo.SourceAppId;
-            SourceUrl = string.IsNullOrEmpty(appInfo.SourceUrl) ? null : appInfo.SourceUrl;
+            Source = appInfo.Source.ToEnum<WellKnownAppInfoSource>();
+            SourceAppId = appInfo.SourceAppId;
+            SourceUrl = appInfo.SourceUrl;
             Name = appInfo.Name;
-            Type = appInfo.Type;
-            ShortDescription = string.IsNullOrEmpty(appInfo.ShortDescription) ? null : appInfo.ShortDescription;
-            IconImageUrl = string.IsNullOrEmpty(appInfo.IconImageUrl) ? null : appInfo.IconImageUrl;
-            BackgroundImageUrl = string.IsNullOrEmpty(appInfo.BackgroundImageUrl) ? null : appInfo.BackgroundImageUrl;
-            CoverImageUrl = string.IsNullOrEmpty(appInfo.CoverImageUrl) ? null : appInfo.CoverImageUrl;
-            AppInfoDetails = new AppInfoDetails(internalId, appInfo.Details);
+            Type = appInfo.Type.ToEnumByString<Enums.AppType>();
+            Description = appInfo.Description;
+            IconImageUrl = appInfo.IconImageUrl;
+            IconImageId = appInfo.IconImageId.Id;
+            BackgroundImageUrl = appInfo.BackgroundImageUrl;
+            BackgroundImageId = appInfo.BackgroundImageId.Id;
+            CoverImageUrl = appInfo.CoverImageUrl;
+            CoverImageId = appInfo.CoverImageId.Id;
+            Developer = appInfo.Developer;
+            Publisher = appInfo.Publisher;
+            AltNames = [.. appInfo.NameAlternatives];
+            Tags = [.. appInfo.Tags];
         }
         public AppInfo() : base() { }
-        public AppInfo GetAppInfoWithoutDetails()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPB()
         {
-            return new AppInfo
-            {
-                Id = Id,
-                Source = Source,
-                SourceAppId = SourceAppId,
-                SourceUrl = SourceUrl,
-                Name = Name,
-                Type = Type,
-                ShortDescription = ShortDescription,
-                IconImageUrl = IconImageUrl,
-                BackgroundImageUrl = BackgroundImageUrl,
-                CoverImageUrl = CoverImageUrl,
-                AppInfoDetails = null,
-                CreatedAt = CreatedAt,
-                UpdatedAt = UpdatedAt
-            };
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo>(this);
         }
-        public TuiHub.Protos.Librarian.V1.AppInfo ToProto()
+        public void UpdateFromProto(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
         {
-            return new TuiHub.Protos.Librarian.V1.AppInfo
-            {
-                Id = new InternalID { Id = Id },
-                Internal = IsInternal,
-                Source = Source,
-                SourceAppId = SourceAppId ?? string.Empty,
-                SourceUrl = SourceUrl ?? string.Empty,
-                Name = Name,
-                Type = Type,
-                ShortDescription = ShortDescription ?? string.Empty,
-                IconImageUrl = IconImageUrl ?? string.Empty,
-                BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
-                CoverImageUrl = CoverImageUrl ?? string.Empty,
-                Details = AppInfoDetails?.ToProto()
-            };
-        }
-        public AppInfoMixed ToProtoAppInfoMixed()
-        {
-            return new AppInfoMixed
-            {
-                Id = new InternalID { Id = Id },
-                Name = Name,
-                Type = Type,
-                ShortDescription = ShortDescription ?? string.Empty,
-                IconImageUrl = IconImageUrl ?? string.Empty,
-                BackgroundImageUrl = BackgroundImageUrl ?? string.Empty,
-                CoverImageUrl = CoverImageUrl ?? string.Empty,
-                Details = AppInfoDetails?.ToProto()
-            };
-        }
-        public void UpdateFromProto(TuiHub.Protos.Librarian.V1.AppInfo appInfo)
-        {
-            Source = appInfo.Source;
+            Source = EnumConverter.ToEnum<WellKnownAppInfoSource>(appInfo.Source);
             SourceAppId = appInfo.SourceAppId;
             SourceUrl = appInfo.SourceUrl;
             Name = appInfo.Name;
-            Type = appInfo.Type;
-            ShortDescription = appInfo.ShortDescription;
+            Type = EnumConverter.ToEnumByString<Enums.AppType>(appInfo.Type);
+            Description = appInfo.Description;
             IconImageUrl = appInfo.IconImageUrl;
+            IconImageId = appInfo.IconImageId.Id;
             BackgroundImageUrl = appInfo.BackgroundImageUrl;
+            BackgroundImageId = appInfo.BackgroundImageId.Id;
             CoverImageUrl = appInfo.CoverImageUrl;
-            UpdatedAt = DateTime.UtcNow;
-            if (appInfo.Details != null)
-            {
-                AppInfoDetails ??= new AppInfoDetails();
-                AppInfoDetails.Id = Id;
-                AppInfoDetails.App ??= this;
-                AppInfoDetails.UpdateFromProto(appInfo.Details);
-            }
-        }
-        public void UpdateFromAppInfo(AppInfo appInfo)
-        {
-            Source = appInfo.Source;
-            SourceAppId = appInfo.SourceAppId;
-            SourceUrl = appInfo.SourceUrl;
-            Name = appInfo.Name;
-            Type = appInfo.Type;
-            ShortDescription = appInfo.ShortDescription;
-            IconImageUrl = appInfo.IconImageUrl;
-            BackgroundImageUrl = appInfo.BackgroundImageUrl;
-            CoverImageUrl = appInfo.CoverImageUrl;
-            UpdatedAt = DateTime.UtcNow;
-            if (appInfo.AppInfoDetails != null)
-            {
-                AppInfoDetails ??= new AppInfoDetails();
-                AppInfoDetails.Id = Id;
-                AppInfoDetails.App ??= this;
-                AppInfoDetails.UpdateFromAppInfoDetails(appInfo.AppInfoDetails);
-            }
+            CoverImageId = appInfo.CoverImageId.Id;
+            Developer = appInfo.Developer;
+            Publisher = appInfo.Publisher;
+            AltNames = [.. appInfo.NameAlternatives];
+            Tags = [.. appInfo.Tags];
         }
         public AppInfo Flatten()
         {
@@ -174,29 +109,30 @@ namespace Librarian.Common.Models.Db
                 "vndb"
             };
             var appInfo = this;
-            foreach (var source in sourcePriorities)
-            {
-                if (appInfo.ChildAppInfos.Where(x => x.Source == source).Any())
-                {
-                    var fappInfo = appInfo.ChildAppInfos.Where(x => x.Source == source).First();
-                    appInfo.SourceUrl = fappInfo.SourceUrl;
-                    if (string.IsNullOrWhiteSpace(appInfo.Name)) appInfo.Name = fappInfo.Name;
-                    if (string.IsNullOrWhiteSpace(appInfo.ShortDescription)) appInfo.ShortDescription = fappInfo.ShortDescription;
-                    if (string.IsNullOrWhiteSpace(appInfo.IconImageUrl)) appInfo.IconImageUrl = fappInfo.IconImageUrl;
-                    if (string.IsNullOrWhiteSpace(appInfo.BackgroundImageUrl)) appInfo.BackgroundImageUrl = fappInfo.BackgroundImageUrl;
-                    if (string.IsNullOrWhiteSpace(appInfo.CoverImageUrl)) appInfo.CoverImageUrl = fappInfo.CoverImageUrl;
-                    if (appInfo.AppInfoDetails == null) appInfo.AppInfoDetails = fappInfo.AppInfoDetails;
-                    else
-                    {
-                        if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Description)) appInfo.AppInfoDetails.Description = fappInfo.AppInfoDetails?.Description;
-                        if (appInfo.AppInfoDetails.ReleaseDate == null) appInfo.AppInfoDetails.ReleaseDate = fappInfo.AppInfoDetails?.ReleaseDate;
-                        if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Developer)) appInfo.AppInfoDetails.Developer = fappInfo.AppInfoDetails?.Developer;
-                        if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Publisher)) appInfo.AppInfoDetails.Publisher = fappInfo.AppInfoDetails?.Publisher;
-                        if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Version)) appInfo.AppInfoDetails.Version = fappInfo.AppInfoDetails?.Version;
-                    }
-                    break;
-                }
-            }
+            // TODO: refactor
+            // foreach (var source in sourcePriorities)
+            // {
+            //     if (appInfo.ChildAppInfos.Where(x => x.Source == source).Any())
+            //     {
+            //         var fappInfo = appInfo.ChildAppInfos.Where(x => x.Source == source).First();
+            //         appInfo.SourceUrl = fappInfo.SourceUrl;
+            //         if (string.IsNullOrWhiteSpace(appInfo.Name)) appInfo.Name = fappInfo.Name;
+            //         if (string.IsNullOrWhiteSpace(appInfo.ShortDescription)) appInfo.ShortDescription = fappInfo.ShortDescription;
+            //         if (string.IsNullOrWhiteSpace(appInfo.IconImageUrl)) appInfo.IconImageUrl = fappInfo.IconImageUrl;
+            //         if (string.IsNullOrWhiteSpace(appInfo.BackgroundImageUrl)) appInfo.BackgroundImageUrl = fappInfo.BackgroundImageUrl;
+            //         if (string.IsNullOrWhiteSpace(appInfo.CoverImageUrl)) appInfo.CoverImageUrl = fappInfo.CoverImageUrl;
+            //         if (appInfo.AppInfoDetails == null) appInfo.AppInfoDetails = fappInfo.AppInfoDetails;
+            //         else
+            //         {
+            //             if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Description)) appInfo.AppInfoDetails.Description = fappInfo.AppInfoDetails?.Description;
+            //             if (appInfo.AppInfoDetails.ReleaseDate == null) appInfo.AppInfoDetails.ReleaseDate = fappInfo.AppInfoDetails?.ReleaseDate;
+            //             if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Developer)) appInfo.AppInfoDetails.Developer = fappInfo.AppInfoDetails?.Developer;
+            //             if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Publisher)) appInfo.AppInfoDetails.Publisher = fappInfo.AppInfoDetails?.Publisher;
+            //             if (string.IsNullOrWhiteSpace(appInfo.AppInfoDetails.Version)) appInfo.AppInfoDetails.Version = fappInfo.AppInfoDetails?.Version;
+            //         }
+            //         break;
+            //     }
+            // }
             return appInfo;
         }
     }
