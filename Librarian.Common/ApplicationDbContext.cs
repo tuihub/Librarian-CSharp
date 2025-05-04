@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 using System.Text.Json;
+using Librarian.Common.Constants;
 
 namespace Librarian.Common
 {
@@ -22,6 +23,8 @@ namespace Librarian.Common
         public DbSet<Account> Accounts { get; set; } = null!;
         public DbSet<Sentinel> Sentinels { get; set; } = null!;
         public DbSet<SentinelLibrary> SentinelLibraries { get; set; } = null!;
+        public DbSet<SentinelAppBinary> SentinelAppBinaries { get; set; } = null!;
+        public DbSet<SentinelAppBinaryFile> SentinelAppBinaryFiles { get; set; } = null!;
         public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<Porter> Porters { get; set; } = null!;
@@ -39,11 +42,6 @@ namespace Librarian.Common
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // relations
-            modelBuilder.Entity<AppInfo>()
-                        .HasOne(e => e.ParentAppInfo)
-                        .WithMany(e => e.ChildAppInfos)
-                        .HasForeignKey(e => e.ParentAppInfoId)
-                        .IsRequired(false);
             modelBuilder.Entity<Porter>()
                 .HasOne(p => p.PorterContext)
                 .WithOne(pc => pc.Porter)
@@ -55,16 +53,14 @@ namespace Librarian.Common
                         .HasComputedColumnSql($"Source = '{Constants.Proto.AppInfoSourceInternal}'");
 
             // conversions
-            modelBuilder.Entity<AppInfoDetails>()
-                        .Property(e => e.ImageUrls)
-                        .HasConversion(
-                            v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                            v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default) ?? new List<string>(),
-                            new ValueComparer<List<string>>(
-                                (c1, c2) => c1!.SequenceEqual(c2!),
-                                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                                c => c.ToList())
-                        );
+            // collections are supported in efcore 8.0, see https://github.com/dotnet/efcore/issues/13947
+            modelBuilder.Entity<App>()
+                .Property(e => e.AppSources)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<Dictionary<WellKnowns.AppInfoSource, string>>(
+                        v, JsonSerializerOptions.Default) ?? new Dictionary<WellKnowns.AppInfoSource, string>()
+                );
 
             // applying custom attribute
             // from https://stackoverflow.com/questions/41664713/using-a-custom-attribute-in-ef7-core-onmodelcreating
@@ -84,6 +80,7 @@ namespace Librarian.Common
             //configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
         }
     }
+    
     // from https://learn.microsoft.com/zh-cn/dotnet/standard/attributes/writing-custom-attributes
     [AttributeUsage(AttributeTargets.Property)]
     public class IsFixedLengthAttribute : Attribute
@@ -95,8 +92,8 @@ namespace Librarian.Common
         }
         public virtual bool IsFixedLength
         {
-            get { return _isFixedLength; }
-            set { _isFixedLength = value; }
+            get => _isFixedLength;
+            set => _isFixedLength = value;
         }
     }
 }

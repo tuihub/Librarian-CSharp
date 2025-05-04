@@ -17,9 +17,11 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
+        // source
         public WellKnownAppInfoSource Source { get; set; }
         [MaxLength(255)] public string SourceAppId { get; set; } = string.Empty;
         [MaxLength(255)] public string SourceUrl { get; set; } = string.Empty;
+        // app info
         [MaxLength(255)] public string Name { get; set; } = null!;
         public Enums.AppType Type { get; set; }
         [MaxLength(4095)] public string Description { get; set; } = string.Empty;
@@ -33,8 +35,9 @@ namespace Librarian.Common.Models.Db
         [MaxLength(255)] public string Publisher { get; set; } = string.Empty;
         public List<string> AltNames { get; set; } = [];
         public List<string> Tags { get; set; } = [];
+        // time
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relations
         // one-to-one relation(required, to child)
@@ -77,17 +80,17 @@ namespace Librarian.Common.Models.Db
             Tags = [.. appInfo.Tags];
         }
         public AppInfo() : base() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPB()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo>(this);
         }
         public void UpdateFromProto(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
         {
-            Source = EnumConverter.ToEnum<WellKnownAppInfoSource>(appInfo.Source);
+            Source = appInfo.Source.ToEnum<WellKnownAppInfoSource>();
             SourceAppId = appInfo.SourceAppId;
             SourceUrl = appInfo.SourceUrl;
             Name = appInfo.Name;
-            Type = EnumConverter.ToEnumByString<Enums.AppType>(appInfo.Type);
+            Type = appInfo.Type.ToEnumByString<Enums.AppType>();
             Description = appInfo.Description;
             IconImageUrl = appInfo.IconImageUrl;
             IconImageId = appInfo.IconImageId.Id;
