@@ -14,7 +14,8 @@ namespace Librarian.Common
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<AppInfo> AppInfos { get; set; } = null!;
         public DbSet<AppInfoDetails> AppInfoDetails { get; set; } = null!;
-        public DbSet<AppBinary> AppBinaries { get; set; } = null!;
+        public DbSet<StoreApp> StoreApps { get; set; } = null!;
+        public DbSet<StoreAppBinary> StoreAppBinaries { get; set; } = null!;
         public DbSet<App> Apps { get; set; } = null!;
         public DbSet<AppSaveFile> AppSaveFiles { get; set; } = null!;
         public DbSet<AppRunTime> AppRunTimes { get; set; } = null!;
@@ -55,6 +56,13 @@ namespace Librarian.Common
             // conversions
             // collections are supported in efcore 8.0, see https://github.com/dotnet/efcore/issues/13947
             modelBuilder.Entity<App>()
+                .Property(e => e.AppSources)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<Dictionary<WellKnowns.AppInfoSource, string>>(
+                        v, JsonSerializerOptions.Default) ?? new Dictionary<WellKnowns.AppInfoSource, string>()
+                );
+            modelBuilder.Entity<StoreApp>()
                 .Property(e => e.AppSources)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),

@@ -66,9 +66,9 @@ namespace Librarian.Common.Models.Db
             RevisedVersion = app.VersionNumber;
             RevisedAt = app.VersionDate.ToDateTime();
             CreatorDeviceId = app.CreatorDeviceId.Id;
-            AppSources = app.AppSources.ToDictionary(kv =>
-                kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
-                d => d.Value);
+            AppSources = app.AppSources.ToDictionary(
+                kv => kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
+                kv => kv.Value);
             IsPublic = app.Public;
             BoundStoreAppId = app.BoundStoreAppId.Id;
             StopStoreManage = app.StopStoreManage;
@@ -92,9 +92,9 @@ namespace Librarian.Common.Models.Db
             RevisedVersion = app.VersionNumber;
             RevisedAt = app.VersionDate.ToDateTime();
             CreatorDeviceId = app.CreatorDeviceId.Id;
-            AppSources = app.AppSources.ToDictionary(kv =>
-                kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
-                d => d.Value);
+            AppSources = app.AppSources.ToDictionary(
+                kv => kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
+                kv => kv.Value);
             IsPublic = app.Public;
             BoundStoreAppId = app.BoundStoreAppId.Id;
             StopStoreManage = app.StopStoreManage;

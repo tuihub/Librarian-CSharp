@@ -43,7 +43,7 @@ namespace Librarian.Common.Models.Db
         // one-to-one relation(required, to child)
         public AppInfoDetails? AppInfoDetails { get; set; }
         // one-to-many relation(required, to child)
-        public ICollection<AppBinary> AppBinaries { get; } = [];
+        public ICollection<StoreAppBinary> AppBinaries { get; } = [];
         // one-to-many relation(optional, to child)
         public ICollection<App> Apps { get; } = [];
         // one-to-many relation(to parent, only used in internal appInfo)

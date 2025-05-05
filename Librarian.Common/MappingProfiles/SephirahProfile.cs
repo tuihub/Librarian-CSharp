@@ -29,7 +29,7 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.RevisedAt, opt => opt.MapFrom(src => src.VersionDate.ToDateTime()))
             .ForMember(dest => dest.CreatorDeviceId, opt => opt.MapFrom(src => src.CreatorDeviceId.Id))
             .ForMember(dest => dest.AppSources, opt => opt.MapFrom(src => src.AppSources.ToDictionary(kv =>
-                kv.Key.ToEnum<WellKnowns.AppInfoSource>(), d => d.Value)))
+                kv.Key.ToEnum<WellKnowns.AppInfoSource>(), kv => kv.Value)))
             .ForMember(dest => dest.IconImageId, opt => opt.MapFrom(src => src.IconImageId.Id))
             .ForMember(dest => dest.BackgroundImageId, opt => opt.MapFrom(src => src.BackgroundImageId.Id))
             .ForMember(dest => dest.CoverImageId, opt => opt.MapFrom(src => src.CoverImageId.Id))
