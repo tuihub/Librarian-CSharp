@@ -1,10 +1,8 @@
-﻿using Librarian.Common.Configs;
+﻿using Librarian.Common.Constants;
 using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 using System.Text.Json;
-using Librarian.Common.Constants;
 
 namespace Librarian.Common
 {
@@ -25,7 +23,6 @@ namespace Librarian.Common
         public DbSet<Sentinel> Sentinels { get; set; } = null!;
         public DbSet<SentinelLibrary> SentinelLibraries { get; set; } = null!;
         public DbSet<SentinelAppBinary> SentinelAppBinaries { get; set; } = null!;
-        public DbSet<SentinelAppBinaryFile> SentinelAppBinaryFiles { get; set; } = null!;
         public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<FileMetadata> FileMetadatas { get; set; } = null!;
         public DbSet<Porter> Porters { get; set; } = null!;
@@ -88,7 +85,7 @@ namespace Librarian.Common
             //configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
         }
     }
-    
+
     // from https://learn.microsoft.com/zh-cn/dotnet/standard/attributes/writing-custom-attributes
     [AttributeUsage(AttributeTargets.Property)]
     public class IsFixedLengthAttribute : Attribute

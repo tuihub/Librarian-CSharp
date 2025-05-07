@@ -11,14 +11,13 @@ namespace Librarian.Common.Models.Db
         [Key]
         public long Id { get; set; }
         public long LibraryId { get; set; }
-        [MaxLength(255)]
-        public string DownloadBasePath { get; set; } = null!;
+        [MaxLength(255)] public string DownloadBasePath { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relations
         // one-to-many relation(required, to child)
-        public ICollection<AppBinary> AppBinaries { get; } = new List<AppBinary>();
+        public ICollection<SentinelAppBinary> AppBinaries { get; } = [];
         // one-to-many relation(required, to parent)
         public long SentinelId { get; set; }
         public Sentinel Sentinel { get; set; } = null!;
