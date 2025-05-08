@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Librarian.Common.Converters;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -17,7 +16,7 @@ namespace Librarian.Common.Models.Db
         public long Id { get; set; }
         [MaxLength(255)]
         public string DeviceName { get; set; } = null!;
-        public SystemType SystemType { get; set; }
+        public Constants.Enums.SystemType SystemType { get; set; }
         [MaxLength(255)]
         public string? SystemVersion { get; set; }
         [MaxLength(255)]
@@ -36,29 +35,20 @@ namespace Librarian.Common.Models.Db
         public ICollection<AppRunTime> AppRunTimes { get; } = new List<AppRunTime>();
 
         // func
-        public Device(long internalId, DeviceInfo deviceInfo)
+        public Device(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device device)
         {
             Id = internalId;
-            DeviceName = deviceInfo.DeviceName;
-            SystemType = deviceInfo.SystemType;
-            SystemVersion = string.IsNullOrEmpty(deviceInfo.SystemVersion) ? null : deviceInfo.SystemVersion;
-            ClientName = string.IsNullOrEmpty(deviceInfo.ClientName) ? null : deviceInfo.ClientName;
-            ClientSourceCodeAddress = string.IsNullOrEmpty(deviceInfo.ClientSourceCodeAddress) ? null : deviceInfo.ClientSourceCodeAddress;
-            ClientVersion = string.IsNullOrEmpty(deviceInfo.ClientVersion) ? null : deviceInfo.ClientVersion;
+            DeviceName = device.DeviceName;
+            SystemType = device.SystemType.ToEnumByString<Constants.Enums.SystemType>();
+            SystemVersion = string.IsNullOrEmpty(device.SystemVersion) ? null : device.SystemVersion;
+            ClientName = string.IsNullOrEmpty(device.ClientName) ? null : device.ClientName;
+            ClientSourceCodeAddress = string.IsNullOrEmpty(device.ClientSourceCodeAddress) ? null : device.ClientSourceCodeAddress;
+            ClientVersion = string.IsNullOrEmpty(device.ClientVersion) ? null : device.ClientVersion;
         }
         public Device() { }
-        public DeviceInfo ToProto()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device ToPb()
         {
-            return new DeviceInfo
-            {
-                DeviceId = new InternalID { Id = Id },
-                DeviceName = DeviceName,
-                SystemType = SystemType,
-                SystemVersion = SystemVersion ?? string.Empty,
-                ClientName = ClientName ?? string.Empty,
-                ClientSourceCodeAddress = ClientSourceCodeAddress ?? string.Empty,
-                ClientVersion = ClientVersion ?? string.Empty
-            };
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device>(this);
         }
     }
 }

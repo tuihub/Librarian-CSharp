@@ -40,12 +40,8 @@ namespace Librarian.Common.Models.Db
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relations
-        // one-to-one relation(required, to child)
-        public AppInfoDetails? AppInfoDetails { get; set; }
         // one-to-many relation(required, to child)
         public ICollection<StoreAppBinary> AppBinaries { get; } = [];
-        // one-to-many relation(optional, to child)
-        public ICollection<App> Apps { get; } = [];
         // one-to-many relation(to parent, only used in internal appInfo)
         public long? UserId { get; set; }
         public User? User { get; set; }
@@ -53,10 +49,7 @@ namespace Librarian.Common.Models.Db
         public long? AccountId { get; set; }
         public Account? Account { get; set; }
         // many-to-many relation(optional)
-        public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
-        // computed
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public bool IsInternal { get; private set; }
+        public ICollection<AppCategory> AppCategories { get; } = [];
 
         // functions
         public AppInfo(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)

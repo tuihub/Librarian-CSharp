@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Librarian.Common.Converters;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -19,11 +19,11 @@ namespace Librarian.Common.Models.Db
         public string Name { get; set; } = null!;
         [MaxLength(255)]
         public string Password { get; set; } = null!;
-        public UserType Type { get; set; }
-        public UserStatus Status { get; set; }
+        public Constants.Enums.UserType Type { get; set; }
+        public Constants.Enums.UserStatus Status { get; set; }
         public long? AppAppSaveFileCapacityCountDefault { get; set; }
         public long? AppAppSaveFileCapacitySizeBytesDefault { get; set; }
-        public AppSaveFileCapacityStrategy AppAppSaveFileCapacityStrategyDefault { get; set; } = AppSaveFileCapacityStrategy.Fail;
+        public Constants.Enums.AppSaveFileCapacityStrategy AppAppSaveFileCapacityStrategyDefault { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
@@ -47,14 +47,14 @@ namespace Librarian.Common.Models.Db
         public long TotalAppSaveFileSizeBytes { get; set; }
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.User ToProto(bool withPassword = false)
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPb(bool withPassword = false)
         {
-            var ret = new TuiHub.Protos.Librarian.Sephirah.V1.User
+            var ret = new TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
                 Username = Name,
-                Type = Type,
-                Status = Status
+                Type = Type.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserType>(),
+                Status = Status.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserStatus>(),
             };
             if (withPassword)
             {

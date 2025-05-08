@@ -1,8 +1,6 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -35,18 +33,9 @@ namespace Librarian.Common.Models.Db
         public User User { get; set; } = null!;
 
         // functions
-        public TuiHub.Protos.Librarian.V1.Account ToProto()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account ToProto()
         {
-            return new TuiHub.Protos.Librarian.V1.Account
-            {
-                Id = new InternalID { Id = Id },
-                Platform = Platform,
-                PlatformAccountId = PlatformAccountId,
-                Name = Name,
-                ProfileUrl = ProfileUrl,
-                AvatarUrl = AvatarUrl,
-                LatestUpdateTime = Timestamp.FromDateTime((UpdatedAt ?? CreatedAt).ToUniversalTime())
-            };
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account>(this);
         }
     }
 }

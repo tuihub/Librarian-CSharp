@@ -9,7 +9,7 @@
             Suspend,
         }
 
-        public enum FeedPullStatus
+        public enum FeedConfigPullStatus
         {
             Unspecified,
             Processing,

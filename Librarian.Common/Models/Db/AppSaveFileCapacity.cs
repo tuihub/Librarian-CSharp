@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -16,7 +15,7 @@ namespace Librarian.Common.Models.Db
         public long EntityInternalId { get; set; }
         public long? Count { get; set; }
         public long? SizeBytes { get; set; }
-        public AppSaveFileCapacityStrategy Strategy { get; set; } = AppSaveFileCapacityStrategy.Fail;
+        public Constants.Enums.AppSaveFileCapacityStrategy Strategy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
@@ -27,7 +26,8 @@ namespace Librarian.Common.Models.Db
 
         // functions
         public AppSaveFileCapacity() { }
-        public AppSaveFileCapacity(long userId, EntityType entityType, long entityInternalId, long? count, long? sizeBytes, AppSaveFileCapacityStrategy strategy)
+        public AppSaveFileCapacity(long userId, EntityType entityType, long entityInternalId, long? count,
+            long? sizeBytes, Constants.Enums.AppSaveFileCapacityStrategy strategy)
         {
             UserId = userId;
             EntityType = entityType;
@@ -36,7 +36,7 @@ namespace Librarian.Common.Models.Db
             SizeBytes = (sizeBytes ?? -1) < 0 ? null : sizeBytes;
             Strategy = strategy;
         }
-        public void Update(long? count, long? sizeBytes, AppSaveFileCapacityStrategy strategy)
+        public void Update(long? count, long? sizeBytes, Constants.Enums.AppSaveFileCapacityStrategy strategy)
         {
             Count = (count ?? -1) < 0 ? null : count;
             SizeBytes = (sizeBytes ?? -1) < 0 ? null : sizeBytes;

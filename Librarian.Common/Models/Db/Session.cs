@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -32,16 +31,9 @@ namespace Librarian.Common.Models.Db
 
         // functions
         public Session() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.UserSession ToProto()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserSession ToPb()
         {
-            return new TuiHub.Protos.Librarian.Sephirah.V1.UserSession
-            {
-                Id = new InternalID { Id = InternalId },
-                UserId = new InternalID { Id = UserId },
-                DeviceInfo = Device.ToProto(),
-                CreateTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(CreatedAt.ToUniversalTime()),
-                ExpireTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(ExpiredAt.ToUniversalTime())
-            };
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserSession>(this);
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -16,11 +15,11 @@ namespace Librarian.Common.Models.Db
         public string Name { get; set; } = null!;
         [MaxLength(4095)]
         public string Description { get; set; } = null!;
-        public FeedConfigStatus Status { get; set; }
+        public Constants.Enums.FeedConfigStatus Status { get; set; }
         public TimeSpan PullInterval { get; set; }
         public bool HideItems { get; set; }
         public DateTime? LastPullTime { get; set; }
-        public FeedConfigPullStatus? LastPullStatus { get; set; }
+        public Constants.Enums.FeedConfigPullStatus? LastPullStatus { get; set; }
         [MaxLength(65535)]
         public string? LastPullMessage { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

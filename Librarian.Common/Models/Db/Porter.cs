@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Models.Db
 {
@@ -23,7 +22,7 @@ namespace Librarian.Common.Models.Db
         public string FeatureSummary { get; set; } = null!;
         [MaxLength(65535)]
         public string? ContextJsonSchema { get; set; }
-        public UserStatus Status { get; set; }
+        public Constants.Enums.UserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
@@ -33,6 +32,6 @@ namespace Librarian.Common.Models.Db
         public PorterContext? PorterContext { get; set; }
         // computed
         [NotMapped]
-        public PorterConnectionStatus ConnectionStatus { get; set; }
+        public Constants.Enums.PorterConnectionStatus ConnectionStatus { get; set; }
     }
 }

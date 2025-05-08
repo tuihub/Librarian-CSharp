@@ -1,11 +1,5 @@
 ﻿using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Common.Utils
 {
@@ -26,7 +20,7 @@ namespace Librarian.Common.Utils
                 {
                     Count = GlobalContext.SystemConfig.UserAppSaveFileCapacityCountMax,
                     SizeBytes = GlobalContext.SystemConfig.UserAppSaveFileCapacitySizeBytesMax,
-                    Strategy = AppSaveFileCapacityStrategy.Fail
+                    Strategy = Constants.Enums.AppSaveFileCapacityStrategy.Fail
                 };
             }
             else
@@ -105,11 +99,11 @@ namespace Librarian.Common.Utils
             }
             switch (asfc.Strategy)
             {
-                case AppSaveFileCapacityStrategy.Fail:
+                case Constants.Enums.AppSaveFileCapacityStrategy.Fail:
                     result.IsSuccess = false;
                     result.Message = "App save file count capacity exceeded with a failing strategy.";
                     break;
-                case AppSaveFileCapacityStrategy.DeleteOldest:
+                case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestOrFail:
                     if (app.TotalAppSaveFileCount <= asfc.Count)
                     {
                         result.IsSuccess = true;
@@ -122,7 +116,7 @@ namespace Librarian.Common.Utils
                             $"({app.TotalAppSaveFileCount} of {asfc.Count} currently used).";
                     }
                     break;
-                case AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
+                case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
                     if (app.TotalAppSaveFileCount - appSaveFiles.Count + 1 <= asfc.Count)
                     {
                         result.IsSuccess = true;
@@ -163,11 +157,11 @@ namespace Librarian.Common.Utils
             }
             switch (asfc.Strategy)
             {
-                case AppSaveFileCapacityStrategy.Fail:
+                case Constants.Enums.AppSaveFileCapacityStrategy.Fail:
                     result.IsSuccess = false;
                     result.Message = "App save file size capacity exceeded with a failing strategy.";
                     break;
-                case AppSaveFileCapacityStrategy.DeleteOldest:
+                case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestOrFail:
                     if (app.TotalAppSaveFileSizeBytes - appSaveFiles.First().FileMetadata.SizeBytes + fileSizeBytes <= asfc.SizeBytes)
                     {
                         result.IsSuccess = true;
@@ -180,7 +174,7 @@ namespace Librarian.Common.Utils
                             $"({HumanizeUtil.SizeBytesToString(app.TotalAppSaveFileSizeBytes)} of {HumanizeUtil.SizeBytesToString((long)asfc.SizeBytes)} currently used).";
                     }
                     break;
-                case AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
+                case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
                     if (app.TotalAppSaveFileSizeBytes - appSaveFiles.Sum(x => x.FileMetadata.SizeBytes) + fileSizeBytes <= asfc.SizeBytes)
                     {
                         result.IsSuccess = true;

@@ -13,7 +13,7 @@
             Unspecified,
             Fail,
             DeleteOldestOrFail,
-            DeleteUntilSatisfied,
+            DeleteOldestUntilSatisfied,
         }
     }
 }

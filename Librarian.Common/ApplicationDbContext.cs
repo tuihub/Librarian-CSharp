@@ -11,7 +11,6 @@ namespace Librarian.Common
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<AppInfo> AppInfos { get; set; } = null!;
-        public DbSet<AppInfoDetails> AppInfoDetails { get; set; } = null!;
         public DbSet<StoreApp> StoreApps { get; set; } = null!;
         public DbSet<StoreAppBinary> StoreAppBinaries { get; set; } = null!;
         public DbSet<App> Apps { get; set; } = null!;
@@ -44,11 +43,6 @@ namespace Librarian.Common
                 .HasOne(p => p.PorterContext)
                 .WithOne(pc => pc.Porter)
                 .HasForeignKey<PorterContext>(pc => pc.PorterId);
-
-            // computed columns
-            modelBuilder.Entity<AppInfo>()
-                        .Property(e => e.IsInternal)
-                        .HasComputedColumnSql($"Source = '{Constants.Proto.AppInfoSourceInternal}'");
 
             // conversions
             // collections are supported in efcore 8.0, see https://github.com/dotnet/efcore/issues/13947
