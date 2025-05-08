@@ -1,0 +1,95 @@
+﻿@page "/users/delete"
+@using Microsoft.EntityFrameworkCore
+@using Librarian.Common.Models.Db
+@inject IDbContextFactory<Librarian.Common.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>User</h2>
+    <hr />
+    @if (user is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@user.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Password</dt>
+            <dd class="col-sm-10">@user.Password</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Type</dt>
+            <dd class="col-sm-10">@user.Type</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@user.Status</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AppAppSaveFileCapacityCountDefault</dt>
+            <dd class="col-sm-10">@user.AppAppSaveFileCapacityCountDefault</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AppAppSaveFileCapacitySizeBytesDefault</dt>
+            <dd class="col-sm-10">@user.AppAppSaveFileCapacitySizeBytesDefault</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AppAppSaveFileCapacityStrategyDefault</dt>
+            <dd class="col-sm-10">@user.AppAppSaveFileCapacityStrategyDefault</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@user.CreatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@user.UpdatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TotalAppSaveFileCount</dt>
+            <dd class="col-sm-10">@user.TotalAppSaveFileCount</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TotalAppSaveFileSizeBytes</dt>
+            <dd class="col-sm-10">@user.TotalAppSaveFileSizeBytes</dd>
+        </dl>
+        <EditForm method="post" Model="user" OnValidSubmit="DeleteUser" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(user is null)">Delete</button> |
+            <a href="/users">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private User? user;
+
+    [SupplyParameterFromQuery]
+    private long Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        user = await context.Users.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (user is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteUser()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Users.Remove(user!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/users");
+    }
+}
