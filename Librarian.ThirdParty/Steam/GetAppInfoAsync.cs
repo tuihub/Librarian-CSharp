@@ -1,6 +1,7 @@
 ﻿using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Helpers;
-using TuiHub.Protos.Librarian.V1;
+using System.Text.Json;
+using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.ThirdParty.Steam
 {
@@ -18,24 +19,32 @@ namespace Librarian.ThirdParty.Steam
             {
                 appReleaseDate = DateTime.MinValue;
             }
+            List<string> tags = [];
+            tags.AddRange(appInfoDetails.Categories.Select(x => x.Description));
+            tags.AddRange(appInfoDetails.Genres.Select(x => x.Description));
             return new AppInfo
             {
                 Source = "steam",
                 SourceAppId = appInfoDetails.SteamAppId.ToString(),
                 SourceUrl = "https://store.steampowered.com/app/" + appInfoDetails.SteamAppId.ToString(),
-                Name = appInfoDetails.Name,
-                Type = appInfoDetails.Type == "game" ? AppType.Game : AppType.Unspecified,
-                ShortDescription = appInfoDetails.ShortDescription,
-                IconImageUrl = null,
-                CoverImageUrl = appInfoDetails.HeaderImage,
+                RawDataJson = JsonSerializer.Serialize(appInfoDetails, s_jso_urje),
                 Details = new AppInfoDetails
                 {
                     Description = appInfoDetails.DetailedDescription,
                     ReleaseDate = appReleaseDate.ToUniversalTime().ToISO8601String(),
                     Developer = string.Join(',', appInfoDetails.Developers),
                     Publisher = string.Join(',', appInfoDetails.Publishers),
-                    Version = null
-                }
+                    Version = string.Empty,
+                    ImageUrls = { appInfoDetails.Screenshots.Select(x => x.PathFull) }
+                },
+                Name = appInfoDetails.Name,
+                Type = AppType.Game,
+                ShortDescription = appInfoDetails.ShortDescription,
+                IconImageUrl = string.Empty,
+                BackgroundImageUrl = appInfoDetails.Background,
+                CoverImageUrl = appInfoDetails.HeaderImage,
+                Tags = { tags },
+                NameAlternatives = { }
             };
         }
     }

@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="SteamWebAPI2" Version="4.4.1" />
-    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.0" />
+    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.4" />
     <PackageReference Include="TuiHub.Protos" Version="0.5.4" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>

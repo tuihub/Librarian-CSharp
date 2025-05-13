@@ -1,12 +1,15 @@
 ﻿using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Handlers;
 using SteamWebAPI2.Utilities;
+using System.Text.Json;
 using System.Threading.RateLimiting;
 
 namespace Librarian.ThirdParty.Steam
 {
     public partial class SteamAPIService : IAppInfoService
     {
+        private static readonly JsonSerializerOptions s_jso_urje = new() { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
         private readonly string _steamAPIKey;
         private readonly SteamWebInterfaceFactory _webInterfaceFactory;
         private readonly HttpClient _httpClient;

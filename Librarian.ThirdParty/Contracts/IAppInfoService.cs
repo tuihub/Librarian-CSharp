@@ -1,4 +1,4 @@
-﻿using TuiHub.Protos.Librarian.V1;
+﻿using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.ThirdParty.Contracts
 {

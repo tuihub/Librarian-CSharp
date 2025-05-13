@@ -3,7 +3,7 @@ using Librarian.ThirdParty.Helpers;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.ThirdParty.Bangumi
 {
@@ -19,7 +19,6 @@ namespace Librarian.ThirdParty.Bangumi
             _bangumiAPIKey = apiKey;
         }
 
-        // TODO: Add AltName
         public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken ct = default)
         {
             if (!int.TryParse(appIdStr, out int appId))
@@ -45,7 +44,7 @@ namespace Librarian.ThirdParty.Bangumi
             var shortDescription = ((string?)respObj.summary?.ToString())?.Length > 97 ?
                 ((string?)respObj.summary?.ToString())?[..97] + "..." : respObj.summary?.ToString();
             var infobox = respObj.infobox as JArray;
-            string? developer = null;
+            string developer = string.Empty;
             if (infobox != null)
             {
                 foreach (JObject parsedObject in infobox.Children<JObject>())
@@ -54,7 +53,43 @@ namespace Librarian.ThirdParty.Bangumi
                     {
                         if (parsedProperty.Value.ToString().Equals("开发"))
                         {
-                            developer = parsedProperty?.Parent?.Last?.First?.ToString();
+                            developer = parsedProperty?.Parent?.Last?.First?.ToString() ?? string.Empty;
+                        }
+                    }
+                }
+            }
+            // tags
+            List<string> tags = [];
+            if (respObj.tags?.Any())
+            {
+                foreach (var tag in respObj.tags)
+                {
+                    var name = tag.name?.ToString();
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        tags.Add(name);
+                    }
+                }
+            }
+            // alt_names
+            List<string> altNames = [];
+            if (!string.IsNullOrWhiteSpace(respObj.name_cn?.ToString()))
+            {
+                if (!string.IsNullOrWhiteSpace(respObj.name?.ToString()))
+                {
+                    altNames.Add(respObj.name.ToString());
+                }
+            }
+            foreach (var info in respObj.infobox)
+            {
+                if (info.key == "别名")
+                {
+                    foreach (var altName in info.value)
+                    {
+                        var name = altName.v?.ToString();
+                        if (!string.IsNullOrWhiteSpace(name) && !altNames.Contains(name))
+                        {
+                            altNames.Add(name);
                         }
                     }
                 }
@@ -64,20 +99,24 @@ namespace Librarian.ThirdParty.Bangumi
                 Source = "bangumi",
                 SourceAppId = respObj.id.ToString(),
                 SourceUrl = "https://bgm.tv/subject/" + respObj.id.ToString(),
-                Name = string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString(),
-                Type = respObj.type.ToString().Equals("4") ? AppType.Game : AppType.Unspecified,
-                ShortDescription = shortDescription,
-                IconImageUrl = respObj.images?.small?.ToString(),
-                CoverImageUrl = respObj.images?.large?.ToString(),
-                BackgroundImageUrl = respObj.images?.large?.ToString(),
+                RawDataJson = response.Content,
                 Details = new AppInfoDetails
                 {
                     Description = respObj.summary?.ToString(),
                     ReleaseDate = releaseDate.ToUniversalTime().ToISO8601String(),
                     Developer = developer,
-                    Publisher = null,
-                    Version = null
-                }
+                    Publisher = string.Empty,
+                    Version = string.Empty,
+                    ImageUrls = { }
+                },
+                Name = (string.IsNullOrWhiteSpace(respObj.name_cn.ToString()) ? respObj.name.ToString() : respObj.name_cn.ToString()) ?? string.Empty,
+                Type = AppType.Game,
+                ShortDescription = shortDescription,
+                IconImageUrl = respObj.images?.small?.ToString(),
+                BackgroundImageUrl = respObj.images?.large?.ToString(),
+                CoverImageUrl = respObj.images?.large?.ToString(),
+                Tags = { tags },
+                NameAlternatives = { altNames }
             };
         }
     }
