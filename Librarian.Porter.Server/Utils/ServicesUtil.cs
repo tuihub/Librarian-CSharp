@@ -1,11 +1,12 @@
 ﻿using Librarian.Porter.Configs;
-using Librarian.Porter.Constants;
 using Librarian.Porter.Models;
 using Librarian.ThirdParty.Bangumi;
 using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Steam;
 using Librarian.ThirdParty.Vndb;
 using Microsoft.Extensions.Logging;
+using Librarian.Common.Constants;
+using Librarian.Common.Converters;
 
 namespace Librarian.Porter.Server.Utils
 {
@@ -25,8 +26,8 @@ namespace Librarian.Porter.Server.Utils
                 {
                     builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey,
                         TimeSpan.FromSeconds(porterConfig.SteamMinRequestIntervalSeconds)));
-                    instanceContext.SupportedAccountPlatforms.Add(WellKnownAccountPlatform.Steam);
-                    instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Steam);
+                    instanceContext.SupportedAccountPlatforms.Add(WellKnowns.AccountPlatform.Steam.ToString().ToLower());
+                    instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Steam.ToString().ToLower());
                 }
             }
             if (porterConfig.IsBangumiEnabled)
@@ -38,13 +39,13 @@ namespace Librarian.Porter.Server.Utils
                 else
                 {
                     builder.Services.AddSingleton(new BangumiAPIService(porterConfig.BangumiApiKey));
-                    instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Bangumi);
+                    instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Bangumi.ToString().ToLower());
                 }
             }
             if (porterConfig.IsVndbEnabled)
             {
                 builder.Services.AddSingleton(new VndbTcpAPIService());
-                instanceContext.SupportedAppInfoSources.Add(WellKnownAppInfoSource.Vndb);
+                instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Vndb.ToString().ToLower());
             }
         }
     }
