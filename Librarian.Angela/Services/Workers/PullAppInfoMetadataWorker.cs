@@ -1,24 +1,16 @@
-﻿using Consul;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Grpc.Net.Client;
 using Librarian.Common;
 using Librarian.Common.Contracts;
+using Librarian.Common.Converters;
 using Librarian.Common.Models;
-using Librarian.Common.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 using TuiHub.Protos.Librarian.Porter.V1;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services.Workers
 {
@@ -92,6 +84,7 @@ namespace Librarian.Angela.Services.Workers
             _messageQueueService.SubscribeQueue(_channel, Platform, workerFunc, typeof(AppIdMQ), ct);
         }
 
+        // TODO: remove appIdMq.UpdateInternalAppInfoName, impl AppInfoDetails, impl UpdateFromProto (Porter Model)
         private async Task WorkerFunc(object appIdMqObj, CancellationToken ct = default)
         {
             if (appIdMqObj is not AppIdMQ)
@@ -102,22 +95,17 @@ namespace Librarian.Angela.Services.Workers
             var appIdMq = (AppIdMQ)appIdMqObj;
             _logger.LogDebug($"Worker ({ServiceId}, {Platform}) got message: {appIdMq}");
             var client = new LibrarianPorterService.LibrarianPorterServiceClient(_grpcChannel);
-            TuiHub.Protos.Librarian.V1.AppInfo? appInfoResp = null;
+            GetAppInfoResponse? response = null;
             try
             {
                 await _retryPolicy.ExecuteAsync(async (ct) =>
                 {
-                    var response = await client.PullAppInfoAsync(new PullAppInfoRequest
+                    response = await client.GetAppInfoAsync(new GetAppInfoRequest
                     {
-                        AppInfoId = new TuiHub.Protos.Librarian.V1.AppInfoID
-                        {
-                            Internal = false,
-                            Source = Platform,
-                            SourceAppId = appIdMq.AppId
-                        }
+                        Source = Platform,
+                        SourceAppId = appIdMq.AppId
                     }, cancellationToken: ct);
                     _logger.LogDebug($"Got response: {response}");
-                    appInfoResp = response.AppInfo;
                 }, cancellationToken: ct);
             }
             catch (TaskCanceledException)
@@ -127,24 +115,11 @@ namespace Librarian.Angela.Services.Workers
             }
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            if (appIdMq.UpdateInternalAppInfoName)
-            {
-                var appInfo = db.AppInfos
-                    .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
-                    .Include(x => x.AppInfoDetails)
-                    .Include(x => x.ParentAppInfo)
-                    .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
-                appInfo.ParentAppInfo!.Name = appInfoResp!.Name;
-                appInfo.UpdateFromProto(appInfoResp);
-            }
-            else
-            {
-                var appInfo = db.AppInfos
-                    .Where(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId)
-                    .Include(x => x.AppInfoDetails)
-                    .Single(x => x.IsInternal == false && x.Source == Platform && x.SourceAppId == appIdMq.AppId);
-                appInfo.UpdateFromProto(appInfoResp!);
-            }
+            var appInfo = db.AppInfos
+                .Where(x => x.Source.ToString() == Platform && x.SourceAppId == appIdMq.AppId)
+                //.Include(x => x.AppInfoDetails)
+                .Single(x => x.Source.ToString() == Platform && x.SourceAppId == appIdMq.AppId);
+            //appInfo.UpdateFromProto(response!.AppInfo);
             await db.SaveChangesAsync(_cts.Token);
         }
     }
