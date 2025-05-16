@@ -1,10 +1,8 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -18,7 +16,6 @@ namespace Librarian.Sephirah.Services
             var appCategory = _dbContext.AppCategories
                 .Where(x => x.Id == appCategoryReq.Id.Id)
                 .Include(x => x.User)
-                .Include(x => x.AppInfos)
                 .Include(x => x.Apps)
                 .SingleOrDefault(x => x.Id == request.AppCategory.Id.Id);
             if (appCategory == null)
@@ -37,13 +34,7 @@ namespace Librarian.Sephirah.Services
             var appIdsToRemove = appIds.Where(x => appIdsReq.Contains(x) == false);
             appIdsToAdd.ToList().ForEach(x => appCategory.Apps.Add(new Common.Models.Db.App { Id = x }));
             appIdsToRemove.ToList().ForEach(x => appCategory.Apps.Remove(new Common.Models.Db.App { Id = x }));
-            // update AppInfos associated with this AppCategory
-            var appInfoIds = appCategory.AppInfos.Select(x => x.Id);
-            var appInfoIdsReq = appCategoryReq.AppInfoIds.Select(x => x.Id);
-            var appInfoIdsToAdd = appInfoIdsReq.Where(x => appInfoIds.Contains(x) == false);
-            var appInfoIdsToRemove = appInfoIds.Where(x => appInfoIdsReq.Contains(x) == false);
-            appInfoIdsToAdd.ToList().ForEach(x => appCategory.AppInfos.Add(new Common.Models.Db.AppInfo { Id = x }));
-            appInfoIdsToRemove.ToList().ForEach(x => appCategory.AppInfos.Remove(new Common.Models.Db.AppInfo { Id = x }));
+
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppCategoryResponse());
         }

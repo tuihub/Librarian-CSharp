@@ -48,8 +48,6 @@ namespace Librarian.Common.Models.Db
         // one-to-many relation(to parent, only used in non-internal appInfo)
         public long? AccountId { get; set; }
         public Account? Account { get; set; }
-        // many-to-many relation(optional)
-        public ICollection<AppCategory> AppCategories { get; } = [];
 
         // functions
         public AppInfo(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
@@ -73,11 +71,11 @@ namespace Librarian.Common.Models.Db
             Tags = [.. appInfo.Tags];
         }
         public AppInfo() : base() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPB()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo>(this);
         }
-        public void UpdateFromProto(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
+        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
         {
             Source = appInfo.Source.ToEnum<WellKnownAppInfoSource>();
             SourceAppId = appInfo.SourceAppId;
