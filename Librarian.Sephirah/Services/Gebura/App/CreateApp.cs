@@ -1,7 +1,6 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Services
@@ -14,6 +13,8 @@ namespace Librarian.Sephirah.Services
             // create app
             var internalId = _idGenerator.CreateId();
             var app = new Common.Models.Db.App(internalId, request.App);
+            _dbContext.Apps.Add(app);
+
             if (app.AppInfoId != null)
             {
                 var appInfo = _dbContext.AppInfos.SingleOrDefault(x => x.Id == app.AppInfoId);
@@ -21,8 +22,8 @@ namespace Librarian.Sephirah.Services
                 {
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "AssignedAppInfo not exists."));
                 }
-                appInfo.Apps.Add(app);
             }
+
             _dbContext.SaveChanges();
             return Task.FromResult(new CreateAppResponse
             {

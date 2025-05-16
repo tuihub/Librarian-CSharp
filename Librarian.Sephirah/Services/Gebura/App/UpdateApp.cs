@@ -1,8 +1,6 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -19,7 +17,7 @@ namespace Librarian.Sephirah.Services
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             }
             // update App
-            app.UpdateFromProto(appReq);
+            app.UpdateFromPB(appReq);
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateAppResponse());
         }

@@ -1,9 +1,8 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Helpers;
-using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Services
@@ -16,16 +15,10 @@ namespace Librarian.Sephirah.Services
             var userId = context.GetInternalIdFromHeader();
             var ownerIdFilter = request.OwnerIdFilter;
             var idFilter = request.IdFilter;
-            var assignedAppInfoIdFilter = request.AssignedAppInfoIdFilter;
             var apps = _dbContext.Apps.AsQueryable();
             if (idFilter.Count > 0)
             {
-                apps = apps.Where(x => idFilter.Select(x => x.Id).Contains(x.Id));
-            }
-            if (assignedAppInfoIdFilter.Count > 0)
-            {
-                var appInfoIds = assignedAppInfoIdFilter.Select(x => x.Id);
-                apps = apps.Where(x => x.AppInfoId != null && appInfoIds.Contains((long)x.AppInfoId));
+                apps = apps.Where(x => idFilter.Select(y => y.Id).Contains(x.Id));
             }
             if (ownerIdFilter.Count == 0)
             {
@@ -33,7 +26,7 @@ namespace Librarian.Sephirah.Services
             }
             else
             {
-                apps = apps.Where(x => ownerIdFilter.Select(x => x.Id).Contains(x.UserId));
+                apps = apps.Where(x => ownerIdFilter.Select(y => y.Id).Contains(x.UserId));
                 apps = apps.Where(x => x.IsPublic == true);
             }
             apps = apps.ApplyPagingRequest(request.Paging);
@@ -41,7 +34,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new PagingResponse { TotalSize = apps.Count() }
             };
-            response.Apps.Add(apps.Select(x => x.ToProto()));
+            response.Apps.Add(apps.Select(x => x.ToPB()));
             return Task.FromResult(response);
         }
     }
