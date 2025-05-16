@@ -1,8 +1,9 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Constants;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -18,7 +19,7 @@ namespace Librarian.Sephirah.Services
             var deviceId = request.DeviceId?.Id;
             // get user
             var user = _dbContext.Users.Single(x => x.Id == internalId);
-            if (user.Status != UserStatus.Active)
+            if (user.Status != Enums.UserStatus.Active)
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
             }

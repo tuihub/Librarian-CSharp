@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -24,7 +24,7 @@ namespace Librarian.Sephirah.Services
             }
             return Task.FromResult(new GetUserResponse
             {
-                User = user.ToProto()
+                User = user.ToPB()
             });
         }
     }

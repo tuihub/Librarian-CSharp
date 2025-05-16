@@ -1,9 +1,10 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Constants;
+using Librarian.Common.Converters;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.IdentityModel.Tokens;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -27,8 +28,8 @@ namespace Librarian.Sephirah.Services
             }
             if (!string.IsNullOrEmpty(userReq.Username)) { user.Name = userReq.Username; }
             if (!string.IsNullOrEmpty(userReq.Password)) { user.Password = PasswordHasher.HashPassword(userReq.Password); }
-            if (userReq.Type != UserType.Unspecified) { user.Type = userReq.Type; }
-            if (userReq.Status != UserStatus.Unspecified) { user.Status = userReq.Status; }
+            if (userReq.Type != UserType.Unspecified) { user.Type = userReq.Type.ToString().ToEnum<Enums.UserType>(); }
+            if (userReq.Status != UserStatus.Unspecified) { user.Status = userReq.Status.ToString().ToEnum<Enums.UserStatus>(); }
             user.UpdatedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
             return Task.FromResult(new UpdateUserResponse());

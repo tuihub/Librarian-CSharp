@@ -3,13 +3,7 @@ using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -25,7 +19,7 @@ namespace Librarian.Sephirah.Services
                     && s.Status == TokenStatus.Normal)
                 .Include(x => x.Device);
             var response = new ListUserSessionsResponse();
-            response.Sessions.AddRange(sessions.Select(x => x.ToProto()));
+            response.Sessions.AddRange(sessions.Select(x => x.ToPB()));
             return Task.FromResult(response);
         }
     }

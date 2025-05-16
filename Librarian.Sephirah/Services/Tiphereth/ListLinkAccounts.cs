@@ -1,12 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -20,7 +15,7 @@ namespace Librarian.Sephirah.Services
             var user = _dbContext.Users.Single(u => u.Id == userId);
             var accounts = user.Accounts;
             var response = new ListLinkAccountsResponse();
-            response.Accounts.AddRange(accounts.Select(a => a.ToProto()));
+            response.Accounts.AddRange(accounts.Select(a => a.ToPB()));
             return Task.FromResult(response);
         }
     }

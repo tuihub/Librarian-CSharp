@@ -1,8 +1,9 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Constants;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.RateLimiting;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -22,7 +23,7 @@ namespace Librarian.Sephirah.Services
             {
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "User not exists."));
             }
-            if (user.Status != UserStatus.Active)
+            if (user.Status != Enums.UserStatus.Active)
             {
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
             }

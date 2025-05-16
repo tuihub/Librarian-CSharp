@@ -3,7 +3,7 @@ using Grpc.Core;
 using Librarian.Common;
 using Librarian.Common.Utils;
 using System.Reflection;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -15,24 +15,29 @@ namespace Librarian.Sephirah.Services
             var valid = JwtUtil.ValidateToken(token, GlobalContext.JwtConfig.AccessTokenAudience);
             var response = new GetServerInformationResponse
             {
-                ServerBinarySummary = new ServerBinarySummary
+                ServerInformation = new ServerInformation
                 {
-                    SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
-                    BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
-                    BuildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToISO8601String()
-                },
-                ProtocolSummary = new ServerProtocolSummary
-                {
-                    Version = Assembly.GetAssembly(typeof(TuiHub.Protos.Librarian.V1.InternalID))?.GetName().Version?.ToString() ?? "Unknown",
-                },
-                CurrentTime = DateTime.UtcNow.ToTimestamp(),
-                ServerInstanceSummary = new ServerInstanceSummary
-                {
-                    Name = GlobalContext.InstanceConfig.Name,
-                    Description = GlobalContext.InstanceConfig.Description,
-                    WebsiteUrl = GlobalContext.InstanceConfig.WebsiteUrl,
-                    LogoUrl = GlobalContext.InstanceConfig.LogoUrl,
-                    BackgroundUrl = GlobalContext.InstanceConfig.BackgroundUrl
+                    ServerBinarySummary = new ServerBinarySummary
+                    {
+                        SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
+                        BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
+                        BuildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToISO8601String()
+                    },
+                    ProtocolSummary = new ServerProtocolSummary
+                    {
+                        Version = Assembly.GetAssembly(typeof(TuiHub.Protos.Librarian.V1.InternalID))?.GetName().Version?.ToString() ?? "Unknown",
+                    },
+                    CurrentTime = DateTime.UtcNow.ToTimestamp(),
+                    ServerInstanceSummary = new ServerInstanceSummary
+                    {
+                        Name = GlobalContext.InstanceConfig.Name,
+                        Description = GlobalContext.InstanceConfig.Description,
+                        WebsiteUrl = GlobalContext.InstanceConfig.WebsiteUrl,
+                        LogoUrl = GlobalContext.InstanceConfig.LogoUrl,
+                        BackgroundUrl = GlobalContext.InstanceConfig.BackgroundUrl
+                    },
+                    // TODO: impl status
+                    StatusReport = string.Empty
                 }
             };
             if (valid)

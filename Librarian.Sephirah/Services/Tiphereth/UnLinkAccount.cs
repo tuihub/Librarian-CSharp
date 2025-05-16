@@ -1,12 +1,7 @@
 ﻿using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -16,14 +11,13 @@ namespace Librarian.Sephirah.Services
         public override Task<UnLinkAccountResponse> UnLinkAccount(UnLinkAccountRequest request, ServerCallContext context)
         {
             var userId = context.GetInternalIdFromHeader();
-            var accountId = request.AccountId;
-            if (accountId == null)
+            if (request == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Account ID is required."));
             }
             var userDb = _dbContext.Users.Single(u => u.Id == userId);
-            var accountDb = userDb.Accounts.SingleOrDefault(a => a.Platform == accountId.Platform
-                && a.PlatformAccountId == accountId.PlatformAccountId);
+            var accountDb = userDb.Accounts.SingleOrDefault(a => a.Platform == request.Platform
+                && a.PlatformAccountId == request.PlatformAccountId);
             if (accountDb == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Account not existed."));
