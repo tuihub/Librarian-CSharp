@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Librarian.Common.Models.Db
 {
+    [Index(nameof(StartDateTime), nameof(EndDateTime))]
     [Index(nameof(CreatedAt))]
     [Index(nameof(UpdatedAt))]
     public class AppRunTime
@@ -14,7 +15,7 @@ namespace Librarian.Common.Models.Db
         public DateTime EndDateTime { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relations
         // one-to-many relation(required, to parent)
@@ -22,5 +23,11 @@ namespace Librarian.Common.Models.Db
         public App App { get; set; } = null!;
         public long DeviceId { get; set; }
         public Device Device { get; set; } = null!;
+
+        // functions
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppRunTime ToPB()
+        {
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppRunTime>(this);
+        }
     }
 }
