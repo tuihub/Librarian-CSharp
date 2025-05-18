@@ -1,10 +1,9 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Converters;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -19,44 +18,73 @@ namespace Librarian.Sephirah.Services
             }
             var userId = context.GetInternalIdFromHeader();
             long internalId;
-            EntityType entityType;
-            if (request.EntityCase == SetAppSaveFileCapacityRequest.EntityOneofCase.User && request.User == true)
+
+            if (!request.ApplyToAll && (request.AppId == null || request.AppId.Id == 0))
             {
-                internalId = userId;
-                entityType = EntityType.User;
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "ApplyToAll or AppId is required."));
             }
-            else if (request.EntityCase == SetAppSaveFileCapacityRequest.EntityOneofCase.AppId && request.AppId.Id != 0)
+
+            var app = _dbContext.Apps.SingleOrDefault(x => x.Id == request.AppId.Id);
+            if (app == null)
             {
-                var app = _dbContext.Apps.SingleOrDefault(x => x.Id == request.AppId.Id);
-                if (app == null)
-                {
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
-                }
-                if (app.UserId != userId)
-                {
-                    throw new RpcException(new Status(StatusCode.PermissionDenied, "App is not owned by user."));
-                }
-                internalId = request.AppId.Id;
-                entityType = EntityType.App;
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
             }
+            if (app.UserId != userId)
+            {
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "App is not owned by user."));
+            }
+            internalId = request.AppId.Id;
+
+            var strategy = request.Strategy.ToEnumByString<Common.Constants.Enums.AppSaveFileCapacityStrategy>();
+
+            // user level capacity
+            if (request.ApplyToAll)
+            {
+                UpdateAppSaveFileCapacity(
+                    userId,
+                    EntityType.User,
+                    userId,
+                    request.Count,
+                    request.SizeBytes,
+                    strategy);
+            }
+            // app level capacity
             else
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Entity is not correct."));
+                UpdateAppSaveFileCapacity(
+                    userId,
+                    EntityType.App,
+                    internalId,
+                    request.Count,
+                    request.SizeBytes,
+                    strategy);
             }
+
+            _dbContext.SaveChanges();
+            return Task.FromResult(new SetAppSaveFileCapacityResponse());
+        }
+
+        private void UpdateAppSaveFileCapacity(
+            long userId,
+            EntityType entityType,
+            long internalId,
+            long count,
+            long sizeBytes,
+            Common.Constants.Enums.AppSaveFileCapacityStrategy strategy)
+        {
             var appSaveFileCapacity = _dbContext.AppSaveFileCapacities.SingleOrDefault(x =>
                     x.UserId == userId && x.EntityInternalId == internalId && x.EntityType == entityType);
+
             if (appSaveFileCapacity == null)
             {
                 appSaveFileCapacity = new AppSaveFileCapacity(userId, entityType,
-                    internalId, request.Count, request.SizeBytes, request.Strategy);
+                    internalId, count, sizeBytes, strategy);
                 _dbContext.AppSaveFileCapacities.Add(appSaveFileCapacity);
             }
             else
             {
-                appSaveFileCapacity.Update(request.Count, request.SizeBytes, request.Strategy);
+                appSaveFileCapacity.Update(count, sizeBytes, strategy);
             }
-            _dbContext.SaveChanges();
-            return Task.FromResult(new SetAppSaveFileCapacityResponse());
         }
     }
 }

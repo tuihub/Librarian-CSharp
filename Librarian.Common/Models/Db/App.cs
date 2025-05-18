@@ -87,7 +87,7 @@ namespace Librarian.Common.Models.Db
             Tags = [.. app.Tags];
         }
         public App() { }
-        public void UpdateFromProto(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App app)
+        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App app)
         {
             RevisedVersion = app.VersionNumber;
             RevisedAt = app.VersionDate.ToDateTime();
@@ -112,7 +112,7 @@ namespace Librarian.Common.Models.Db
             AltNames = [.. app.NameAlternatives];
             Tags = [.. app.Tags];
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App ToPB()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App>(this);
         }

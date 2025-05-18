@@ -1,10 +1,9 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Converters;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
@@ -15,32 +14,42 @@ namespace Librarian.Sephirah.Services
         {
             var userId = context.GetInternalIdFromHeader();
             long internalId;
-            EntityType entityType;
-            if (request.EntityCase == GetAppSaveFileCapacityRequest.EntityOneofCase.User && request.User == true)
+
+            if (request.AppId == null || request.AppId.Id == 0)
             {
-                internalId = userId;
-                entityType = EntityType.User;
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "AppId is required."));
             }
-            else if (request.EntityCase == GetAppSaveFileCapacityRequest.EntityOneofCase.AppId && request.AppId.Id != 0)
-            {
-                entityType = EntityType.App;
-                internalId = request.AppId.Id;
-            }
-            else
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Entity is not correct."));
-            }
+
+            internalId = request.AppId.Id;
+
+            // get capacity by app
             var appSaveFileCapacity = _dbContext.AppSaveFileCapacities
                 .Where(x => x.UserId == userId)
-                .Where(x => x.EntityType == entityType)
+                .Where(x => x.EntityType == EntityType.App)
                 .Where(x => x.EntityInternalId == internalId)
                 .FirstOrDefault();
-            appSaveFileCapacity ??= new AppSaveFileCapacity();
+            // get capacity by user
+            if (appSaveFileCapacity == null)
+            {
+                appSaveFileCapacity = _dbContext.AppSaveFileCapacities
+                    .Where(x => x.UserId == userId)
+                    .Where(x => x.EntityType == EntityType.User)
+                    .Where(x => x.EntityInternalId == userId)
+                    .FirstOrDefault();
+            }
+            // NOTE: AppSaveFileCapacity for user need to be created in user creation
+            if (appSaveFileCapacity == null)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, "AppSaveFileCapacity not found."));
+            }
+
             return Task.FromResult(new GetAppSaveFileCapacityResponse
             {
-                Count = appSaveFileCapacity.Count ?? -1,
-                SizeBytes = appSaveFileCapacity.SizeBytes ?? -1,
-                Strategy = appSaveFileCapacity.Strategy
+                Count = count,
+                CountMax = countMax,
+                SizeBytes = sizeBytes,
+                SizeBytesMax = sizeBytesMax,
+                Strategy = appSaveFileCapacity.Strategy.ToEnumByString<AppSaveFileCapacityStrategy>()
             });
         }
     }

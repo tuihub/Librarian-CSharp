@@ -27,24 +27,24 @@ namespace Librarian.Common.Utils
             {
                 if (GlobalContext.SystemConfig.UserAppSaveFileCapacityCountMax >= 0)
                 {
-                    if (userAsfc.Count == null)
+                    if (userAsfc.Count < 0)
                     {
                         userAsfc.Count = GlobalContext.SystemConfig.UserAppSaveFileCapacityCountMax;
                     }
                     else
                     {
-                        userAsfc.Count = Math.Min((long)userAsfc.Count, GlobalContext.SystemConfig.UserAppSaveFileCapacityCountMax);
+                        userAsfc.Count = Math.Min(userAsfc.Count, GlobalContext.SystemConfig.UserAppSaveFileCapacityCountMax);
                     }
                 }
                 if (GlobalContext.SystemConfig.UserAppSaveFileCapacitySizeBytesMax >= 0)
                 {
-                    if (userAsfc.SizeBytes == null)
+                    if (userAsfc.SizeBytes < 0)
                     {
                         userAsfc.SizeBytes = GlobalContext.SystemConfig.UserAppSaveFileCapacitySizeBytesMax;
                     }
                     else
                     {
-                        userAsfc.SizeBytes = Math.Min((long)userAsfc.SizeBytes, GlobalContext.SystemConfig.UserAppSaveFileCapacitySizeBytesMax);
+                        userAsfc.SizeBytes = Math.Min(userAsfc.SizeBytes, GlobalContext.SystemConfig.UserAppSaveFileCapacitySizeBytesMax);
                     }
                 }
             }
@@ -68,30 +68,30 @@ namespace Librarian.Common.Utils
                 .Include(x => x.FileMetadata)
                 .OrderByDescending(x => x.CreatedAt);
             // check app level capacity
-            CheckCapacityResult result = new(true, new List<long>());
-            result.Update(CheckCapacityCount(appAsfc, appSaveFiles.ToList(), app));
+            CheckCapacityResult result = new(true, []);
+            result.Update(CheckCapacityCount(appAsfc, appSaveFiles, app));
             if (result.IsSuccess == false) { return result; }
-            result.Update(CheckCapacitySizeBytes(appAsfc, appSaveFiles.ToList(), app, fileSizeBytes));
+            result.Update(CheckCapacitySizeBytes(appAsfc, appSaveFiles, app, fileSizeBytes));
             if (result.IsSuccess == false) { return result; }
             // check user level capacity
-            result.Update(CheckCapacityCount(userAsfc, appSaveFiles.ToList(), app));
+            result.Update(CheckCapacityCount(userAsfc, appSaveFiles, app));
             if (result.IsSuccess == false) { return result; }
-            result.Update(CheckCapacitySizeBytes(userAsfc, appSaveFiles.ToList(), app, fileSizeBytes));
+            result.Update(CheckCapacitySizeBytes(userAsfc, appSaveFiles, app, fileSizeBytes));
             return result;
         }
 
-        private static CheckCapacityResult CheckCapacityCount(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.Db.App app)
+        private static CheckCapacityResult CheckCapacityCount(AppSaveFileCapacity? asfc, IOrderedQueryable<AppSaveFile> appSaveFiles, Models.Db.App app)
         {
-            if (asfc == null || asfc.Count == null)
+            if (asfc == null || asfc.Count < 0)
             {
-                return new CheckCapacityResult(true, new List<long>());
+                return new CheckCapacityResult(true, []);
             }
             else if (app.TotalAppSaveFileCount + 1 <= asfc.Count)
             {
-                return new CheckCapacityResult(true, new List<long>());
+                return new CheckCapacityResult(true, []);
             }
             var result = new CheckCapacityResult();
-            if (appSaveFiles.Count == 0)
+            if (!appSaveFiles.Any())
             {
                 result.IsSuccess = false;
                 result.Message = "App save file count capacity exceeded with no file can be removed.";
@@ -117,12 +117,13 @@ namespace Librarian.Common.Utils
                     }
                     break;
                 case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
-                    if (app.TotalAppSaveFileCount - appSaveFiles.Count + 1 <= asfc.Count)
+                    if (app.TotalAppSaveFileCount - appSaveFiles.Count() + 1 <= asfc.Count)
                     {
+                        var appSaveFileIds = appSaveFiles.Select(x => x.Id).ToList();
                         result.IsSuccess = true;
                         for (int i = 0; i < app.TotalAppSaveFileCount - asfc.Count + 1; i++)
                         {
-                            result.AppSaveFileIdsToRemove.Add(appSaveFiles[i].Id);
+                            result.AppSaveFileIdsToRemove.Add(appSaveFileIds[i]);
                         }
                     }
                     else
@@ -138,18 +139,18 @@ namespace Librarian.Common.Utils
             return result;
         }
 
-        private static CheckCapacityResult CheckCapacitySizeBytes(AppSaveFileCapacity? asfc, List<AppSaveFile> appSaveFiles, Models.Db.App app, long fileSizeBytes)
+        private static CheckCapacityResult CheckCapacitySizeBytes(AppSaveFileCapacity? asfc, IOrderedQueryable<AppSaveFile> appSaveFiles, Models.Db.App app, long fileSizeBytes)
         {
-            if (asfc == null || asfc.SizeBytes == null)
+            if (asfc == null || asfc.SizeBytes < 0)
             {
-                return new CheckCapacityResult(true, new List<long>());
+                return new CheckCapacityResult(true, []);
             }
             else if (app.TotalAppSaveFileSizeBytes + fileSizeBytes <= asfc.SizeBytes)
             {
-                return new CheckCapacityResult(true, new List<long>());
+                return new CheckCapacityResult(true, []);
             }
             var result = new CheckCapacityResult();
-            if (appSaveFiles.Count == 0)
+            if (!appSaveFiles.Any())
             {
                 result.IsSuccess = false;
                 result.Message = "App save file size capacity exceeded with no file can be removed.";
@@ -171,7 +172,7 @@ namespace Librarian.Common.Utils
                     {
                         result.IsSuccess = false;
                         result.Message = "App save file size capacity still exceeded with removing the oldest file " +
-                            $"({HumanizeUtil.SizeBytesToString(app.TotalAppSaveFileSizeBytes)} of {HumanizeUtil.SizeBytesToString((long)asfc.SizeBytes)} currently used).";
+                            $"({HumanizeUtil.SizeBytesToString(app.TotalAppSaveFileSizeBytes)} of {HumanizeUtil.SizeBytesToString(asfc.SizeBytes)} currently used).";
                     }
                     break;
                 case Constants.Enums.AppSaveFileCapacityStrategy.DeleteOldestUntilSatisfied:
@@ -179,11 +180,16 @@ namespace Librarian.Common.Utils
                     {
                         result.IsSuccess = true;
                         var cntSizeBytes = app.TotalAppSaveFileSizeBytes + fileSizeBytes;
+                        var appSaveFilesList = appSaveFiles.Select(x => new
+                        {
+                            x.Id,
+                            x.FileMetadata.SizeBytes
+                        }).ToList();
                         var i = 0;
                         while (cntSizeBytes > asfc.SizeBytes)
                         {
-                            result.AppSaveFileIdsToRemove.Add(appSaveFiles[i].Id);
-                            cntSizeBytes -= appSaveFiles[i].FileMetadata.SizeBytes;
+                            result.AppSaveFileIdsToRemove.Add(appSaveFilesList[i].Id);
+                            cntSizeBytes -= appSaveFilesList[i].SizeBytes;
                             i++;
                         }
                     }
@@ -191,7 +197,7 @@ namespace Librarian.Common.Utils
                     {
                         result.IsSuccess = false;
                         result.Message = "App save file size capacity still exceeded with removing all files " +
-                            $"({HumanizeUtil.SizeBytesToString(app.TotalAppSaveFileSizeBytes)} of {HumanizeUtil.SizeBytesToString((long)asfc.SizeBytes)} currently used).";
+                            $"({HumanizeUtil.SizeBytesToString(app.TotalAppSaveFileSizeBytes)} of {HumanizeUtil.SizeBytesToString(asfc.SizeBytes)} currently used).";
                     }
                     break;
                 default:
@@ -217,7 +223,7 @@ namespace Librarian.Common.Utils
     public class CheckCapacityResult
     {
         public bool IsSuccess { get; set; }
-        public List<long> AppSaveFileIdsToRemove { get; set; } = new();
+        public List<long> AppSaveFileIdsToRemove { get; set; } = [];
         public string? Message { get; set; }
 
         public CheckCapacityResult() { }
@@ -233,7 +239,7 @@ namespace Librarian.Common.Utils
             else if (ccr.IsSuccess == false)
             {
                 IsSuccess = false;
-                AppSaveFileIdsToRemove = new List<long>();
+                AppSaveFileIdsToRemove = [];
                 Message = ccr.Message;
             }
             else
