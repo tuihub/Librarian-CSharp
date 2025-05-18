@@ -4,17 +4,15 @@ using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Minio;
 using Minio.DataModel.Args;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
         [Authorize]
-        public override async Task<RemoveAppSaveFileResponse> RemoveAppSaveFile(RemoveAppSaveFileRequest request, ServerCallContext context)
+        public override async Task<DeleteAppSaveFileResponse> DeleteAppSaveFile(DeleteAppSaveFileRequest request, ServerCallContext context)
         {
             var id = request.Id.Id;
             var userId = context.GetInternalIdFromHeader();
@@ -46,7 +44,7 @@ namespace Librarian.Sephirah.Services
             _dbContext.FileMetadatas.Remove(fileMetadata);
             _dbContext.AppSaveFiles.Remove(appSaveFile);
             await _dbContext.SaveChangesAsync();
-            return new RemoveAppSaveFileResponse();
+            return new DeleteAppSaveFileResponse();
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Grpc.Core;
-using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Services
@@ -28,7 +27,7 @@ namespace Librarian.Sephirah.Services
                 Results = { appSaveFiles.Select(x => new ListAppSaveFilesResponse.Types.Result
                 {
                     Id = new InternalID { Id = x.Id },
-                    File = x.FileMetadata.ToProto(),
+                    File = x.FileMetadata.ToPB(),
                     Pinned = x.IsPinned
                 }) }
             });

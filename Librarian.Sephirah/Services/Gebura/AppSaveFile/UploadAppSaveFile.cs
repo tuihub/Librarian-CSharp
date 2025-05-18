@@ -1,14 +1,16 @@
 ﻿using Grpc.Core;
+using Librarian.Common;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using Minio.DataModel.Args;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {
     public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
     {
+        // TODO: update AppSaveFile.Status
         [Authorize]
         public override Task<UploadAppSaveFileResponse> UploadAppSaveFile(UploadAppSaveFileRequest request, ServerCallContext context)
         {
@@ -21,6 +23,30 @@ namespace Librarian.Sephirah.Services
             if (result.IsSuccess == false)
             {
                 throw new RpcException(new Status(StatusCode.ResourceExhausted, result.Message ?? "Unknown reason."));
+            }
+            // remove AppSaveFileIdsToRemove from result
+            var appSaveFileIdsToRemove = result.AppSaveFileIdsToRemove;
+            foreach (var appSaveFileIdToRemove in appSaveFileIdsToRemove)
+            {
+                var appSaveFileToRemove = _dbContext.AppSaveFiles.Single(x => x.Id == appSaveFileIdToRemove);
+                var fileMetadataToRemove = _dbContext.FileMetadatas.Single(x => x.Id == appSaveFileToRemove.FileMetadataId);
+                // only remove in minio when status is Stored
+                if (appSaveFileToRemove.Status == AppSaveFileStatus.Stored)
+                {
+                    var minioClient = MinioClientUtil.GetMinioClient();
+                    var rmArgs = new RemoveObjectArgs()
+                                     .WithBucket(GlobalContext.SystemConfig.MinioBucket)
+                                     .WithObject(appSaveFileToRemove.FileMetadataId.ToString());
+                    minioClient.RemoveObjectAsync(rmArgs).Wait();
+                }
+                // update user and app capacity
+                user.TotalAppSaveFileCount--;
+                user.TotalAppSaveFileSizeBytes -= fileMetadataToRemove.SizeBytes;
+                app.TotalAppSaveFileCount--;
+                app.TotalAppSaveFileSizeBytes -= fileMetadataToRemove.SizeBytes;
+                // remove db entries
+                _dbContext.FileMetadatas.Remove(fileMetadataToRemove);
+                _dbContext.AppSaveFiles.Remove(appSaveFileToRemove);
             }
             // create file metadata
             var fileMetadataId = _idGenerator.CreateId();
