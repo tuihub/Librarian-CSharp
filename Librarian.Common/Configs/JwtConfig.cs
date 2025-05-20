@@ -10,6 +10,8 @@
         public string Key { get; set; } = null!;
         public double AccessTokenExpireMinutes { get; set; }
         public double RefreshTokenExpireMinutes { get; set; }
+        public double SentinelAccessTokenExpireMinutes { get; set; }
+        public double SentinelRefreshTokenExpireMinutes { get; set; }
         public double UploadTokenExpireMinutes { get; set; }
         public double DownloadTokenExpireMinutes { get; set; }
     }
