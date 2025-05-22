@@ -52,6 +52,21 @@ namespace Librarian.Common.Utils
             var issuer = GlobalContext.JwtConfig.Issuer;
             return GenerateToken(issuer, audience, expireMinutes, internalId);
         }
+        public static string GenerateSentinelAccessToken(long internalId)
+        {
+            var expireMinutes = GlobalContext.JwtConfig.SentinelAccessTokenExpireMinutes;
+            var audience = GlobalContext.JwtConfig.AccessTokenAudience;
+            var issuer = GlobalContext.JwtConfig.Issuer;
+            return GenerateToken(issuer, audience, expireMinutes, internalId);
+
+        }
+        public static string GenerateSentinelRefreshToken(long internalId)
+        {
+            var expireMinutes = GlobalContext.JwtConfig.SentinelRefreshTokenExpireMinutes;
+            var audience = GlobalContext.JwtConfig.RefreshTokenAudience;
+            var issuer = GlobalContext.JwtConfig.Issuer;
+            return GenerateToken(issuer, audience, expireMinutes, internalId);
+        }
         public static string GenerateUploadToken(long internalId)
         {
             var expireMinutes = GlobalContext.JwtConfig.UploadTokenExpireMinutes;

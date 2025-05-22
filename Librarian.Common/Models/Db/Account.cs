@@ -12,28 +12,23 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(255)]
-        public string Platform { get; set; } = null!;
-        [MaxLength(255)]
-        public string PlatformAccountId { get; set; } = null!;
-        [MaxLength(255)]
-        public string Name { get; set; } = null!;
-        [MaxLength(255)]
-        public string ProfileUrl { get; set; } = null!;
-        [MaxLength(255)]
-        public string AvatarUrl { get; set; } = null!;
+        [MaxLength(255)] public string Platform { get; set; } = null!;
+        [MaxLength(255)] public string PlatformAccountId { get; set; } = null!;
+        [MaxLength(255)] public string Name { get; set; } = null!;
+        [MaxLength(255)] public string ProfileUrl { get; set; } = null!;
+        [MaxLength(255)] public string AvatarUrl { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
         // relations
         // one-to-many relation(to child, only used in non-internal appInfo)
-        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
+        public ICollection<AppInfo> AppInfos { get; } = [];
         // one-to-many relation(required, to parent)
         public long UserId { get; set; }
         public User User { get; set; } = null!;
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account ToProto()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account ToPB()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account>(this);
         }

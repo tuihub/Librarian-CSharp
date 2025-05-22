@@ -21,33 +21,33 @@ namespace Librarian.Common.Models.Db
         public string Password { get; set; } = null!;
         public Constants.Enums.UserType Type { get; set; }
         public Constants.Enums.UserStatus Status { get; set; }
-        public long? AppAppSaveFileCapacityCountDefault { get; set; }
-        public long? AppAppSaveFileCapacitySizeBytesDefault { get; set; }
+        public long AppAppSaveFileCapacityCountDefault { get; set; } = -1; // -1 for unlimited
+        public long AppAppSaveFileCapacitySizeBytesDefault { get; set; } = -1; // -1 for unlimited
         public Constants.Enums.AppSaveFileCapacityStrategy AppAppSaveFileCapacityStrategyDefault { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relations
         // one-to-many relation(required, to child)
-        public ICollection<Account> Accounts { get; } = new List<Account>();
+        public ICollection<Account> Accounts { get; } = [];
         // one-to-many relation(required, to child)
-        public ICollection<Sentinel> Sentinels { get; } = new List<Sentinel>();
+        public ICollection<Sentinel> Sentinels { get; } = [];
         // one-to-many relation(to child, only used in internal appInfo)
-        public ICollection<AppInfo> AppInfos { get; } = new List<AppInfo>();
+        public ICollection<AppInfo> AppInfos { get; } = [];
         // one-to-many relation(required, to child)
-        public ICollection<App> Apps { get; } = new List<App>();
+        public ICollection<App> Apps { get; } = [];
         // many-to-many relation(required)
-        public ICollection<Device> Devices { get; } = new List<Device>();
+        public ICollection<Device> Devices { get; } = [];
         // one-to-many relation(required, to child)
-        public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
+        public ICollection<AppCategory> AppCategories { get; } = [];
         // one-to-many relation(required, to child)
-        public ICollection<AppSaveFileCapacity> AppSaveFileCapacities { get; } = new List<AppSaveFileCapacity>();
+        public ICollection<AppSaveFileCapacity> AppSaveFileCapacities { get; } = [];
         // aggregations
         public long TotalAppSaveFileCount { get; set; }
         public long TotalAppSaveFileSizeBytes { get; set; }
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPb(bool withPassword = false)
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPB(bool withPassword = false)
         {
             var ret = new TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User
             {

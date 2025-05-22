@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
 
 namespace Librarian.Common.Models.Db
 {
@@ -28,5 +29,27 @@ namespace Librarian.Common.Models.Db
         public SentinelLibrary SentinelLibrary { get; set; } = null!;
 
         // functions
+        public SentinelAppBinary() { }
+        public SentinelAppBinary(long libraryId, SentinelLibraryAppBinary appBinary)
+        {
+            SentinelLibraryId = libraryId;
+            GeneratedId = appBinary.SentinelGeneratedId;
+            SizeBytes = appBinary.SizeBytes;
+            NeedToken = appBinary.NeedToken;
+            Name = appBinary.Name;
+            Version = appBinary.Version;
+            Developer = appBinary.Developer;
+            Publisher = appBinary.Publisher;
+        }
+        public void Update(SentinelLibraryAppBinary appBinary)
+        {
+            SizeBytes = appBinary.SizeBytes;
+            NeedToken = appBinary.NeedToken;
+            Name = appBinary.Name;
+            Version = appBinary.Version;
+            Developer = appBinary.Developer;
+            Publisher = appBinary.Publisher;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

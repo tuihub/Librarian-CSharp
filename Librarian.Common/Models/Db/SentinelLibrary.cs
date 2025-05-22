@@ -21,5 +21,19 @@ namespace Librarian.Common.Models.Db
         // one-to-many relation(required, to parent)
         public long SentinelId { get; set; }
         public Sentinel Sentinel { get; set; } = null!;
+
+        // functions
+        public SentinelLibrary() { }
+        public SentinelLibrary(long sentinelId, TuiHub.Protos.Librarian.Sephirah.V1.Sentinel.SentinelLibrary library)
+        {
+            SentinelId = sentinelId;
+            LibraryId = library.Id;
+            DownloadBasePath = library.DownloadBasePath;
+        }
+        public void Update(TuiHub.Protos.Librarian.Sephirah.V1.Sentinel.SentinelLibrary library)
+        {
+            DownloadBasePath = library.DownloadBasePath;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

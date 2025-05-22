@@ -25,7 +25,7 @@ namespace Librarian.Common.Models.Db
 
         // functions
         public StoreAppBinary() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.StoreAppBinary ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.StoreAppBinary ToPB()
         {
             // TODO: refactor
             return null;

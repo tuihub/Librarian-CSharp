@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
 
 namespace Librarian.Common.Models.Db
 {
@@ -8,7 +9,6 @@ namespace Librarian.Common.Models.Db
     [Index(nameof(UpdatedAt))]
     public class Sentinel
     {
-        // same as UserId
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
@@ -22,5 +22,41 @@ namespace Librarian.Common.Models.Db
         // relations
         // one-to-many relation(required, to child)
         public ICollection<SentinelLibrary> SentinelLibraries { get; } = [];
+
+        // functions
+        public Sentinel() { }
+        public Sentinel(long id, ReportSentinelInformationRequest request)
+        {
+            Id = id;
+            Url = request.Url;
+            AltUrls = request.UrlAlternatives;
+            GetTokenUrlPath = request.GetTokenPath;
+            DownloadFileUrlPath = request.DownloadFileBasePath;
+            foreach (var lib in request.Libraries)
+            {
+                SentinelLibraries.Add(new SentinelLibrary(id, lib));
+            }
+        }
+        public void Update(ReportSentinelInformationRequest request)
+        {
+            Url = request.Url;
+            AltUrls = request.UrlAlternatives;
+            GetTokenUrlPath = request.GetTokenPath;
+            DownloadFileUrlPath = request.DownloadFileBasePath;
+            UpdatedAt = DateTime.UtcNow;
+            var existingLibraryIds = SentinelLibraries.Select(sl => sl.LibraryId).ToHashSet();
+            foreach (var lib in request.Libraries)
+            {
+                var existingLib = SentinelLibraries.FirstOrDefault(sl => sl.LibraryId == lib.Id);
+                if (existingLib != null)
+                {
+                    existingLib.Update(lib);
+                }
+                else
+                {
+                    SentinelLibraries.Add(new SentinelLibrary(Id, lib));
+                }
+            }
+        }
     }
 }

@@ -36,5 +36,13 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.AltNames, opt => opt.MapFrom(src => src.NameAlternatives.ToList()))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.ToList()))
             .ReverseMap();
+            
+        CreateMap<Models.Db.AppCategory, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new TuiHub.Protos.Librarian.V1.InternalID { Id = src.Id }))
+            .ForMember(dest => dest.VersionNumber, opt => opt.MapFrom(src => 0UL))
+            .ForMember(dest => dest.VersionDate, opt => opt.MapFrom(src => 
+                src.UpdatedAt.HasValue ? Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(src.UpdatedAt.Value.ToUniversalTime()) : Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(src.CreatedAt.ToUniversalTime())))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.AppIds, opt => opt.MapFrom(src => src.Apps.Select(a => new TuiHub.Protos.Librarian.V1.InternalID { Id = a.Id })));
     }
 }
