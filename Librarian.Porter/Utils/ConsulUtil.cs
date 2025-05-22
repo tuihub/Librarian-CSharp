@@ -1,5 +1,4 @@
 ﻿using Consul;
-using Librarian.Porter.Configs;
 using Librarian.Porter.Models;
 
 namespace Librarian.Porter.Utils

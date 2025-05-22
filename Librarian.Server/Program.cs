@@ -1,22 +1,13 @@
 using Consul;
 using IdGen.DependencyInjection;
-using Librarian.Angela;
 using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
-using Librarian.Common.Contracts;
-using Librarian.Common.Services;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Configs;
-using Librarian.Sephirah.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Minio;
-using RabbitMQ.Client;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,7 +89,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
+app.MapGrpcService<Librarian.Angela.Services.Tiphereth.SephirahService>();
 
 // add server reflection when env is dev
 IWebHostEnvironment env = app.Environment;

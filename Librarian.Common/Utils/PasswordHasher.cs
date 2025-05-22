@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Librarian.Common.Utils
+﻿namespace Librarian.Common.Utils
 {
     public static class PasswordHasher
     {

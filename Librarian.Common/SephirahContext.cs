@@ -1,5 +1,4 @@
 ﻿using Consul;
-using Librarian.Common.Configs;
 
 namespace Librarian.Common
 {

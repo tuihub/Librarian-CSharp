@@ -47,7 +47,7 @@ namespace Librarian.Angela.Services
             // Get AppInfo objects and add to response
             foreach (var appInfo in appInfosList)
             {
-                response.AppInfos.Add(appInfo.ToPB());
+                response.AppInfos.Add(appInfo.ToPb());
             }
 
             return response;

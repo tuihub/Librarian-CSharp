@@ -2,9 +2,7 @@
 using Grpc.Net.Client;
 using Librarian.Common;
 using Librarian.Common.Contracts;
-using Librarian.Common.Converters;
 using Librarian.Common.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;

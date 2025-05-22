@@ -56,7 +56,7 @@ namespace Librarian.Sephirah.Services
                     TotalSize = appRunTimes.Count,
                 }
             };
-            response.AppRunTimes.AddRange(appRunTimes.Select(x => x.ToPB()));
+            response.AppRunTimes.AddRange(appRunTimes.Select(x => x.ToPb()));
             return Task.FromResult(response);
         }
     }

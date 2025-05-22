@@ -19,7 +19,7 @@ namespace Librarian.Sephirah.Services
                     && s.Status == TokenStatus.Normal)
                 .Include(x => x.Device);
             var response = new ListUserSessionsResponse();
-            response.Sessions.AddRange(sessions.Select(x => x.ToPB()));
+            response.Sessions.AddRange(sessions.Select(x => x.ToPb()));
             return Task.FromResult(response);
         }
     }

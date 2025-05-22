@@ -24,7 +24,7 @@ namespace Librarian.Sephirah.Services
             }
             return Task.FromResult(new GetUserResponse
             {
-                User = user.ToPB()
+                User = user.ToPb()
             });
         }
     }

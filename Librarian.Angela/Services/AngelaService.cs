@@ -8,11 +8,11 @@ namespace Librarian.Angela.Services
     {
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _dbContext;
-        
+
         public AngelaService(ILogger<AngelaService> logger, ApplicationDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
         }
     }
-} 
+}

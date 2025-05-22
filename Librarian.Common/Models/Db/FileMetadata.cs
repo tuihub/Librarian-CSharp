@@ -35,7 +35,7 @@ namespace Librarian.Common.Models.Db
             CreatedAt = metadata.CreateTime.ToDateTime();
         }
         public FileMetadata() { }
-        public TuiHub.Protos.Librarian.V1.FileMetadata ToPB()
+        public TuiHub.Protos.Librarian.V1.FileMetadata ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.V1.FileMetadata>(this);
         }

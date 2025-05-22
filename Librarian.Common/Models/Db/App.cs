@@ -112,7 +112,7 @@ namespace Librarian.Common.Models.Db
             AltNames = [.. app.NameAlternatives];
             Tags = [.. app.Tags];
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App ToPB()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App>(this);
         }

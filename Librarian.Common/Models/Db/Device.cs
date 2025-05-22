@@ -46,7 +46,7 @@ namespace Librarian.Common.Models.Db
             ClientVersion = device.ClientVersion;
         }
         public Device() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device ToPB()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device>(this);
         }

@@ -31,7 +31,7 @@ namespace Librarian.Sephirah.Services
             {
                 Paging = new PagingResponse { TotalSize = appInfos.Count() }
             };
-            response.AppInfos.Add(appInfos.Select(x => x.Flatten().ToPB()));
+            response.AppInfos.Add(appInfos.Select(x => x.Flatten().ToPb()));
             return Task.FromResult(response);
         }
     }

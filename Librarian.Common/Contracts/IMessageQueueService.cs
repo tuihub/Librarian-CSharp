@@ -1,11 +1,4 @@
-﻿using Librarian.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Librarian.Common.Contracts
+﻿namespace Librarian.Common.Contracts
 {
     public interface IMessageQueueService
     {

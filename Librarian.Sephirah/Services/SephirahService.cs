@@ -1,12 +1,9 @@
-﻿using Grpc.Core;
-using IdGen;
+﻿using IdGen;
 using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using Minio;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
 namespace Librarian.Sephirah.Services
 {

@@ -48,7 +48,7 @@ namespace Librarian.Angela.Services
             };
 
             // Add users to response
-            response.Users.AddRange(users.Select(u => u.ToPB()));
+            response.Users.AddRange(users.Select(u => u.ToPb()));
 
             return response;
         }

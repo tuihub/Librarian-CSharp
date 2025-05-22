@@ -1,10 +1,10 @@
 using Consul;
 using Librarian.Porter.Configs;
-using Librarian.Porter.Utils;
+using Librarian.Porter.Helpers;
+using Librarian.Porter.Models;
 using Librarian.Porter.Server.Utils;
 using Librarian.Porter.Services;
-using Librarian.Porter.Models;
-using Librarian.Porter.Helpers;
+using Librarian.Porter.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

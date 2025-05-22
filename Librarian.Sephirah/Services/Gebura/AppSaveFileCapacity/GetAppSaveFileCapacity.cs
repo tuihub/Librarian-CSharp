@@ -45,10 +45,10 @@ namespace Librarian.Sephirah.Services
 
             return Task.FromResult(new GetAppSaveFileCapacityResponse
             {
-                Count = count,
-                CountMax = countMax,
-                SizeBytes = sizeBytes,
-                SizeBytesMax = sizeBytesMax,
+                Count = appSaveFileCapacity.Count,
+                CountMax = appSaveFileCapacity.Count,
+                SizeBytes = appSaveFileCapacity.SizeBytes,
+                SizeBytesMax = appSaveFileCapacity.SizeBytes,
                 Strategy = appSaveFileCapacity.Strategy.ToEnumByString<AppSaveFileCapacityStrategy>()
             });
         }

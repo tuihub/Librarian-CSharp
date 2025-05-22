@@ -32,7 +32,7 @@ namespace Librarian.Common.Models.Db
             Name = appCategory.Name;
             UserId = userId;
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory ToPB()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory>(this);
         }

@@ -27,7 +27,7 @@ namespace Librarian.Sephirah.Services
                 Results = { appSaveFiles.Select(x => new ListAppSaveFilesResponse.Types.Result
                 {
                     Id = new InternalID { Id = x.Id },
-                    File = x.FileMetadata.ToPB(),
+                    File = x.FileMetadata.ToPb(),
                     Pinned = x.IsPinned
                 }) }
             });

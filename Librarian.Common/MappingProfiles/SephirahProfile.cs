@@ -14,7 +14,7 @@ public class SephirahProfile : Profile
 
         CreateMap<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppType, Enums.AppType>()
             .ConvertUsingEnumMapping(opt => opt.MapByName());
-        
+
         CreateMap<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo, Models.Db.AppInfo>()
             .ForMember(dest => dest.IconImageId, opt => opt.MapFrom(src => src.IconImageId.Id))
             .ForMember(dest => dest.BackgroundImageId, opt => opt.MapFrom(src => src.BackgroundImageId.Id))
@@ -22,7 +22,7 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.AltNames, opt => opt.MapFrom(src => src.NameAlternatives.ToList()))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.ToList()))
             .ReverseMap();
-        
+
         CreateMap<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App, Models.Db.App>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Id))
             .ForMember(dest => dest.RevisedVersion, opt => opt.MapFrom(src => src.VersionNumber))
@@ -36,11 +36,11 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.AltNames, opt => opt.MapFrom(src => src.NameAlternatives.ToList()))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.ToList()))
             .ReverseMap();
-            
+
         CreateMap<Models.Db.AppCategory, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new TuiHub.Protos.Librarian.V1.InternalID { Id = src.Id }))
             .ForMember(dest => dest.VersionNumber, opt => opt.MapFrom(src => 0UL))
-            .ForMember(dest => dest.VersionDate, opt => opt.MapFrom(src => 
+            .ForMember(dest => dest.VersionDate, opt => opt.MapFrom(src =>
                 src.UpdatedAt.HasValue ? Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(src.UpdatedAt.Value.ToUniversalTime()) : Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(src.CreatedAt.ToUniversalTime())))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.AppIds, opt => opt.MapFrom(src => src.Apps.Select(a => new TuiHub.Protos.Librarian.V1.InternalID { Id = a.Id })));

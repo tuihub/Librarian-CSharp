@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Librarian.Common.Constants;
+using Librarian.Common.Converters;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Librarian.Common.Constants;
 using TuiHub.Protos.Librarian.V1;
-using Librarian.Common.Converters;
 
 namespace Librarian.Common.Models.Db
 {
@@ -71,7 +71,7 @@ namespace Librarian.Common.Models.Db
             Tags = [.. appInfo.Tags];
         }
         public AppInfo() : base() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPB()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPb()
         {
             return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo>(this);
         }

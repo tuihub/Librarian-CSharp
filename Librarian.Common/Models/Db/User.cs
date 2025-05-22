@@ -47,7 +47,7 @@ namespace Librarian.Common.Models.Db
         public long TotalAppSaveFileSizeBytes { get; set; }
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPB(bool withPassword = false)
+        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPb(bool withPassword = false)
         {
             var ret = new TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User
             {
