@@ -1,13 +1,12 @@
-﻿using Librarian.ThirdParty.Contracts;
-using Librarian.ThirdParty.Helpers;
+﻿using Librarian.ThirdParty.Helpers;
 using System.Text.Json;
 using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.ThirdParty.Steam
 {
-    public partial class SteamAPIService : IAppInfoService
+    public partial class SteamApiService
     {
-        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken cts = default)
+        public async Task<AppInfo> GetAppInfoAsync(string appIdStr, CancellationToken ct = default)
         {
             if (!uint.TryParse(appIdStr, out uint appId))
             {

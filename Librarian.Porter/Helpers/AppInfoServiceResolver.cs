@@ -12,16 +12,16 @@ namespace Librarian.Porter.Helpers
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly PorterConfig _porterConfig;
-        private readonly SteamAPIService _steamAPIService;
-        private readonly BangumiAPIService _bangumiAPIService;
-        private readonly VndbTcpAPIService _vndbAPIService;
+        private readonly SteamApiService _steamAPIService;
+        private readonly BangumiApiService _bangumiAPIService;
+        private readonly VndbTcpApiService _vndbAPIService;
 
         public AppInfoServiceResolver(
             IServiceProvider serviceProvider,
             PorterConfig porterConfig,
-            SteamAPIService steamAPIService,
-            BangumiAPIService bangumiAPIService,
-            VndbTcpAPIService vndbAPIService)
+            SteamApiService steamAPIService,
+            BangumiApiService bangumiAPIService,
+            VndbTcpApiService vndbAPIService)
         {
             _serviceProvider = serviceProvider;
             _porterConfig = porterConfig;
