@@ -12,22 +12,22 @@ namespace Librarian.Porter.Helpers
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly PorterConfig _porterConfig;
-        private readonly SteamApiService _steamAPIService;
-        private readonly BangumiApiService _bangumiAPIService;
-        private readonly VndbTcpApiService _vndbAPIService;
+        private readonly SteamApiService _steamApiService;
+        private readonly BangumiApiService _bangumiApiService;
+        private readonly VndbTcpApiService _vndbApiService;
 
         public AppInfoServiceResolver(
             IServiceProvider serviceProvider,
             PorterConfig porterConfig,
-            SteamApiService steamAPIService,
-            BangumiApiService bangumiAPIService,
-            VndbTcpApiService vndbAPIService)
+            SteamApiService steamApiService,
+            BangumiApiService bangumiApiService,
+            VndbTcpApiService vndbApiService)
         {
             _serviceProvider = serviceProvider;
             _porterConfig = porterConfig;
-            _steamAPIService = steamAPIService;
-            _bangumiAPIService = bangumiAPIService;
-            _vndbAPIService = vndbAPIService;
+            _steamApiService = steamApiService;
+            _bangumiApiService = bangumiApiService;
+            _vndbApiService = vndbApiService;
         }
 
         public IAppInfoService GetService(string source)
@@ -52,9 +52,9 @@ namespace Librarian.Porter.Helpers
         {
             return source switch
             {
-                WellKnowns.AppInfoSource.Steam => _steamAPIService,
-                WellKnowns.AppInfoSource.Bangumi => _bangumiAPIService,
-                WellKnowns.AppInfoSource.Vndb => _vndbAPIService,
+                WellKnowns.AppInfoSource.Steam => _steamApiService,
+                WellKnowns.AppInfoSource.Bangumi => _bangumiApiService,
+                WellKnowns.AppInfoSource.Vndb => _vndbApiService,
                 _ => throw new ArgumentException($"Unsupported source: {source}")
             };
         }

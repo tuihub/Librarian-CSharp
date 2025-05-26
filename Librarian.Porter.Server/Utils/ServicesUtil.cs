@@ -1,5 +1,8 @@
 ﻿using Librarian.Common.Constants;
 using Librarian.Porter.Models;
+using Librarian.ThirdParty.Bangumi;
+using Librarian.ThirdParty.Steam;
+using Librarian.ThirdParty.Vndb;
 
 namespace Librarian.Porter.Server.Utils
 {
@@ -17,8 +20,10 @@ namespace Librarian.Porter.Server.Utils
                 }
                 else
                 {
-                    builder.Services.AddSingleton(new SteamAPIService(porterConfig.SteamApiKey,
-                        TimeSpan.FromSeconds(porterConfig.SteamMinRequestIntervalSeconds)));
+                    builder.Services.AddSingleton(p => new SteamApiService(
+                        porterConfig.SteamApiKey,
+                        TimeSpan.FromSeconds(porterConfig.SteamMinRequestIntervalSeconds),
+                        p.GetRequiredService<ILogger<SteamApiService>>()));
                     instanceContext.SupportedAccountPlatforms.Add(WellKnowns.AccountPlatform.Steam.ToString().ToLower());
                     instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Steam.ToString().ToLower());
                 }
@@ -31,13 +36,15 @@ namespace Librarian.Porter.Server.Utils
                 }
                 else
                 {
-                    builder.Services.AddSingleton(new BangumiAPIService(porterConfig.BangumiApiKey));
+                    builder.Services.AddSingleton(p => new BangumiApiService(
+                        porterConfig.BangumiApiKey,
+                        p.GetRequiredService<ILogger<BangumiApiService>>()));
                     instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Bangumi.ToString().ToLower());
                 }
             }
             if (porterConfig.IsVndbEnabled)
             {
-                builder.Services.AddSingleton(new VndbTcpAPIService());
+                builder.Services.AddSingleton(p => new VndbTcpApiService(p.GetRequiredService<ILogger<VndbTcpApiService>>()));
                 instanceContext.SupportedAppInfoSources.Add(WellKnowns.AppInfoSource.Vndb.ToString().ToLower());
             }
         }

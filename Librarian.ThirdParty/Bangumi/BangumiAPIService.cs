@@ -5,15 +5,15 @@ namespace Librarian.ThirdParty.Bangumi
 {
     public partial class BangumiApiService : IAppInfoService
     {
-        private readonly string _bangumiAPIKey;
+        private readonly string _bangumiApiKey;
         private readonly ILogger<BangumiApiService> _logger;
 
-        private readonly string _bangumiAPIBaseURL = "https://api.bgm.tv/";
-        private readonly string _bangumiAPIUserAgent = "Librarian-CSharp/0.2 (https://github.com/tuihub/Librarian-CSharp)";
+        private readonly string _bangumiApiBaseURL = "https://api.bgm.tv/";
+        private readonly string _bangumiApiUserAgent = "Librarian-CSharp/0.2 (https://github.com/tuihub/Librarian-CSharp)";
 
         public BangumiApiService(string apiKey, ILogger<BangumiApiService> logger)
         {
-            _bangumiAPIKey = apiKey;
+            _bangumiApiKey = apiKey;
             _logger = logger;
         }
     }

@@ -89,7 +89,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-app.MapGrpcService<Librarian.Angela.Services.Tiphereth.SephirahService>();
+app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
 
 // add server reflection when env is dev
 IWebHostEnvironment env = app.Environment;

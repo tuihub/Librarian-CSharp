@@ -16,10 +16,10 @@ namespace Librarian.ThirdParty.Bangumi
             }
 
             // Configure REST client
-            var options = new RestClientOptions(_bangumiAPIBaseURL)
+            var options = new RestClientOptions(_bangumiApiBaseURL)
             {
-                Authenticator = new JwtAuthenticator(_bangumiAPIKey),
-                UserAgent = _bangumiAPIUserAgent
+                Authenticator = new JwtAuthenticator(_bangumiApiKey),
+                UserAgent = _bangumiApiUserAgent
             };
             var client = new RestClient(options);
 

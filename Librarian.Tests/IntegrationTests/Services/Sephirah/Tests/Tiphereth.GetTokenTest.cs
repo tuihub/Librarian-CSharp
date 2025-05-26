@@ -3,6 +3,7 @@ using Librarian.Common;
 using Librarian.Common.Utils;
 using LibrarianTests.IntegrationTests.Services.Sephirah;
 using Microsoft.Extensions.DependencyInjection;
+using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 using Xunit;
 
 namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
@@ -20,7 +21,7 @@ namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
                 {
                     Name = "test",
                     Password = PasswordHasher.HashPassword("test"),
-                    Status = UserStatus.Active,
+                    Status = Common.Constants.Enums.UserStatus.Active,
                 });
                 dbContext.SaveChanges();
             }
