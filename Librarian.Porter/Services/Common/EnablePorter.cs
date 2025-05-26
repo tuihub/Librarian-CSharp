@@ -3,7 +3,7 @@ using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Porter.Services
 {
-    public partial class PorterService : LibrarianPorterService.LibrarianPorterServiceBase
+    public partial class PorterService
     {
         public override Task<EnablePorterResponse> EnablePorter(EnablePorterRequest request, ServerCallContext context)
         {

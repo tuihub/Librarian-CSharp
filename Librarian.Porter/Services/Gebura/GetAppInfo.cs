@@ -4,7 +4,7 @@ using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Porter.Services
 {
-    public partial class PorterService : LibrarianPorterService.LibrarianPorterServiceBase
+    public partial class PorterService
     {
         public override async Task<GetAppInfoResponse> GetAppInfo(GetAppInfoRequest request, ServerCallContext context)
         {

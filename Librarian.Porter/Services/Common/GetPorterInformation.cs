@@ -6,7 +6,7 @@ using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Porter.Services
 {
-    public partial class PorterService : LibrarianPorterService.LibrarianPorterServiceBase
+    public partial class PorterService
     {
         // TODO: FeatureSummary
         public override Task<GetPorterInformationResponse> GetPorterInformation(GetPorterInformationRequest request, ServerCallContext context)
@@ -22,7 +22,7 @@ namespace Librarian.Porter.Services
             }));
             var response = new GetPorterInformationResponse
             {
-                BinarySummary = new TuiHub.Protos.Librarian.V1.PorterBinarySummary
+                BinarySummary = new PorterBinarySummary
                 {
                     SourceCodeAddress = "https://github.com/tuihub/Librarian-CSharp",
                     BuildVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown",
