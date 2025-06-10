@@ -6,7 +6,7 @@ namespace Librarian.Common
     {
         public static SystemConfig SystemConfig { get; set; } = null!;
         public static JwtConfig JwtConfig { get; set; } = null!;
-        public static MessageQueueConfig MessageQueueConfig { get; set; } = null!;
+        public static MassTransitConfig MassTransitConfig { get; set; } = null!;
         public static InstanceConfig InstanceConfig { get; set; } = null!;
     }
 }

@@ -3,15 +3,13 @@ using IdGen.DependencyInjection;
 using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
-using Librarian.Common.Contracts;
-using Librarian.Common.Services;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Configs;
 using Librarian.Sephirah.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
 
 namespace Librarian.Sephirah.Server
 {
@@ -29,12 +27,31 @@ namespace Librarian.Sephirah.Server
             GlobalContext.JwtConfig = jwtConfig;
             var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
             GlobalContext.InstanceConfig = instanceConfig;
-            var messageQueueConfig = builder.Configuration.GetSection("messageQueueConfig").Get<MessageQueueConfig>() ?? throw new Exception("MessageQueueConfig parse failed");
-            GlobalContext.MessageQueueConfig = messageQueueConfig;
+            var massTransitConfig = builder.Configuration.GetSection("MassTransitConfig").Get<MassTransitConfig>() ?? throw new Exception("MassTransitConfig parse failed");
+            GlobalContext.MassTransitConfig = massTransitConfig;
             var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
 
             // Add SephirahContext DI
-            builder.Services.AddSingleton<SephirahContext>();
+            builder.Services.AddSingleton<SephirahContext>(provider =>
+            {
+                var context = new SephirahContext();
+
+                // Add static Porter instances from configuration
+                if (systemConfig.StaticPorterInstances != null && systemConfig.StaticPorterInstances.Count > 0)
+                {
+                    context.StaticPorterInstances = systemConfig.StaticPorterInstances;
+                    // Log the loaded static Porter instances
+                    var logger = provider.GetService<ILoggerFactory>()?.CreateLogger("StartUp");
+                    logger?.LogInformation("Loaded {Count} static Porter instances from configuration", systemConfig.StaticPorterInstances.Count);
+                    foreach (var porter in systemConfig.StaticPorterInstances)
+                    {
+                        logger?.LogInformation("Static Porter: Id={Id}, Url={Url}, Tags={Tags}",
+                            porter.Id, porter.Url, string.Join(",", porter.Tags));
+                    }
+                }
+
+                return context;
+            });
 
             // Add ApplicationDbContext DI
             builder.Services.AddDbContext<ApplicationDbContext>(o =>
@@ -104,26 +121,54 @@ namespace Librarian.Sephirah.Server
                 {
                     c.Address = new Uri(consulConfig.ConsulAddress);
                 }));
-                // Add pull metadata service
+                // 注册PullMetadataService，IBusControl将通过DI自动注入
                 builder.Services.AddSingleton<PullMetadataService>();
             }
-            if (GlobalContext.MessageQueueConfig.MessageQueueType == MessageQueueType.InMemoryMq)
+            if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.InMemory)
             {
-                builder.Services.AddSingleton<IMessageQueueService, InMemoryMqService>();
-            }
-            else if (GlobalContext.MessageQueueConfig.MessageQueueType == MessageQueueType.RabbitMq)
-            {
-                var rabbitMqConfig = GlobalContext.MessageQueueConfig.RabbitMqConfig;
-                var connFactory = new ConnectionFactory
+                builder.Services.AddMassTransit(x =>
                 {
-                    HostName = rabbitMqConfig.Hostname,
-                    Port = rabbitMqConfig.Port,
-                    UserName = rabbitMqConfig.Username,
-                    Password = rabbitMqConfig.Password,
-                    DispatchConsumersAsync = true
-                };
-                builder.Services.AddSingleton(connFactory.CreateConnection());
-                builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
+                    // Register consumers
+                    RegisterConsumers(x);
+
+                    // Use in-memory transport
+                    x.UsingInMemory((context, cfg) =>
+                    {
+                        cfg.ConfigureEndpoints(context);
+                    });
+                });
+            }
+            else if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.RabbitMq)
+            {
+                var rabbitMqConfig = GlobalContext.MassTransitConfig.RabbitMqConfig;
+
+                builder.Services.AddMassTransit(x =>
+                {
+                    // Register consumers
+                    RegisterConsumers(x);
+
+                    // Use RabbitMQ transport
+                    x.UsingRabbitMq((context, cfg) =>
+                    {
+                        cfg.Host(rabbitMqConfig.Hostname, "/", h =>
+                        {
+                            h.Username(rabbitMqConfig.Username);
+                            h.Password(rabbitMqConfig.Password);
+                        });
+
+                        cfg.ConfigureEndpoints(context);
+                    });
+
+                    // Set service name
+                    if (!string.IsNullOrEmpty(GlobalContext.MassTransitConfig.ServiceName))
+                    {
+                        x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(GlobalContext.MassTransitConfig.ServiceName, false));
+                    }
+                });
+            }
+            else
+            {
+                throw new NotSupportedException($"Unsupported transport type: {GlobalContext.MassTransitConfig.TransportType}");
             }
         }
 
@@ -159,14 +204,22 @@ namespace Librarian.Sephirah.Server
             // Enable RateLimiter
             app.UseRateLimiter();
 
-            // TODO: refactor pull metadata service
-            //// Start pull metadata service
-            //app.Services.GetRequiredService<PullMetadataService>().Start();
+            // 启动PullMetadataService
+            if (app.Services.GetService<PullMetadataService>() != null)
+            {
+                app.Services.GetRequiredService<PullMetadataService>().Start();
 
-            //app.Lifetime.ApplicationStopping.Register(() =>
-            //{
-            //    app.Services.GetRequiredService<PullMetadataService>().Cancel();
-            //});
+                app.Lifetime.ApplicationStopping.Register(() =>
+                {
+                    app.Services.GetRequiredService<PullMetadataService>().Cancel();
+                });
+            }
+        }
+
+        private static void RegisterConsumers(IBusRegistrationConfigurator x)
+        {
+            x.AddConsumer<AppInfoConsumer>();
+            x.AddConsumer<AppIdConsumer>();
         }
     }
 }

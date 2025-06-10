@@ -1,7 +1,7 @@
 ﻿using IdGen;
 using Librarian.Angela.Services;
 using Librarian.Common;
-using Librarian.Common.Contracts;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 
@@ -14,16 +14,38 @@ namespace Librarian.Sephirah.Services
         private readonly PullMetadataService _pullMetadataService;
         private readonly SephirahContext _sephirahContext;
         private readonly IdGenerator _idGenerator;
-        private readonly IMessageQueueService _messageQueueService;
+        private readonly IBus _bus;
+
         public SephirahService(ILogger<SephirahService> logger, ApplicationDbContext dbContext, PullMetadataService pullMetadataService,
-            SephirahContext sephirahContext, IdGenerator idGenerator, IMessageQueueService messageQueueService)
+            SephirahContext sephirahContext, IdGenerator idGenerator, IBus bus)
         {
             _logger = logger;
             _dbContext = dbContext;
             _pullMetadataService = pullMetadataService;
             _sephirahContext = sephirahContext;
             _idGenerator = idGenerator;
-            _messageQueueService = messageQueueService;
+            _bus = bus;
+        }
+
+        // Example method for sending AppId messages
+        protected async Task SendAppIdMessageAsync(string appId, string platform)
+        {
+            try
+            {
+                var message = new AppId
+                {
+                    Id = appId,
+                };
+
+                var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{platform}"));
+                await endpoint.Send(message);
+
+                _logger.LogDebug("Sent AppId message to platform {platform}: {message}", platform, message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send AppId message to platform {platform}: {appId}", platform, appId);
+            }
         }
     }
 }

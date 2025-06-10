@@ -1,7 +1,6 @@
 ﻿using Consul;
-using Grpc.Net.Client;
-using Librarian.Angela.Services.Workers;
 using Librarian.Common;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Librarian.Angela.Services
@@ -12,34 +11,85 @@ namespace Librarian.Angela.Services
         private readonly IConsulClient _consulClient;
         private readonly SephirahContext _sephirahContext;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IBusControl _busControl;
 
         private readonly CancellationTokenSource _cts;
         private readonly Thread _mainPullMetadataThread;
-        private readonly Dictionary<(string, string), PullAppInfoMetadataWorker> _pullAppInfoMetadataWorkers;
+        private readonly Dictionary<(string, string), HostReceiveEndpointHandle> _platformEndpoints;
 
-        public PullMetadataService(ILogger<PullMetadataService> logger, SephirahContext sephirahContext, IConsulClient consulClient, IServiceProvider serviceProvider)
+        public PullMetadataService(
+            ILogger<PullMetadataService> logger,
+            SephirahContext sephirahContext,
+            IConsulClient consulClient,
+            IServiceProvider serviceProvider,
+            IBusControl busControl)
         {
             _logger = logger;
             _consulClient = consulClient;
             _sephirahContext = sephirahContext;
             _serviceProvider = serviceProvider;
+            _busControl = busControl;
 
             _cts = new CancellationTokenSource();
             _mainPullMetadataThread = new Thread(() => MainPullMetadataThread(_cts.Token));
-            _pullAppInfoMetadataWorkers = new Dictionary<(string, string), PullAppInfoMetadataWorker>();
+            _platformEndpoints = new Dictionary<(string, string), HostReceiveEndpointHandle>();
         }
 
         public void Start()
         {
             _mainPullMetadataThread.Start();
+
+            // Initialize static Porter instances
+            InitializeStaticPorterInstances();
         }
+
         public void Cancel()
         {
             _cts.Cancel();
         }
+
         public void EnablePorter(string porterServiceId)
         {
-            _pullAppInfoMetadataWorkers.Where(x => x.Key.Item1 == porterServiceId).ToList().ForEach(x => x.Value.Start());
+            _logger.LogInformation("Porter service {ServiceId} enabled", porterServiceId);
+        }
+
+        // Initialize static Porter instances from configuration
+        private void InitializeStaticPorterInstances()
+        {
+            if (_sephirahContext.StaticPorterInstances == null || _sephirahContext.StaticPorterInstances.Count == 0)
+            {
+                _logger.LogInformation("No static Porter instances configured");
+                return;
+            }
+
+            _logger.LogInformation("Initializing {Count} static Porter instances", _sephirahContext.StaticPorterInstances.Count);
+
+            // For each static Porter instance, create endpoints for its tags
+            foreach (var porter in _sephirahContext.StaticPorterInstances)
+            {
+                _logger.LogInformation("Initializing static Porter: Id={Id}, Url={Url}, Tags={Tags}",
+                    porter.Id, porter.Url, string.Join(",", porter.Tags));
+
+                // Create endpoints for each tag
+                foreach (var tag in porter.Tags)
+                {
+                    _logger.LogInformation("Creating endpoint for static Porter ({Id}, {Tag})", porter.Id, tag);
+
+                    try
+                    {
+                        // 为静态Porter的每个Tag创建一个终端点
+                        var handle = _busControl.ConnectReceiveEndpoint(tag, _ => { });
+
+                        // 存储终端点句柄以便管理
+                        _platformEndpoints[(porter.Id, tag)] = handle;
+                        _logger.LogInformation("Successfully created endpoint for static Porter ({Id}, {Tag})", porter.Id, tag);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to create endpoint for static Porter ({Id}, {Tag})", porter.Id, tag);
+                    }
+                }
+            }
         }
 
         private async void MainPullMetadataThread(CancellationToken ct)
@@ -59,10 +109,12 @@ namespace Librarian.Angela.Services
                 }
                 catch (TaskCanceledException)
                 {
-                    foreach (var worker in _pullAppInfoMetadataWorkers.Values)
+                    // stop all endpoints
+                    foreach (var endpoint in _platformEndpoints.Values)
                     {
-                        worker.Cancel();
+                        await endpoint.StopAsync();
                     }
+                    _platformEndpoints.Clear();
                     break;
                 }
                 _logger.LogInformation($"Got {serviceName}, WaitIndex = {consulQueryOptions.WaitIndex}, LastIndex = {response.LastIndex}");
@@ -70,38 +122,63 @@ namespace Librarian.Angela.Services
                 {
                     consulQueryOptions.WaitIndex = response.LastIndex;
 
-                    // update workers
-                    var existingWorkers = _pullAppInfoMetadataWorkers.Keys.ToList();
+                    // update the endpoints for dynamic Porter instances from Consul
+                    // 只处理不是静态Porter的终端点
+                    var existingDynamicEndpoints = _platformEndpoints.Keys
+                        .Where(k => !_sephirahContext.StaticPorterInstances.Any(p => p.Id == k.Item1))
+                        .ToList();
+
                     var serviceTags = response.Response
                         .Select(x => x.Service)
                         .SelectMany(s => s.Tags,
                             (s, t) => (s.ID, t))
                         .ToList();
-                    var workersToRemove = existingWorkers.Except(serviceTags).ToList();
-                    foreach (var workerToRemove in workersToRemove)
+
+                    var endpointsToRemove = existingDynamicEndpoints.Except(serviceTags).ToList();
+                    foreach (var endpointToRemove in endpointsToRemove)
                     {
-                        _logger.LogInformation($"Cancelling worker for ({workerToRemove.Item1}, {workerToRemove.Item2})");
-                        var worker = _pullAppInfoMetadataWorkers[workerToRemove];
-                        worker.Cancel();
-                        _pullAppInfoMetadataWorkers.Remove(workerToRemove);
-                    }
-                    var workersToAdd = serviceTags.Except(existingWorkers).ToList();
-                    foreach (var workerToAdd in workersToAdd)
-                    {
-                        _logger.LogInformation($"Adding worker for ({workerToAdd.Item1}, {workerToAdd.Item2})");
-                        var service = response.Response.Where(x => x.Service.ID == workerToAdd.Item1).First().Service;
-                        var serviceUrl = $"http://{service.Address}:{service.Port}";
-                        var worker = new PullAppInfoMetadataWorker(
-                            _serviceProvider,
-                            GrpcChannel.ForAddress(serviceUrl),
-                            workerToAdd.Item1,
-                            workerToAdd.Item2);
-                        _pullAppInfoMetadataWorkers[workerToAdd] = worker;
+                        _logger.LogInformation($"Stopping endpoint for ({endpointToRemove.Item1}, {endpointToRemove.Item2})");
+                        var endpoint = _platformEndpoints[endpointToRemove];
+                        await endpoint.StopAsync();
+                        _platformEndpoints.Remove(endpointToRemove);
                     }
 
-                    // update SephirahContext
+                    var endpointsToAdd = serviceTags.Except(existingDynamicEndpoints).ToList();
+                    foreach (var endpointToAdd in endpointsToAdd)
+                    {
+                        _logger.LogInformation($"Creating endpoint for ({endpointToAdd.Item1}, {endpointToAdd.Item2})");
+                        var platform = endpointToAdd.Item2;
+
+                        // 不在这里配置消费者，使用空的配置函数
+                        // 消费者已经在StartUp.cs的RegisterConsumers中注册
+                        var handle = _busControl.ConnectReceiveEndpoint(platform, _ => { });
+
+                        _platformEndpoints[endpointToAdd] = handle;
+                    }
+
+                    // 更新SephirahContext中的动态Porter服务
                     _sephirahContext.PorterServices = response.Response.Select(x => x.Service).ToList();
                 }
+            }
+        }
+
+        public async Task SendAppIdMQAsync(string platform, string appId, bool updateInternalName = false)
+        {
+            var message = new AppId
+            {
+                Id = appId,
+            };
+
+            try
+            {
+                // send to platform queue
+                var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{platform}"));
+                await sendEndpoint.Send(message);
+                _logger.LogDebug("Sent message to platform {Platform}: {message}", platform, message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send message to platform {Platform}: {message}", platform, message);
             }
         }
     }

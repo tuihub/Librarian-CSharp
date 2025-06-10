@@ -5,6 +5,7 @@ using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Configs;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,8 @@ GlobalContext.JwtConfig = jwtConfig;
 var instanceConfig = builder.Configuration.GetSection("InstanceConfig").Get<InstanceConfig>() ?? throw new Exception("InstanceConfig parse failed");
 GlobalContext.InstanceConfig = instanceConfig;
 var consulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
-var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>() ?? throw new Exception("RabbitMqConfig parse failed");
+var massTransitConfig = builder.Configuration.GetSection("MassTransitConfig").Get<MassTransitConfig>() ?? throw new Exception("MassTransitConfig parse failed");
+GlobalContext.MassTransitConfig = massTransitConfig;
 
 // Add ApplicationDbContext DI
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -66,18 +68,42 @@ if (consulConfig.IsEnabled)
         c.Address = new Uri(consulConfig.ConsulAddress);
     }));
 }
-//if (rabbitMqConfig.IsEnabled)
-//{
-//    var connFactory = new ConnectionFactory
-//    {
-//        HostName = rabbitMqConfig.Hostname,
-//        Port = rabbitMqConfig.Port,
-//        UserName = rabbitMqConfig.Username,
-//        Password = rabbitMqConfig.Password
-//    };
-//    builder.Services.AddSingleton<IConnection>(connFactory.CreateConnection());
-//    builder.Services.AddSingleton<IMessageQueueService, RabbitMqService>();
-//}
+
+builder.Services.AddMassTransit(x =>
+{
+    // 注册消费者
+
+    if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.InMemory)
+    {
+        // 使用内存传输
+        x.UsingInMemory((context, cfg) =>
+        {
+            cfg.ConfigureEndpoints(context);
+        });
+    }
+    else if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.RabbitMq)
+    {
+        // 使用RabbitMQ传输
+        var rabbitMqConfig = GlobalContext.MassTransitConfig.RabbitMqConfig;
+
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            cfg.Host(rabbitMqConfig.Hostname, "/", h =>
+            {
+                h.Username(rabbitMqConfig.Username);
+                h.Password(rabbitMqConfig.Password);
+            });
+
+            cfg.ConfigureEndpoints(context);
+        });
+
+        // 设置服务名称
+        if (!string.IsNullOrEmpty(GlobalContext.MassTransitConfig.ServiceName))
+        {
+            x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(GlobalContext.MassTransitConfig.ServiceName, false));
+        }
+    }
+});
 
 var app = builder.Build();
 
@@ -89,7 +115,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-app.MapGrpcService<Librarian.Sephirah.Services.SephirahService>();
+app.MapGrpcService<Librarian.Angela.Services.AngelaService>();
 
 // add server reflection when env is dev
 IWebHostEnvironment env = app.Environment;

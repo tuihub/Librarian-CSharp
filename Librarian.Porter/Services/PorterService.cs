@@ -10,12 +10,15 @@ namespace Librarian.Porter.Services
         private readonly ILogger _logger;
         private readonly GlobalContext _globalContext;
         private readonly AppInfoServiceResolver _appInfoServiceResolver;
+        private readonly AccountServiceResolver _accountServiceResolver;
+
         public PorterService(ILogger<PorterService> logger, GlobalContext globalContext,
-            AppInfoServiceResolver appInfoServiceResolver)
+            AppInfoServiceResolver appInfoServiceResolver, AccountServiceResolver accountServiceResolver)
         {
             _logger = logger;
             _globalContext = globalContext;
             _appInfoServiceResolver = appInfoServiceResolver;
+            _accountServiceResolver = accountServiceResolver;
         }
     }
 }
