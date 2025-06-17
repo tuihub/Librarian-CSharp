@@ -1,95 +1,93 @@
+using Grpc.Core;
+using Librarian.Common.Models.Mq;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using Polly;
+using Polly.Retry;
+using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Common.Services.Consumers
 {
     public abstract class PorterConsumerBase<TMessage>(
         ILogger logger,
-        PorterManagementService porterManagementService,
-        string region) : IConsumer<TMessage>
-        where TMessage : class
+        LibrarianPorterClientService porterClientService,
+        string featureName) : IConsumer<TMessage>
+        where TMessage : PorterMessageBase
     {
         private readonly ILogger _logger = logger;
-        private readonly PorterManagementService _porterManagementService = porterManagementService;
-        private readonly string _region = region;
+        private readonly LibrarianPorterClientService _porterClientService = porterClientService;
+        private readonly string _featureName = featureName;
+
+        /// <summary>
+        /// Gets the retry policy for this consumer. Can be overridden by derived classes.
+        /// Default policy retries 3 times on Unavailable error.
+        /// </summary>
+        protected virtual AsyncRetryPolicy RetryPolicy => Policy
+            .Handle<RpcException>(ex => ex.StatusCode == StatusCode.Unavailable)
+            .WaitAndRetryAsync(
+                3,
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, time, retryCount, context) =>
+                {
+                    if (retryCount > 0)
+                    {
+                        _logger.LogWarning(ex, "Porter operation failed, retrying in {Time} seconds, attempt {RetryCount}",
+                            time.TotalSeconds, retryCount);
+                    }
+                });
 
         public async Task Consume(ConsumeContext<TMessage> context)
         {
             var message = context.Message;
-            var featureName = GetFeatureName();
+            var region = message.Region;
 
-            _logger.LogDebug("Starting message processing, feature: {Feature}, region: {Region}", featureName, _region);
-
-            PorterInstance? porterInstance = null;
-            var stopwatch = Stopwatch.StartNew();
-            Exception? processingException = null;
+            _logger.LogDebug("Starting message processing, feature: {Feature}, region: {Region}", _featureName, region);
 
             try
             {
-                // Acquire Porter instance
-                porterInstance = await _porterManagementService.AcquirePorterInstanceAsync(featureName, _region);
+                // Use LibrarianPorterClientService which handles Porter acquisition, retry logic, and resource management
+                await ProcessMessageAsync(context, context.CancellationToken);
 
-                if (porterInstance == null)
-                {
-                    throw new InvalidOperationException($"Unable to acquire available Porter instance for feature {featureName} in region {_region}");
-                }
-
-                _logger.LogDebug("Acquired Porter: {PorterId} ({Url}) for feature: {Feature}",
-                    porterInstance.Id, porterInstance.Url, featureName);
-
-                try
-                {
-                    // Process message
-                    await ProcessMessageAsync(context, porterInstance, context.CancellationToken);
-
-                    _logger.LogDebug("Successfully processed message, Porter: {PorterId}, feature: {Feature}, elapsed: {ElapsedMs}ms",
-                        porterInstance.Id, featureName, stopwatch.ElapsedMilliseconds);
-                }
-                catch (Exception ex)
-                {
-                    processingException = ex;
-                    _logger.LogError(ex, "Error occurred while processing message, Porter: {PorterId}, feature: {Feature}",
-                        porterInstance.Id, featureName);
-                    throw;
-                }
-                finally
-                {
-                    stopwatch.Stop();
-                }
+                _logger.LogDebug("Successfully processed message, feature: {Feature}, region: {Region}", _featureName, region);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
-                _logger.LogInformation("Task was cancelled, feature: {Feature}", featureName);
+                _logger.LogInformation("Task was cancelled, feature: {Feature}, region: {Region}", _featureName, region);
+                throw;
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.ResourceExhausted)
+            {
+                _logger.LogError(ex, "Resource exhausted while processing message, feature: {Feature}, region: {Region}", _featureName, region);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Consumer error occurred while processing message, feature: {Feature}", featureName);
+                _logger.LogError(ex, "Consumer error occurred while processing message, feature: {Feature}, region: {Region}", _featureName, region);
                 throw;
-            }
-            finally
-            {
-                // Release Porter instance
-                if (porterInstance != null)
-                {
-                    _porterManagementService.ReleasePorterInstance(porterInstance.Id, featureName);
-                    _logger.LogDebug("Released Porter instance: {PorterId}, feature: {Feature}", porterInstance.Id, featureName);
-                }
             }
         }
 
-        /// <summary>
-        /// Gets the Porter feature name corresponding to the current consumer
-        /// </summary>
-        protected abstract string GetFeatureName();
-
-        /// <summary>
-        /// Abstract method for actual message processing, implemented by derived classes
-        /// </summary>
         protected abstract Task ProcessMessageAsync(
             ConsumeContext<TMessage> context,
-            PorterInstance porter,
             CancellationToken cancellationToken);
+
+        protected async Task<TResult?> ExecuteWithPorterAsync<TResult>(
+            string? region,
+            Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
+            CancellationToken cancellationToken)
+        {
+            return await RetryPolicy.ExecuteAsync(async (token) =>
+            {
+                return await _porterClientService.ExecuteWithPorterAsync(_featureName, region, action, token);
+            }, cancellationToken);
+        }
+
+        protected Task<TResult?> ExecuteWithPorterDirectAsync<TResult>(
+            string? region,
+            Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
+            CancellationToken cancellationToken)
+        {
+            return _porterClientService.ExecuteWithPorterAsync(_featureName, region, action, cancellationToken);
+        }
     }
 }
