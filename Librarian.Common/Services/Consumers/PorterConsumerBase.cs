@@ -4,18 +4,15 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Common.Services.Consumers
 {
     public abstract class PorterConsumerBase<TMessage>(
         ILogger logger,
-        LibrarianPorterClientService porterClientService,
         string featureName) : IConsumer<TMessage>
         where TMessage : PorterMessageBase
     {
         private readonly ILogger _logger = logger;
-        private readonly LibrarianPorterClientService _porterClientService = porterClientService;
         private readonly string _featureName = featureName;
 
         /// <summary>
@@ -50,16 +47,6 @@ namespace Librarian.Common.Services.Consumers
 
                 _logger.LogDebug("Successfully processed message, feature: {Feature}, region: {Region}", _featureName, region);
             }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Task was cancelled, feature: {Feature}, region: {Region}", _featureName, region);
-                throw;
-            }
-            catch (RpcException ex) when (ex.StatusCode == StatusCode.ResourceExhausted)
-            {
-                _logger.LogError(ex, "Resource exhausted while processing message, feature: {Feature}, region: {Region}", _featureName, region);
-                throw;
-            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Consumer error occurred while processing message, feature: {Feature}, region: {Region}", _featureName, region);
@@ -70,24 +57,5 @@ namespace Librarian.Common.Services.Consumers
         protected abstract Task ProcessMessageAsync(
             ConsumeContext<TMessage> context,
             CancellationToken cancellationToken);
-
-        protected async Task<TResult?> ExecuteWithPorterAsync<TResult>(
-            string? region,
-            Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
-            CancellationToken cancellationToken)
-        {
-            return await RetryPolicy.ExecuteAsync(async (token) =>
-            {
-                return await _porterClientService.ExecuteWithPorterAsync(_featureName, region, action, token);
-            }, cancellationToken);
-        }
-
-        protected Task<TResult?> ExecuteWithPorterDirectAsync<TResult>(
-            string? region,
-            Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
-            CancellationToken cancellationToken)
-        {
-            return _porterClientService.ExecuteWithPorterAsync(_featureName, region, action, cancellationToken);
-        }
     }
 }

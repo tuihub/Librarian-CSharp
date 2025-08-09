@@ -28,7 +28,7 @@ namespace Librarian.Common.Services
             string platformAccountId,
             string? region = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteWithPorterAsync(
+            InvokeWithPorterInnerAsync(
                 featureName: "GetAccount",
                 region,
                 async (client, token) =>
@@ -47,7 +47,7 @@ namespace Librarian.Common.Services
             string nameLike,
             string? region = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteWithPorterAsync(
+            InvokeWithPorterInnerAsync(
                 featureName: "SearchAppInfo",
                 region,
                 async (client, token) =>
@@ -63,8 +63,8 @@ namespace Librarian.Common.Services
             string sourceAppId,
             string? region = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteWithPorterAsync(
-                featureName: "GetAppInfo",
+            InvokeWithPorterInnerAsync(
+                featureName: $"{Constants.PorterFeature.AppInfoSource}.{source}",
                 region,
                 async (client, token) =>
                 {
@@ -84,7 +84,7 @@ namespace Librarian.Common.Services
             string rawDataJson,
             string? region = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteWithPorterAsync(
+            InvokeWithPorterInnerAsync(
                 featureName: "ParseRawAppInfo",
                 region,
                 async (client, token) =>
@@ -100,7 +100,7 @@ namespace Librarian.Common.Services
                 },
                 cancellationToken);
 
-        public async Task<TResult?> ExecuteWithPorterAsync<TResult>(
+        private async Task<TResult?> InvokeWithPorterInnerAsync<TResult>(
             string featureName,
             string? region,
             Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,

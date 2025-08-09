@@ -1,5 +1,6 @@
 ﻿using Consul;
 using Librarian.Common;
+using Librarian.Common.Models;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -164,9 +165,9 @@ namespace Librarian.Angela.Services
 
         public async Task SendAppIdMQAsync(string platform, string appId, bool updateInternalName = false)
         {
-            var message = new AppId
+            var message = new AppIdMQ
             {
-                Id = appId,
+                AppId = appId,
             };
 
             try

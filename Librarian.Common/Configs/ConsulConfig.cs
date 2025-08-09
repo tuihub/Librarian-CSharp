@@ -1,4 +1,4 @@
-﻿namespace Librarian.Porter.Configs
+﻿namespace Librarian.Common.Configs
 {
     public partial class ConsulConfig
     {

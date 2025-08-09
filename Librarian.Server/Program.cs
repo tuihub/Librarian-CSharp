@@ -4,7 +4,6 @@ using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
-using Librarian.Sephirah.Configs;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;

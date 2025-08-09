@@ -4,7 +4,6 @@ using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
 using Librarian.Common.Utils;
-using Librarian.Sephirah.Configs;
 using Librarian.Sephirah.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -218,8 +217,6 @@ namespace Librarian.Sephirah.Server
 
         private static void RegisterConsumers(IBusRegistrationConfigurator x)
         {
-            x.AddConsumer<AppInfoConsumer>();
-            x.AddConsumer<AppIdConsumer>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using IdGen;
 using Librarian.Angela.Services;
 using Librarian.Common;
+using Librarian.Common.Models;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
@@ -32,9 +33,9 @@ namespace Librarian.Sephirah.Services
         {
             try
             {
-                var message = new AppId
+                var message = new AppIdMQ
                 {
-                    Id = appId,
+                    AppId = appId,
                 };
 
                 var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{platform}"));

@@ -1,4 +1,5 @@
-﻿using Librarian.Porter.Configs;
+﻿using Librarian.Common.Configs;
+using Librarian.Porter.Configs;
 
 namespace Librarian.Porter.Models
 {
