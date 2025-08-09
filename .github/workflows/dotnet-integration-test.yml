@@ -13,7 +13,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root_pass
           MYSQL_DATABASE: dev_db
@@ -22,16 +22,16 @@ jobs:
         ports:
           - "3306:3306"
         options: >-
-          --health-cmd "mysqladmin ping -ppass"
+          --health-cmd "mysqladmin ping -uroot -proot_pass"
           --health-interval 10s
           --health-start-period 10s
           --health-timeout 5s
           --health-retries 10
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
@@ -45,6 +45,6 @@ jobs:
         -e DB_TYPE="MySQL"
         -e DB_CONN_STR="server=localhost;port=3306;Database=dev_db;Uid=dev_user;Pwd=dev_pass;SslMode=None;"
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
