@@ -5,6 +5,7 @@ using Librarian.Sephirah.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -60,7 +61,7 @@ namespace LibrarianTests.IntegrationTests.Services.Sephirah
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Ensure create db
                     dbContext.Database.EnsureDeleted();
-                    dbContext.Database.EnsureCreated();
+                    dbContext.Database.Migrate();
                 }
 
                 StartUp.Configure(_app);
