@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -353,13 +354,13 @@ namespace Librarian.Common.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Url = table.Column<string>(type: "varchar(4095)", maxLength: 4095, nullable: false)
+                    Url = table.Column<string>(type: "varchar(511)", maxLength: 511, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AltUrls = table.Column<string>(type: "varchar(4095)", maxLength: 4095, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    GetTokenUrlPath = table.Column<string>(type: "varchar(4095)", maxLength: 4095, nullable: false)
+                    GetTokenUrlPath = table.Column<string>(type: "varchar(511)", maxLength: 511, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DownloadFileUrlPath = table.Column<string>(type: "varchar(4095)", maxLength: 4095, nullable: false)
+                    DownloadFileUrlPath = table.Column<string>(type: "varchar(511)", maxLength: 511, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),

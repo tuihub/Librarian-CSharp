@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Librarian.Common.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250522141653_V0_2_0")]
+    [Migration("20250826155723_V0_2_0")]
     partial class V0_2_0
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Librarian.Common.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -921,21 +921,21 @@ namespace Librarian.Common.Migrations
 
                     b.Property<string>("DownloadFileUrlPath")
                         .IsRequired()
-                        .HasMaxLength(4095)
-                        .HasColumnType("varchar(4095)");
+                        .HasMaxLength(511)
+                        .HasColumnType("varchar(511)");
 
                     b.Property<string>("GetTokenUrlPath")
                         .IsRequired()
-                        .HasMaxLength(4095)
-                        .HasColumnType("varchar(4095)");
+                        .HasMaxLength(511)
+                        .HasColumnType("varchar(511)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(4095)
-                        .HasColumnType("varchar(4095)");
+                        .HasMaxLength(511)
+                        .HasColumnType("varchar(511)");
 
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint");

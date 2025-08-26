@@ -5,6 +5,7 @@ using LibrarianTests.IntegrationTests.Services.Sephirah;
 using Microsoft.Extensions.DependencyInjection;
 using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
 using Xunit;
+using Assert = Xunit.Assert;
 
 namespace Librarian.Tests.IntegrationTests.Services.Sephirah.Tests
 {

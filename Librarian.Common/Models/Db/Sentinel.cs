@@ -12,10 +12,10 @@ namespace Librarian.Common.Models.Db
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
-        [MaxLength(4095)] public string Url { get; set; } = null!;
+        [MaxLength(511)] public string Url { get; set; } = null!;
         [MaxLength(4095)] public ICollection<string> AltUrls { get; set; } = [];
-        [MaxLength(4095)] public string GetTokenUrlPath { get; set; } = null!;
-        [MaxLength(4095)] public string DownloadFileUrlPath { get; set; } = null!;
+        [MaxLength(511)] public string GetTokenUrlPath { get; set; } = null!;
+        [MaxLength(511)] public string DownloadFileUrlPath { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
