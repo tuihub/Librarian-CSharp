@@ -3,7 +3,7 @@ using Librarian.Common;
 using Librarian.Common.Utils;
 using LibrarianTests.IntegrationTests.Services.Sephirah;
 using Microsoft.Extensions.DependencyInjection;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 using Xunit;
 using Assert = Xunit.Assert;
 

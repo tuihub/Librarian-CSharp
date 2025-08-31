@@ -47,14 +47,14 @@ namespace Librarian.Common.Models.Db
         public long TotalAppSaveFileSizeBytes { get; set; }
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User ToPb(bool withPassword = false)
+        public TuiHub.Protos.Librarian.Sephirah.V1.User ToPb(bool withPassword = false)
         {
-            var ret = new TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.User
+            var ret = new TuiHub.Protos.Librarian.Sephirah.V1.User
             {
                 Id = new TuiHub.Protos.Librarian.V1.InternalID { Id = Id },
                 Username = Name,
-                Type = Type.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserType>(),
-                Status = Status.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserStatus>(),
+                Type = Type.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.UserType>(),
+                Status = Status.ToEnumByString<TuiHub.Protos.Librarian.Sephirah.V1.UserStatus>(),
             };
             if (withPassword)
             {

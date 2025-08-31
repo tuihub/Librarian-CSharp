@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Minio.DataModel.Args;
 using System.IO.Pipes;
 using System.Security.Cryptography;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
 {

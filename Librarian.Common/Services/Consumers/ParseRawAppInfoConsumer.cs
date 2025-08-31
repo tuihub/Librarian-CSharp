@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using TuiHub.Protos.Librarian.Porter.V1;
 using TuiHub.Protos.Librarian.V1;
 
@@ -31,21 +32,27 @@ namespace Librarian.Common.Services.Consumers
             var request = context.Message;
             var region = request.Region;
 
-            _logger.LogInformation("Processing ParseRawAppInfo request {RequestId} for source: {Source}, appId: {SourceAppId}, region: {Region}",
-                request.RequestId, request.Source, request.SourceAppId, region);
+            _logger.LogInformation("Processing ParseRawAppInfo request {RequestId} for source: {Source}, region: {Region}",
+                request.RequestId, request.Source, region);
 
             try
             {
                 using var scope = _serviceProvider.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var appInfo = await _porterClientService.ParseRawAppInfoAsync(request.Source, request.SourceAppId, request.RawDataJson, region, cancellationToken);
+                var featureRequest = new FeatureRequest
+                {
+                    Id = request.Source,
+                    Region = region ?? string.Empty,
+                    ConfigJson = JsonSerializer.Serialize(new Models.FeatureRequests.ParseRawAppInfo()),
+                };
+                var appInfo = await _porterClientService.ParseRawAppInfoAsync(featureRequest, request.RawDataJson, cancellationToken);
 
                 if (appInfo != null)
                 {
                     // Find or create AppInfo record
                     var existingAppInfo = await dbContext.AppInfos
-                        .FirstOrDefaultAsync(x => x.Source.ToString() == request.Source && x.SourceAppId == request.SourceAppId,
+                        .FirstOrDefaultAsync(x => x.Source.ToString() == request.Source && x.SourceAppId == appInfo.SourceAppId,
                             cancellationToken);
 
                     if (existingAppInfo != null)
@@ -53,7 +60,7 @@ namespace Librarian.Common.Services.Consumers
                         // Update existing record
                         UpdateAppInfoFromProto(existingAppInfo, appInfo);
                         _logger.LogInformation("Updated existing AppInfo record for source: {Source}, appId: {SourceAppId}, region: {Region}",
-                            request.Source, request.SourceAppId, region);
+                            request.Source, appInfo.SourceAppId, region);
                     }
                     else
                     {
@@ -61,7 +68,7 @@ namespace Librarian.Common.Services.Consumers
                         var newAppInfo = CreateAppInfoFromProto(appInfo);
                         dbContext.AppInfos.Add(newAppInfo);
                         _logger.LogInformation("Created new AppInfo record for source: {Source}, appId: {SourceAppId}, region: {Region}",
-                            request.Source, request.SourceAppId, region);
+                            request.Source, appInfo.SourceAppId, region);
                     }
 
                     await dbContext.SaveChangesAsync(cancellationToken);
@@ -70,8 +77,8 @@ namespace Librarian.Common.Services.Consumers
                 }
                 else
                 {
-                    _logger.LogWarning("Received empty AppInfo response for source: {Source}, appId: {SourceAppId}, region: {Region}",
-                        request.Source, request.SourceAppId, region);
+                    _logger.LogWarning("Received empty AppInfo response for source: {Source}, region: {Region}",
+                        request.Source, region);
                 }
             }
             catch (TaskCanceledException)

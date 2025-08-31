@@ -30,6 +30,7 @@ if (globalContext.ConsulConfig.IsEnabled)
 }
 ServicesUtil.ConfigureThirdPartyServices(builder, globalContext, LoggerFactory.Create(b => { b.AddConsole(); b.AddDebug(); }).CreateLogger("startup"));
 builder.Services.AddSingleton<AppInfoServiceResolver>();
+builder.Services.AddSingleton<AccountServiceResolver>();
 
 var app = builder.Build();
 

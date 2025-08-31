@@ -25,9 +25,9 @@ namespace Librarian.Common.Models.Db
         public Device Device { get; set; } = null!;
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppRunTime ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppRunTime ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppRunTime>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.AppRunTime>(this);
         }
     }
 }

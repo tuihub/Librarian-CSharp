@@ -1,11 +1,11 @@
 using Grpc.Core;
 using Librarian.Common.Utils;
 using Microsoft.Extensions.Logging;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
+using TuiHub.Protos.Librarian.Sentinel.V1;
 
 namespace Librarian.Sentinel.Services
 {
-    public partial class SentinelService
+    public partial class SephirahSentinelService
     {
         // TODO: impl client alive check
         public override Task<HeartbeatResponse> Heartbeat(HeartbeatRequest request, ServerCallContext context)

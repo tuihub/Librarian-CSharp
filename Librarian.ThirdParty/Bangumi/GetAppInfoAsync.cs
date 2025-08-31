@@ -53,7 +53,7 @@ namespace Librarian.ThirdParty.Bangumi
             _logger.LogDebug("Successfully received Bangumi data for ID: {AppId}", appId);
 
             // Use ParseRawAppInfoAsync to parse response content
-            return await ParseRawAppInfoAsync(appIdStr, response.Content, ct);
+            return await ParseRawAppInfoAsync(response.Content, ct);
         }
     }
 }

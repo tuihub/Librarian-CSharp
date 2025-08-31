@@ -11,6 +11,8 @@ namespace Librarian.Common.Models.Db
         [Key]
         public long Id { get; set; }
         [MaxLength(255)]
+        public string IdStr { get; set; } = null!;
+        [MaxLength(255)]
         public string Region { get; set; } = null!;
         [MaxLength(65535)]
         public string ConfigJson { get; set; } = null!;

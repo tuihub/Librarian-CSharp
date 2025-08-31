@@ -16,7 +16,7 @@
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="System.Threading.RateLimiting" Version="9.0.8" />
-    <PackageReference Include="TuiHub.Protos" Version="0.5.7" />
+    <PackageReference Include="TuiHub.Protos" Version="0.6.0" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 

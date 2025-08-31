@@ -28,9 +28,9 @@ namespace Librarian.Common.Models.Db
         public User User { get; set; } = null!;
 
         // functions
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Account ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Account>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Account>(this);
         }
     }
 }

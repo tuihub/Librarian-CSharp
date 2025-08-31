@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
+using TuiHub.Protos.Librarian.Sentinel.V1;
 
 namespace Librarian.Common.Models.Db
 {

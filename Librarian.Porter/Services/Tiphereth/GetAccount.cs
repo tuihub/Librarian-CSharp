@@ -1,5 +1,8 @@
 using Grpc.Core;
+using Librarian.Common.Models.FeatureRequests;
 using Microsoft.Extensions.Logging;
+using NJsonSchema;
+using System.Text.Json;
 using TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Porter.Services
@@ -8,19 +11,21 @@ namespace Librarian.Porter.Services
     {
         public override async Task<GetAccountResponse> GetAccount(GetAccountRequest request, ServerCallContext context)
         {
-            _logger.LogInformation("GetAccount called for platform: {Platform}, accountId: {AccountId}",
-                request.Platform, request.PlatformAccountId);
+            _logger.LogInformation("GetAccount called");
 
             try
             {
-                var accountService = _accountServiceResolver.GetAccountService(request.Platform);
-                if (accountService == null)
+                var validationErrors = JsonSchema.FromType<GetAccount>().Validate(request.Config.ConfigJson);
+                if (validationErrors != null && validationErrors.Count > 0)
                 {
-                    _logger.LogError("No account service available for platform: {Platform}", request.Platform);
-                    throw new RpcException(new Status(StatusCode.NotFound, $"No account service available for platform: {request.Platform}"));
+                    var errorMsg = $"GetAccount config validation failed: {string.Join("; ", validationErrors.Select(e => e.ToString()))}";
+                    _logger.LogWarning(errorMsg);
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, errorMsg));
                 }
+                var config = JsonSerializer.Deserialize<GetAccount>(request.Config.ConfigJson)!;
 
-                var account = await accountService.GetAccountAsync(request.PlatformAccountId, context.CancellationToken);
+                var accountService = _accountServiceResolver.GetService(request.Config);
+                var account = await accountService.GetAccountAsync(config.AccountId, context.CancellationToken);
 
                 return new GetAccountResponse
                 {
@@ -29,8 +34,7 @@ namespace Librarian.Porter.Services
             }
             catch (Exception ex) when (ex is not RpcException)
             {
-                _logger.LogError(ex, "Error getting account for platform: {Platform}, accountId: {AccountId}",
-                    request.Platform, request.PlatformAccountId);
+                _logger.LogError(ex, "Error getting account information");
                 throw new RpcException(new Status(StatusCode.Internal, $"Error getting account information: {ex.Message}"));
             }
         }

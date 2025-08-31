@@ -24,13 +24,13 @@ namespace Librarian.Common.Models.Db
 
         // functions
         public SentinelLibrary() { }
-        public SentinelLibrary(long sentinelId, TuiHub.Protos.Librarian.Sephirah.V1.Sentinel.SentinelLibrary library)
+        public SentinelLibrary(long sentinelId, TuiHub.Protos.Librarian.Sentinel.V1.SentinelLibrary library)
         {
             SentinelId = sentinelId;
             LibraryId = library.Id;
             DownloadBasePath = library.DownloadBasePath;
         }
-        public void Update(TuiHub.Protos.Librarian.Sephirah.V1.Sentinel.SentinelLibrary library)
+        public void Update(TuiHub.Protos.Librarian.Sentinel.V1.SentinelLibrary library)
         {
             DownloadBasePath = library.DownloadBasePath;
             UpdatedAt = DateTime.UtcNow;

@@ -6,6 +6,6 @@ namespace Librarian.ThirdParty.Contracts
     {
         Task<AppInfo> GetAppInfoAsync(string appId, CancellationToken ct = default);
         Task<List<AppInfo>> SearchAppInfoAsync(string nameLike, CancellationToken ct = default);
-        Task<AppInfo> ParseRawAppInfoAsync(string appId, string rawDataJson, CancellationToken ct = default);
+        Task<AppInfo> ParseRawAppInfoAsync(string rawDataJson, CancellationToken ct = default);
     }
 }

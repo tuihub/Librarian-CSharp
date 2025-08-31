@@ -1,21 +1,22 @@
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using TuiHub.Protos.Librarian.Porter.V1;
+using PbBase = TuiHub.Protos.Librarian.V1;
+using PbPorter = TuiHub.Protos.Librarian.Porter.V1;
 
 namespace Librarian.Common.Services
 {
     public class LibrarianPorterClientService
     {
         private readonly ILogger<LibrarianPorterClientService> _logger;
-        private readonly PorterGrpcClientPool<LibrarianPorterService.LibrarianPorterServiceClient> _clientPool;
+        private readonly PorterGrpcClientPool<PbPorter.LibrarianPorterService.LibrarianPorterServiceClient> _clientPool;
         private readonly PorterManagementService _porterManagementService;
 
         private static readonly TimeSpan ConcurrencyIncreaseThreshold = TimeSpan.FromSeconds(10);
 
         public LibrarianPorterClientService(
             ILogger<LibrarianPorterClientService> logger,
-            PorterGrpcClientPool<LibrarianPorterService.LibrarianPorterServiceClient> clientPool,
+            PorterGrpcClientPool<PbPorter.LibrarianPorterService.LibrarianPorterServiceClient> clientPool,
             PorterManagementService porterManagementService)
         {
             _logger = logger;
@@ -23,77 +24,71 @@ namespace Librarian.Common.Services
             _porterManagementService = porterManagementService;
         }
 
-        public Task<Account?> GetAccountAsync(
-            string platform,
-            string platformAccountId,
-            string? region = null,
+        public Task<PbPorter.Account?> GetAccountAsync(
+            PbBase.FeatureRequest featureRequest,
             CancellationToken cancellationToken = default) =>
             InvokeWithPorterInnerAsync(
                 featureName: "GetAccount",
-                region,
+                string.IsNullOrWhiteSpace(featureRequest.Region) ? null : featureRequest.Region,
                 async (client, token) =>
                 {
-                    var request = new GetAccountRequest
+                    var request = new PbPorter.GetAccountRequest
                     {
-                        Platform = platform,
-                        PlatformAccountId = platformAccountId
+                        Config = featureRequest,
                     };
                     var response = await client.GetAccountAsync(request, cancellationToken: token);
                     return response.Account;
                 },
                 cancellationToken);
 
-        public Task<IEnumerable<AppInfo>?> SearchAppInfoAsync(
-            string nameLike,
-            string? region = null,
+        public Task<IEnumerable<PbPorter.AppInfo>?> SearchAppInfoAsync(
+            PbBase.FeatureRequest featureRequest,
             CancellationToken cancellationToken = default) =>
             InvokeWithPorterInnerAsync(
                 featureName: "SearchAppInfo",
-                region,
+                string.IsNullOrWhiteSpace(featureRequest.Region) ? null : featureRequest.Region,
                 async (client, token) =>
                 {
-                    var request = new SearchAppInfoRequest { NameLike = nameLike };
+                    var request = new PbPorter.SearchAppInfoRequest
+                    {
+                        Config = featureRequest,
+                    };
                     var response = await client.SearchAppInfoAsync(request, cancellationToken: token);
-                    return (IEnumerable<AppInfo>)(response.AppInfos ?? Enumerable.Empty<AppInfo>());
+                    return response.AppInfos ?? Enumerable.Empty<PbPorter.AppInfo>();
                 },
                 cancellationToken);
 
-        public Task<AppInfo?> GetAppInfoAsync(
-            string source,
-            string sourceAppId,
-            string? region = null,
+        public Task<PbPorter.AppInfo?> GetAppInfoAsync(
+            PbBase.FeatureRequest featureRequest,
             CancellationToken cancellationToken = default) =>
             InvokeWithPorterInnerAsync(
-                featureName: $"{Constants.PorterFeature.AppInfoSource}.{source}",
-                region,
+                // TODO: change FeatureRequest
+                featureName: $"{Constants.PorterFeature.AppInfoSource}.{featureRequest.Id}",
+                string.IsNullOrWhiteSpace(featureRequest.Region) ? null : featureRequest.Region,
                 async (client, token) =>
                 {
-                    var request = new GetAppInfoRequest
+                    var request = new PbPorter.GetAppInfoRequest
                     {
-                        Source = source,
-                        SourceAppId = sourceAppId
+                        Config = featureRequest,
                     };
                     var response = await client.GetAppInfoAsync(request, cancellationToken: token);
                     return response.AppInfo;
                 },
                 cancellationToken);
 
-        public Task<AppInfo?> ParseRawAppInfoAsync(
-            string source,
-            string sourceAppId,
+        public Task<PbPorter.AppInfo?> ParseRawAppInfoAsync(
+            PbBase.FeatureRequest featureRequest,
             string rawDataJson,
-            string? region = null,
             CancellationToken cancellationToken = default) =>
             InvokeWithPorterInnerAsync(
                 featureName: "ParseRawAppInfo",
-                region,
+                string.IsNullOrWhiteSpace(featureRequest.Region) ? null : featureRequest.Region,
                 async (client, token) =>
                 {
-                    var request = new ParseRawAppInfoRequest
+                    var request = new PbPorter.ParseRawAppInfoRequest
                     {
-                        Source = source,
-                        SourceAppId = sourceAppId,
-                        RawDataJson = rawDataJson
+                        Config = featureRequest,
+                        RawDataJson = rawDataJson,
                     };
                     var response = await client.ParseRawAppInfoAsync(request, cancellationToken: token);
                     return response.AppInfo;
@@ -103,7 +98,7 @@ namespace Librarian.Common.Services
         private async Task<TResult?> InvokeWithPorterInnerAsync<TResult>(
             string featureName,
             string? region,
-            Func<LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
+            Func<PbPorter.LibrarianPorterService.LibrarianPorterServiceClient, CancellationToken, Task<TResult?>> action,
             CancellationToken cancellationToken)
         {
             _logger.LogDebug("Trying to acquire Porter for feature: {Feature}, region: {Region}", featureName, region);

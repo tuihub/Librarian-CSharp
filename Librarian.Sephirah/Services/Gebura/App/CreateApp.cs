@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Sephirah.Services

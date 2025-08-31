@@ -9,12 +9,12 @@ namespace Librarian.Porter.Services
     {
         public override async Task<ParseRawAppInfoResponse> ParseRawAppInfo(ParseRawAppInfoRequest request, ServerCallContext context)
         {
-            _logger.LogInformation("Parsing raw app info for source: {Source}, appId: {AppId}", request.Source, request.SourceAppId);
+            _logger.LogInformation("Parsing raw app info for source: {Source}", request.Config);
 
             IAppInfoService appInfoService;
             try
             {
-                appInfoService = _appInfoServiceResolver.GetService(request.Source);
+                appInfoService = _appInfoServiceResolver.GetService(request.Config);
             }
             catch (Exception ex)
             {
@@ -24,7 +24,7 @@ namespace Librarian.Porter.Services
 
             try
             {
-                var appInfo = await appInfoService.ParseRawAppInfoAsync(request.SourceAppId, request.RawDataJson, context.CancellationToken);
+                var appInfo = await appInfoService.ParseRawAppInfoAsync(request.RawDataJson, context.CancellationToken);
 
                 _logger.LogInformation("Successfully parsed app info: {AppName}", appInfo.Name);
 

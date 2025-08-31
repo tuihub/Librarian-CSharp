@@ -2,11 +2,11 @@
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
+using TuiHub.Protos.Librarian.Sentinel.V1;
 
 namespace Librarian.Sentinel.Services
 {
-    public partial class SentinelService
+    public partial class SephirahSentinelService
     {
         // TODO: impl revoke
         [Authorize(AuthenticationSchemes = "RefreshToken")]

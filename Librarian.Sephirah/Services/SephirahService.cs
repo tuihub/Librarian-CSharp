@@ -4,7 +4,7 @@ using Librarian.Common;
 using Librarian.Common.Models;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
 {

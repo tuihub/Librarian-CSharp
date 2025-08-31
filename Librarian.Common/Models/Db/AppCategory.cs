@@ -26,15 +26,15 @@ namespace Librarian.Common.Models.Db
         // functions
         public AppCategory() { }
         // without app relations
-        public AppCategory(long id, long userId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory appCategory)
+        public AppCategory(long id, long userId, TuiHub.Protos.Librarian.Sephirah.V1.AppCategory appCategory)
         {
             Id = id;
             Name = appCategory.Name;
             UserId = userId;
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppCategory ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppCategory>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.AppCategory>(this);
         }
     }
 }

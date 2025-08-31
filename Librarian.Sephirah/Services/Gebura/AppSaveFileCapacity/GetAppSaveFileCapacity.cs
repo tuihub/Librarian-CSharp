@@ -3,7 +3,7 @@ using Librarian.Common.Converters;
 using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
 {

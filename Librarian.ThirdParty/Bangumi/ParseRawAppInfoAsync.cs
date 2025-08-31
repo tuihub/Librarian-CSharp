@@ -7,37 +7,38 @@ namespace Librarian.ThirdParty.Bangumi
 {
     public partial class BangumiApiService
     {
-        // Constants for Bangumi infobox keys
-        private const string DEVELOPER_KEY = "开发"; // Developer
-        private const string ALIAS_KEY = "别名"; // Alias
+        // constants for Bangumi infobox keys
+        private const string DEVELOPER_KEY = "开发";
+        private const string ALIAS_KEY = "别名";
 
-        public Task<AppInfo> ParseRawAppInfoAsync(string appId, string rawDataJson, CancellationToken ct = default)
+        public Task<AppInfo> ParseRawAppInfoAsync(string rawDataJson, CancellationToken ct = default)
         {
+            string appIdFromRawInfo = "unknown";
             try
             {
-                _logger.LogDebug("Parsing raw Bangumi app info data for ID: {AppId}", appId);
-
-                // Parse the raw JSON data
+                // parse the raw JSON data
                 dynamic respObj = JObject.Parse(rawDataJson);
+                appIdFromRawInfo = (string?)respObj?.id?.ToString() ?? "unknown";
+                _logger.LogDebug("Parsing raw Bangumi app info data for ID: {AppId}", appIdFromRawInfo);
 
                 if (respObj == null)
                 {
-                    _logger.LogError("Unable to parse JSON data for Bangumi subject ID: {AppId}", appId);
+                    _logger.LogError("Unable to parse JSON data for Bangumi subject.");
                     throw new ArgumentException("Unable to parse JSON data for Bangumi subject");
                 }
 
-                // Extract release date
+                // extract release date
                 if (DateTime.TryParse(respObj.date.ToString(), out DateTime releaseDate) == false)
                 {
-                    _logger.LogWarning("Invalid release date format for Bangumi subject ID: {AppId}", appId);
+                    _logger.LogWarning("Invalid release date format for Bangumi subject ID: {AppId}", appIdFromRawInfo);
                     releaseDate = DateTime.MinValue;
                 }
 
-                // Create short description
+                // create short description
                 var shortDescription = ((string?)respObj.summary?.ToString())?.Length > 97 ?
                     ((string?)respObj.summary?.ToString())?[..97] + "..." : respObj.summary?.ToString();
 
-                // Extract developer from infobox
+                // extract developer from infobox
                 var infobox = respObj.infobox as JArray;
                 string developer = string.Empty;
 
@@ -50,13 +51,13 @@ namespace Librarian.ThirdParty.Bangumi
                             if (parsedProperty.Value.ToString().Equals(DEVELOPER_KEY))
                             {
                                 developer = parsedProperty?.Parent?.Last?.First?.ToString() ?? string.Empty;
-                                _logger.LogDebug("Found developer: {Developer} for ID: {AppId}", developer, appId);
+                                _logger.LogDebug("Found developer: {Developer} for ID: {AppId}", developer, appIdFromRawInfo);
                             }
                         }
                     }
                 }
 
-                // Extract tags
+                // extract tags
                 List<string> tags = [];
                 if (respObj.tags?.Any())
                 {
@@ -68,10 +69,10 @@ namespace Librarian.ThirdParty.Bangumi
                             tags.Add(name);
                         }
                     }
-                    _logger.LogDebug("Extracted {TagCount} tags for ID: {AppId}", tags.Count, appId);
+                    _logger.LogDebug("Extracted {TagCount} tags for ID: {AppId}", tags.Count, appIdFromRawInfo);
                 }
 
-                // Extract alternative names
+                // extract alternative names
                 List<string> altNames = [];
                 if (!string.IsNullOrWhiteSpace(respObj.name_cn?.ToString()))
                 {
@@ -81,7 +82,7 @@ namespace Librarian.ThirdParty.Bangumi
                     }
                 }
 
-                // Check for aliases in infobox
+                // check for aliases in infobox
                 foreach (var info in respObj.infobox)
                 {
                     if (info.key == ALIAS_KEY)
@@ -96,9 +97,9 @@ namespace Librarian.ThirdParty.Bangumi
                         }
                     }
                 }
-                _logger.LogDebug("Extracted {AltNameCount} alternative names for ID: {AppId}", altNames.Count, appId);
+                _logger.LogDebug("Extracted {AltNameCount} alternative names for ID: {AppId}", altNames.Count, appIdFromRawInfo);
 
-                // Create AppInfo object
+                // create AppInfo object
                 return Task.FromResult(new AppInfo
                 {
                     Source = "bangumi",
@@ -126,7 +127,7 @@ namespace Librarian.ThirdParty.Bangumi
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to parse Bangumi data for ID: {AppId}. Error: {ErrorMessage}", appId, ex.Message);
+                _logger.LogError(ex, "Failed to parse Bangumi data for ID: {AppId}. Error: {ErrorMessage}", appIdFromRawInfo, ex.Message);
                 throw new ArgumentException($"Failed to parse Bangumi data: {ex.Message}", ex);
             }
         }

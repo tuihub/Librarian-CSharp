@@ -50,7 +50,7 @@ namespace Librarian.Common.Models.Db
         public Account? Account { get; set; }
 
         // functions
-        public AppInfo(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
+        public AppInfo(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.AppInfo appInfo)
         {
             Id = internalId;
             Source = appInfo.Source.ToEnum<WellKnownAppInfoSource>();
@@ -71,11 +71,11 @@ namespace Librarian.Common.Models.Db
             Tags = [.. appInfo.Tags];
         }
         public AppInfo() : base() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.AppInfo ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.AppInfo>(this);
         }
-        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.AppInfo appInfo)
+        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.AppInfo appInfo)
         {
             Source = appInfo.Source.ToEnum<WellKnownAppInfoSource>();
             SourceAppId = appInfo.SourceAppId;

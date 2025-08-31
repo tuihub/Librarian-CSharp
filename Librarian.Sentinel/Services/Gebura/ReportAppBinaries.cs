@@ -3,12 +3,12 @@ using Librarian.Common.Helpers;
 using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sentinel;
+using TuiHub.Protos.Librarian.Sentinel.V1;
 using DbModels = Librarian.Common.Models.Db;
 
 namespace Librarian.Sentinel.Services
 {
-    public partial class SentinelService
+    public partial class SephirahSentinelService
     {
         // TODO: impl heartbeat check, commit snapshot
         public override async Task<ReportAppBinariesResponse> ReportAppBinaries(ReportAppBinariesRequest request, ServerCallContext context)

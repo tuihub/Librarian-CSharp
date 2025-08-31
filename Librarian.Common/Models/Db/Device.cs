@@ -35,7 +35,7 @@ namespace Librarian.Common.Models.Db
         public ICollection<AppRunTime> AppRunTimes { get; } = [];
 
         // func
-        public Device(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device device)
+        public Device(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Device device)
         {
             Id = internalId;
             DeviceName = device.DeviceName;
@@ -46,9 +46,9 @@ namespace Librarian.Common.Models.Db
             ClientVersion = device.ClientVersion;
         }
         public Device() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.Device ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.Device>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Device>(this);
         }
     }
 }

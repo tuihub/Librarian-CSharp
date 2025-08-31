@@ -31,9 +31,9 @@ namespace Librarian.Common.Models.Db
 
         // functions
         public Session() { }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserSession ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.UserSession ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.UserSession>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.UserSession>(this);
         }
     }
 

@@ -5,6 +5,7 @@ using Librarian.ThirdParty.Bangumi;
 using Librarian.ThirdParty.Contracts;
 using Librarian.ThirdParty.Steam;
 using Librarian.ThirdParty.Vndb;
+using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Porter.Helpers
 {
@@ -30,16 +31,16 @@ namespace Librarian.Porter.Helpers
             _vndbApiService = vndbApiService;
         }
 
-        public IAppInfoService GetService(string source)
+        public IAppInfoService GetService(FeatureRequest featureRequest)
         {
             WellKnowns.AppInfoSource appInfoSource;
             try
             {
-                appInfoSource = source.ToEnum<WellKnowns.AppInfoSource>();
+                appInfoSource = featureRequest.Id.ToEnum<WellKnowns.AppInfoSource>();
             }
             catch (ArgumentException)
             {
-                throw new ArgumentException($"Invalid app info source: {source}");
+                throw new ArgumentException($"Invalid app info source: {featureRequest.Id}");
             }
             if (!IsSourceEnabled(appInfoSource))
             {

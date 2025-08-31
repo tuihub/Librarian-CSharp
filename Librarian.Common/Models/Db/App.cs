@@ -60,7 +60,7 @@ namespace Librarian.Common.Models.Db
         public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
 
         // functions
-        public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App app)
+        public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
             Id = internalId;
             RevisedVersion = app.VersionNumber;
@@ -87,7 +87,7 @@ namespace Librarian.Common.Models.Db
             Tags = [.. app.Tags];
         }
         public App() { }
-        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App app)
+        public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.App app)
         {
             RevisedVersion = app.VersionNumber;
             RevisedAt = app.VersionDate.ToDateTime();
@@ -112,9 +112,9 @@ namespace Librarian.Common.Models.Db
             AltNames = [.. app.NameAlternatives];
             Tags = [.. app.Tags];
         }
-        public TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App ToPb()
+        public TuiHub.Protos.Librarian.Sephirah.V1.App ToPb()
         {
-            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.Sephirah.App>(this);
+            return StaticContext.Mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.App>(this);
         }
     }
 }

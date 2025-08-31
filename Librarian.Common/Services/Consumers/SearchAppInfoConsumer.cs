@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using TuiHub.Protos.Librarian.Porter.V1;
 using TuiHub.Protos.Librarian.V1;
 
@@ -43,7 +44,16 @@ namespace Librarian.Common.Services.Consumers
                 using var scope = _serviceProvider.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var appInfos = await _porterClientService.SearchAppInfoAsync(request.NameLike, region, cancellationToken);
+                var featureRequest = new FeatureRequest
+                {
+                    Id = request.Source,
+                    Region = region ?? string.Empty,
+                    ConfigJson = JsonSerializer.Serialize(new Models.FeatureRequests.SearchAppInfo
+                    {
+                        NameLike = request.NameLike,
+                    })
+                };
+                var appInfos = await _porterClientService.SearchAppInfoAsync(featureRequest, cancellationToken);
 
                 if (appInfos != null && appInfos.Any())
                 {

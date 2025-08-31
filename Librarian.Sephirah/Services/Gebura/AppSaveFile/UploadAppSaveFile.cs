@@ -4,7 +4,7 @@ using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Minio.DataModel.Args;
-using TuiHub.Protos.Librarian.Sephirah.V1.Sephirah;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Sephirah.Services
 {
