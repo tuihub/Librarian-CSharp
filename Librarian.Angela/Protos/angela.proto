@@ -1,0 +1,207 @@
+syntax = "proto3";
+
+package librarian.angela.v1;
+
+option csharp_namespace = "Librarian.Angela.V1";
+
+import "google/api/annotations.proto";
+
+// Common message types used across Angela services
+
+// Internal ID wrapper
+message InternalID {
+  int64 id = 1;
+}
+
+// Paging request
+message PagingRequest {
+  int64 page_size = 1;
+  int64 page_num = 2;
+}
+
+// Paging response  
+message PagingResponse {
+  int64 total_size = 1;
+}
+
+// User types
+enum UserType {
+  USER_TYPE_UNSPECIFIED = 0;
+  USER_TYPE_ADMIN = 1;
+  USER_TYPE_NORMAL = 2;
+}
+
+// User status
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_BLOCKED = 2;
+}
+
+// User message
+message User {
+  InternalID id = 1;
+  string username = 2;
+  string password = 3;
+  UserType type = 4;
+  UserStatus status = 5;
+}
+
+// App info source enum (based on WellKnownAppInfoSource)
+enum AppInfoSource {
+  APP_INFO_SOURCE_UNSPECIFIED = 0;
+  APP_INFO_SOURCE_STEAM = 1;
+  APP_INFO_SOURCE_VNDB = 2;
+  APP_INFO_SOURCE_BANGUMI = 3;
+  APP_INFO_SOURCE_INTERNAL = 4;
+}
+
+// App info message
+message AppInfo {
+  InternalID id = 1;
+  AppInfoSource source = 2;
+  string source_app_id = 3;
+  string source_url = 4;
+  string name = 5;
+  string description = 6;
+  string icon_image_url = 7;
+  string background_image_url = 8;
+  string cover_image_url = 9;
+}
+
+// Porter message
+message Porter {
+  string id = 1;
+  string name = 2;
+  string version = 3;
+  repeated string tags = 4;
+  string url = 5;
+}
+
+// Tiphereth service messages
+
+// GetToken
+message GetTokenRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message GetTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// RefreshToken
+message RefreshTokenRequest {
+  // Empty - token comes from authorization header
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// ListUsers
+message ListUsersRequest {
+  PagingRequest paging = 1;
+  repeated UserType type_filter = 2;
+  repeated UserStatus status_filter = 3;
+}
+
+message ListUsersResponse {
+  PagingResponse paging = 1;
+  repeated User users = 2;
+}
+
+// CreateUser
+message CreateUserRequest {
+  User user = 1;
+}
+
+message CreateUserResponse {
+  InternalID id = 1;
+}
+
+// UpdateUser
+message UpdateUserRequest {
+  User user = 1;
+}
+
+message UpdateUserResponse {
+  // Empty response
+}
+
+// ListPorters
+message ListPortersRequest {
+  PagingRequest paging = 1;
+}
+
+message ListPortersResponse {
+  PagingResponse paging = 1;
+  repeated Porter porters = 2;
+}
+
+// Gebura service messages
+
+// SearchAppInfos
+message SearchAppInfosRequest {
+  PagingRequest paging = 1;
+  string name_like = 2;
+  repeated string source_filter = 3;
+}
+
+message SearchAppInfosResponse {
+  PagingResponse paging = 1;
+  repeated AppInfo app_infos = 2;
+}
+
+// Angela service combines all admin management services
+service AngelaService {
+  // Tiphereth services (user management)
+  rpc GetToken(GetTokenRequest) returns (GetTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/token"
+      body: "*"
+    };
+  }
+  
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/refresh"
+      body: "*"
+    };
+  }
+  
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users"
+    };
+  }
+  
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users"
+      body: "*"
+    };
+  }
+  
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/users/{user.id.id}"
+      body: "*"
+    };
+  }
+  
+  rpc ListPorters(ListPortersRequest) returns (ListPortersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/porters"
+    };
+  }
+  
+  // Gebura services (app management)
+  rpc SearchAppInfos(SearchAppInfosRequest) returns (SearchAppInfosResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/app-infos"
+    };
+  }
+}

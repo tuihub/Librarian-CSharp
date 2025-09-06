@@ -1,56 +1,122 @@
-﻿//using Grpc.Core;
-//using Librarian.Common.Constants;
-//using Librarian.Common.Converters;
-//using Librarian.Common.Helpers;
-//using Librarian.Common.Utils;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.EntityFrameworkCore;
-//using TuiHub.Protos.Librarian.Sephirah.V1.Angela;
-//using TuiHub.Protos.Librarian.V1;
+﻿using Grpc.Core;
+using Librarian.Common.Constants;
+using Librarian.Common.Converters;
+using Librarian.Common.Helpers;
+using Librarian.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Librarian.Angela.V1;
 
-//namespace Librarian.Angela.Services
-//{
-//    public partial class AngelaService
-//    {
-//        [Authorize]
-//        public override async Task<ListUsersResponse> ListUsers(ListUsersRequest request, ServerCallContext context)
-//        {
-//            // Verify that the user is an administrator
-//            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
+namespace Librarian.Angela.Services
+{
+    public partial class AngelaService
+    {
+        [Authorize]
+        public override async Task<ListUsersResponse> ListUsers(ListUsersRequest request, ServerCallContext context)
+        {
+            // Verify that the user is an administrator
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
 
-//            // Query users
-//            IQueryable<Common.Models.Db.User> usersDb = _dbContext.Users;
+            // Query users
+            IQueryable<Common.Models.Db.User> usersDb = _dbContext.Users;
 
-//            // Exclude current user
-//            usersDb = usersDb.Where(u => u.Id != context.GetInternalIdFromHeader());
+            // Exclude current user
+            usersDb = usersDb.Where(u => u.Id != context.GetInternalIdFromHeader());
 
-//            // Filter by requested type and status
-//            if (request.TypeFilter.Count > 0)
-//            {
-//                usersDb = usersDb.Where(u => request.TypeFilter.Select(t => t.ToString().ToEnum<Enums.UserType>()).Contains(u.Type));
-//            }
+            // Filter by requested type and status
+            if (request.TypeFilter.Count > 0)
+            {
+                var typeFilters = request.TypeFilter.Select(t => ConvertToDbUserType(t)).ToList();
+                usersDb = usersDb.Where(u => typeFilters.Contains(u.Type));
+            }
 
-//            if (request.StatusFilter.Count > 0)
-//            {
-//                usersDb = usersDb.Where(u => request.StatusFilter.Select(s => s.ToString().ToEnum<Enums.UserStatus>()).Contains(u.Status));
-//            }
+            if (request.StatusFilter.Count > 0)
+            {
+                var statusFilters = request.StatusFilter.Select(s => ConvertToDbUserStatus(s)).ToList();
+                usersDb = usersDb.Where(u => statusFilters.Contains(u.Status));
+            }
 
-//            // Apply paging
-//            usersDb = usersDb.ApplyPagingRequest(request.Paging);
+            // Apply paging
+            usersDb = ApplyAngelaPagingRequest(usersDb, request.Paging);
 
-//            // Get final results
-//            var users = await usersDb.ToListAsync();
+            // Get final results
+            var users = await usersDb.ToListAsync();
 
-//            // Build response
-//            var response = new ListUsersResponse
-//            {
-//                Paging = new PagingResponse { TotalSize = users.Count }
-//            };
+            // Build response
+            var response = new ListUsersResponse
+            {
+                Paging = new PagingResponse { TotalSize = users.Count }
+            };
 
-//            // Add users to response
-//            response.Users.AddRange(users.Select(u => u.ToPb()));
+            // Add users to response
+            response.Users.AddRange(users.Select(u => ConvertToProtoUser(u)));
 
-//            return response;
-//        }
-//    }
-//}
+            return response;
+        }
+
+        private IQueryable<T> ApplyAngelaPagingRequest<T>(IQueryable<T> source, PagingRequest? pagingRequest)
+        {
+            if (pagingRequest == null)
+            {
+                return source;
+            }
+            else
+            {
+                var pageSize = pagingRequest.PageSize;
+                var pageNum = pagingRequest.PageNum;
+                return source.Skip((int)(pageSize * (pageNum - 1))).Take((int)pageSize);
+            }
+        }
+
+        private Enums.UserType ConvertToDbUserType(UserType protoType)
+        {
+            return protoType switch
+            {
+                UserType.Admin => Enums.UserType.Admin,
+                UserType.Normal => Enums.UserType.Normal,
+                _ => Enums.UserType.Normal
+            };
+        }
+
+        private Enums.UserStatus ConvertToDbUserStatus(UserStatus protoStatus)
+        {
+            return protoStatus switch
+            {
+                UserStatus.Active => Enums.UserStatus.Active,
+                UserStatus.Blocked => Enums.UserStatus.Blocked,
+                _ => Enums.UserStatus.Active
+            };
+        }
+
+        private User ConvertToProtoUser(Common.Models.Db.User dbUser)
+        {
+            return new User
+            {
+                Id = new InternalID { Id = dbUser.Id },
+                Username = dbUser.Name,
+                Type = ConvertToProtoUserType(dbUser.Type),
+                Status = ConvertToProtoUserStatus(dbUser.Status)
+            };
+        }
+
+        private UserType ConvertToProtoUserType(Enums.UserType dbType)
+        {
+            return dbType switch
+            {
+                Enums.UserType.Admin => UserType.Admin,
+                Enums.UserType.Normal => UserType.Normal,
+                _ => UserType.Normal
+            };
+        }
+
+        private UserStatus ConvertToProtoUserStatus(Enums.UserStatus dbStatus)
+        {
+            return dbStatus switch
+            {
+                Enums.UserStatus.Active => UserStatus.Active,
+                Enums.UserStatus.Blocked => UserStatus.Blocked,
+                _ => UserStatus.Active
+            };
+        }
+    }
+}
