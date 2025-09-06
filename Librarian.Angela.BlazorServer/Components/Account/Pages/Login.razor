@@ -4,11 +4,14 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using Librarian.Angela.BlazorServer.Data
+@using Librarian.Angela.BlazorServer.Services
+@using Librarian.Angela.BlazorServer.Components.Account
 
-@inject SignInManager<ApplicationUser> SignInManager
+@inject ISephirahAuthService AuthService
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Log in</PageTitle>
 
@@ -19,13 +22,13 @@
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
+                <h2>Use Sephirah account to log in.</h2>
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label for="email" class="form-label">Email</label>
-                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                    <InputText @bind-Value="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="username" />
+                    <label for="username" class="form-label">Username</label>
+                    <ValidationMessage For="() => Input.Username" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
                     <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
@@ -80,43 +83,57 @@
     {
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            // Clear any existing authentication cookies
+            await HttpContext.SignOutAsync("Cookies");
         }
     }
 
     public async Task LoginUser()
     {
-        // This doesn't count login failures towards account lockout
-        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded)
+        try
         {
-            Logger.LogInformation("User logged in.");
-            RedirectManager.RedirectTo(ReturnUrl);
+            var result = await AuthService.LoginAsync(Input.Username, Input.Password);
+            
+            if (result != null && !string.IsNullOrEmpty(result.AccessToken))
+            {
+                // Store tokens in HTTP-only cookies
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1) // Token expiry
+                };
+
+                HttpContext.Response.Cookies.Append("AccessToken", result.AccessToken, cookieOptions);
+                HttpContext.Response.Cookies.Append("RefreshToken", result.RefreshToken, cookieOptions);
+
+                // Notify authentication state provider
+                if (AuthStateProvider is JwtAuthenticationStateProvider jwtProvider)
+                {
+                    jwtProvider.NotifyUserAuthentication(result.AccessToken);
+                }
+
+                Logger.LogInformation("User logged in successfully.");
+                RedirectManager.RedirectTo(ReturnUrl);
+            }
+            else
+            {
+                errorMessage = "Error: Invalid login attempt.";
+                Logger.LogWarning("Invalid login attempt for user: {Username}", Input.Username);
+            }
         }
-        else if (result.RequiresTwoFactor)
+        catch (Exception ex)
         {
-            RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
-        }
-        else
-        {
-            errorMessage = "Error: Invalid login attempt.";
+            Logger.LogError(ex, "Login error for user: {Username}", Input.Username);
+            errorMessage = "Error: An unexpected error occurred during login.";
         }
     }
 
     private sealed class InputModel
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; } = "";
+        public string Username { get; set; } = "";
 
         [Required]
         [DataType(DataType.Password)]

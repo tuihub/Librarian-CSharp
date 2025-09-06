@@ -1,6 +1,8 @@
 using Librarian.Angela.BlazorServer.Components;
 using Librarian.Angela.BlazorServer.Components.Account;
 using Librarian.Angela.BlazorServer.Data;
+using Librarian.Angela.BlazorServer.Services;
+using Librarian.Angela.BlazorServer.Services.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +13,35 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Configure Sephirah API settings
+builder.Services.Configure<SephirahApiConfig>(
+    builder.Configuration.GetSection("SephirahApi"));
+
+// Add HttpClient for Sephirah API
+builder.Services.AddHttpClient<ISephirahAuthService, SephirahAuthService>();
+
+// Add HTTP context accessor
+builder.Services.AddHttpContextAccessor();
+
+// Add JWT authentication state provider
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+
+// Keep Identity system for now (will be removed after migration is complete)
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+// Configure authentication
 builder.Services.AddAuthentication(options =>
     {
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+        options.DefaultScheme = "Cookies";
+        options.DefaultSignInScheme = "Cookies";
     })
-    .AddIdentityCookies();
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

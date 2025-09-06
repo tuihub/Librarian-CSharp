@@ -86,7 +86,7 @@ namespace Librarian.Sephirah.Server
             builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
             // Add services to the container.
-            builder.Services.AddGrpc();
+            builder.Services.AddGrpc().AddJsonTranscoding();
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddGrpcReflection();
