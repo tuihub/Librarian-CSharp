@@ -86,7 +86,7 @@ namespace Librarian.Sephirah.Server
             builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
             // Add services to the container.
-            builder.Services.AddGrpc();
+            builder.Services.AddGrpc().AddJsonTranscoding();
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddGrpcReflection();
@@ -178,12 +178,12 @@ namespace Librarian.Sephirah.Server
 
         public static void Configure(WebApplication app)
         {
-            // Migrate DB
-            using (var scope = app.Services.CreateScope())
-            {
-                using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                db.Database.Migrate();
-            }
+            // Migrate DB - commented out for testing
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            //    db.Database.Migrate();
+            //}
 
             // Configure the HTTP request pipeline.
             app.MapGrpcService<SephirahService>();
