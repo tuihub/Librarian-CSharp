@@ -4,8 +4,6 @@ package librarian.angela.v1;
 
 option csharp_namespace = "Librarian.Angela.V1";
 
-import "google/api/annotations.proto";
-
 // Common message types used across Angela services
 
 // Internal ID wrapper
@@ -158,50 +156,18 @@ message SearchAppInfosResponse {
 // Angela service combines all admin management services
 service AngelaService {
   // Tiphereth services (user management)
-  rpc GetToken(GetTokenRequest) returns (GetTokenResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/auth/token"
-      body: "*"
-    };
-  }
+  rpc GetToken(GetTokenRequest) returns (GetTokenResponse);
   
-  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/auth/refresh"
-      body: "*"
-    };
-  }
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/users"
-    };
-  }
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/users"
-      body: "*"
-    };
-  }
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/users/{user.id.id}"
-      body: "*"
-    };
-  }
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   
-  rpc ListPorters(ListPortersRequest) returns (ListPortersResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/porters"
-    };
-  }
+  rpc ListPorters(ListPortersRequest) returns (ListPortersResponse);
   
   // Gebura services (app management)
-  rpc SearchAppInfos(SearchAppInfosRequest) returns (SearchAppInfosResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/app-infos"
-    };
-  }
+  rpc SearchAppInfos(SearchAppInfosRequest) returns (SearchAppInfosResponse);
 }
