@@ -19,8 +19,4 @@
         <ProjectReference Include="..\Librarian.Common\Librarian.Common.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Configs\"/>
-    </ItemGroup>
-
 </Project>

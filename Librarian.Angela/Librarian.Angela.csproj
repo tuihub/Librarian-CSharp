@@ -12,6 +12,7 @@
         <PackageReference Include="Grpc.AspNetCore" Version="2.71.0"/>
         <PackageReference Include="Grpc.AspNetCore.Web" Version="2.71.0"/>
         <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.19" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8"/>
     </ItemGroup>
 

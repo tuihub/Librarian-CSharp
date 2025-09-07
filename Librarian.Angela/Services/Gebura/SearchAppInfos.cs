@@ -1,11 +1,11 @@
 using Grpc.Core;
-using Librarian.Angela.V1;
+using Librarian.Sephirah.Angela;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TuiHub.Protos.Librarian.V1;
-using InternalID = Librarian.Angela.V1.InternalID;
-using PagingResponse = Librarian.Angela.V1.PagingResponse;
+using InternalID = Librarian.Sephirah.Angela.InternalID;
+using PagingResponse = Librarian.Sephirah.Angela.PagingResponse;
 
 namespace Librarian.Angela.Services;
 

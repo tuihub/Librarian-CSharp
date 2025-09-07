@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Librarian.Angela.V1;
+using Librarian.Sephirah.Angela;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;

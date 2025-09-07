@@ -11,7 +11,7 @@
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.71.0"/>
         <PackageReference Include="Grpc.AspNetCore.Web" Version="2.71.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.19"/>
+        <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.8.19" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -10,6 +10,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Librarian.Sephirah.Server;
 
@@ -86,9 +87,20 @@ public static class StartUp
         // Add IdGen DI
         builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
-        // Add services to the container.
+        // Add grpc
         builder.Services.AddGrpc().AddJsonTranscoding();
-        if (builder.Environment.IsDevelopment()) builder.Services.AddGrpcReflection();
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddGrpcReflection();
+
+            // Add Swagger
+            builder.Services.AddGrpcSwagger();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo { Title = "gRPC transcoding", Version = "v1" });
+            });
+        }
 
         // Add Auth
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -181,16 +193,23 @@ public static class StartUp
             db.Database.Migrate();
         }
 
+        app.MapGet("/",
+            () =>
+                "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+
+        // Map swagger
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Librarian Angela API V1"); });
+        }
+
         // Configure the HTTP request pipeline.
         app.MapGrpcService<SephirahService>();
         app.MapGrpcService<AngelaService>();
 
         // add server reflection when env is dev
         if (app.Environment.IsDevelopment()) app.MapGrpcReflectionService();
-
-        app.MapGet("/",
-            () =>
-                "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
         // Enable gRPC-Web for browser support
         app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
