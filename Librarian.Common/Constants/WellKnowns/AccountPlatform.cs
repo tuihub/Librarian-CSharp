@@ -1,11 +1,10 @@
-﻿namespace Librarian.Common.Constants
+﻿namespace Librarian.Common.Constants;
+
+public static partial class WellKnowns
 {
-    public static partial class WellKnowns
+    public enum AccountPlatform
     {
-        public enum AccountPlatform
-        {
-            Unspecified,
-            Steam,
-        }
+        Unspecified,
+        Steam
     }
 }

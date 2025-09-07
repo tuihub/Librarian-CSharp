@@ -1,13 +1,12 @@
-namespace Librarian.Common.Constants
+namespace Librarian.Common.Constants;
+
+public static partial class WellKnowns
 {
-    public static partial class WellKnowns
+    public enum AppInfoSource
     {
-        public enum AppInfoSource
-        {
-            Unspecified,
-            Steam,
-            Vndb,
-            Bangumi,
-        }
+        Unspecified,
+        Steam,
+        Vndb,
+        Bangumi
     }
 }

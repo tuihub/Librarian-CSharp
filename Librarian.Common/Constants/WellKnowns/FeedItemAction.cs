@@ -1,12 +1,11 @@
-namespace Librarian.Common.Constants
+namespace Librarian.Common.Constants;
+
+public static partial class WellKnowns
 {
-    public static partial class WellKnowns
+    public enum FeedItemAction
     {
-        public enum FeedItemAction
-        {
-            Unspecified,
-            KeywordFilter,
-            DescriptionGenerator,
-        }
+        Unspecified,
+        KeywordFilter,
+        DescriptionGenerator
     }
 }

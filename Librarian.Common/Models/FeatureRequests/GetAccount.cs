@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Librarian.Common.Models.FeatureRequests
+namespace Librarian.Common.Models.FeatureRequests;
+
+public class GetAccount
 {
-    public class GetAccount
-    {
-        [Required, MaxLength(511)]
-        public string AccountId { get; set; } = null!;
-    }
+    [Required] [MaxLength(511)] public string AccountId { get; set; } = null!;
 }

@@ -8,5 +8,5 @@ public enum PorterFeature
     NotifyDestination,
     FeedItemAction,
     FeedSetter,
-    FeedGetter,
+    FeedGetter
 }

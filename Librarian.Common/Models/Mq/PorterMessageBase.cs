@@ -1,8 +1,7 @@
-namespace Librarian.Common.Models.Mq
+namespace Librarian.Common.Models.Mq;
+
+public abstract record PorterMessageBase
 {
-    public abstract record PorterMessageBase
-    {
-        public string? Region { get; set; }
-        public Guid RequestId { get; set; } = Guid.NewGuid();
-    }
+    public string? Region { get; set; }
+    public Guid RequestId { get; set; } = Guid.NewGuid();
 }

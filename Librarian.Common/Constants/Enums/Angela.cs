@@ -1,12 +1,11 @@
-﻿namespace Librarian.Common.Constants
+﻿namespace Librarian.Common.Constants;
+
+public static partial class Enums
 {
-    public static partial class Enums
+    public enum ServerEvent
     {
-        public enum ServerEvent
-        {
-            Unspecified,
-            ListenerConnected,
-            SystemNotificationUpdated,
-        }
+        Unspecified,
+        ListenerConnected,
+        SystemNotificationUpdated
     }
 }

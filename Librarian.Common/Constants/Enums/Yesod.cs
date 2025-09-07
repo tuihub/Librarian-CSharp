@@ -1,20 +1,19 @@
-﻿namespace Librarian.Common.Constants
-{
-    public static partial class Enums
-    {
-        public enum FeedConfigStatus
-        {
-            Unspecified,
-            Active,
-            Suspend,
-        }
+﻿namespace Librarian.Common.Constants;
 
-        public enum FeedConfigPullStatus
-        {
-            Unspecified,
-            Processing,
-            Success,
-            Failed,
-        }
+public static partial class Enums
+{
+    public enum FeedConfigPullStatus
+    {
+        Unspecified,
+        Processing,
+        Success,
+        Failed
+    }
+
+    public enum FeedConfigStatus
+    {
+        Unspecified,
+        Active,
+        Suspend
     }
 }

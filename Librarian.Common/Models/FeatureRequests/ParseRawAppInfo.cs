@@ -1,6 +1,5 @@
-﻿namespace Librarian.Common.Models.FeatureRequests
+﻿namespace Librarian.Common.Models.FeatureRequests;
+
+public class ParseRawAppInfo
 {
-    public class ParseRawAppInfo
-    {
-    }
 }

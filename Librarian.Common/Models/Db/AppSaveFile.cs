@@ -1,38 +1,40 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace Librarian.Common.Models.Db
+namespace Librarian.Common.Models.Db;
+
+[Index(nameof(Status))]
+[Index(nameof(IsPinned))]
+[Index(nameof(CreatedAt))]
+[Index(nameof(UpdatedAt))]
+public class AppSaveFile
 {
-    [Index(nameof(Status))]
-    [Index(nameof(IsPinned))]
-    [Index(nameof(CreatedAt))]
-    [Index(nameof(UpdatedAt))]
-    public class AppSaveFile
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public long Id { get; set; }
-        public AppSaveFileStatus Status { get; set; }
-        public bool IsPinned { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public long Id { get; set; }
 
-        // relations
-        // one-to-one relation(required)
-        public long FileMetadataId { get; set; }
-        public FileMetadata FileMetadata { get; set; } = null!;
-        // one-to-many relation(to parent)
-        public long AppId { get; set; }
-        public App App { get; set; } = null!;
-    }
+    public AppSaveFileStatus Status { get; set; }
+    public bool IsPinned { get; set; } = false;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public enum AppSaveFileStatus
-    {
-        Pending,
-        InProgress,
-        Stored,
-        Sha256Mismatch,
-        Failed,
-    }
+    // relations
+    // one-to-one relation(required)
+    public long FileMetadataId { get; set; }
+
+    public FileMetadata FileMetadata { get; set; } = null!;
+
+    // one-to-many relation(to parent)
+    public long AppId { get; set; }
+    public App App { get; set; } = null!;
+}
+
+public enum AppSaveFileStatus
+{
+    Pending,
+    InProgress,
+    Stored,
+    Sha256Mismatch,
+    Failed
 }

@@ -1,6 +1,5 @@
-﻿namespace Librarian.Angela.Services
+﻿namespace Librarian.Angela.Services;
+
+public class FeedRoutingService
 {
-    public class FeedRoutingService
-    {
-    }
 }

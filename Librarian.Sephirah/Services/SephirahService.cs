@@ -6,47 +6,47 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
-namespace Librarian.Sephirah.Services
+namespace Librarian.Sephirah.Services;
+
+public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
 {
-    public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
+    private readonly IBus _bus;
+    private readonly ApplicationDbContext _dbContext;
+    private readonly IdGenerator _idGenerator;
+    private readonly ILogger _logger;
+    private readonly PullMetadataService _pullMetadataService;
+    private readonly SephirahContext _sephirahContext;
+
+    public SephirahService(ILogger<SephirahService> logger, ApplicationDbContext dbContext,
+        PullMetadataService pullMetadataService,
+        SephirahContext sephirahContext, IdGenerator idGenerator, IBus bus)
     {
-        private readonly ILogger _logger;
-        private readonly ApplicationDbContext _dbContext;
-        private readonly PullMetadataService _pullMetadataService;
-        private readonly SephirahContext _sephirahContext;
-        private readonly IdGenerator _idGenerator;
-        private readonly IBus _bus;
+        _logger = logger;
+        _dbContext = dbContext;
+        _pullMetadataService = pullMetadataService;
+        _sephirahContext = sephirahContext;
+        _idGenerator = idGenerator;
+        _bus = bus;
+    }
 
-        public SephirahService(ILogger<SephirahService> logger, ApplicationDbContext dbContext, PullMetadataService pullMetadataService,
-            SephirahContext sephirahContext, IdGenerator idGenerator, IBus bus)
+    // Example method for sending AppId messages
+    protected async Task SendAppIdMessageAsync(string appId, string platform)
+    {
+        try
         {
-            _logger = logger;
-            _dbContext = dbContext;
-            _pullMetadataService = pullMetadataService;
-            _sephirahContext = sephirahContext;
-            _idGenerator = idGenerator;
-            _bus = bus;
+            var message = new AppIdMQ
+            {
+                AppId = appId
+            };
+
+            var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{platform}"));
+            await endpoint.Send(message);
+
+            _logger.LogDebug("Sent AppId message to platform {platform}: {message}", platform, message);
         }
-
-        // Example method for sending AppId messages
-        protected async Task SendAppIdMessageAsync(string appId, string platform)
+        catch (Exception ex)
         {
-            try
-            {
-                var message = new AppIdMQ
-                {
-                    AppId = appId,
-                };
-
-                var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{platform}"));
-                await endpoint.Send(message);
-
-                _logger.LogDebug("Sent AppId message to platform {platform}: {message}", platform, message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send AppId message to platform {platform}: {appId}", platform, appId);
-            }
+            _logger.LogError(ex, "Failed to send AppId message to platform {platform}: {appId}", platform, appId);
         }
     }
 }

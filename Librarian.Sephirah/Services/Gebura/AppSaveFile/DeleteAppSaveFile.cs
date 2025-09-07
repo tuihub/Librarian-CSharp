@@ -7,44 +7,44 @@ using Microsoft.EntityFrameworkCore;
 using Minio.DataModel.Args;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
-namespace Librarian.Sephirah.Services
+namespace Librarian.Sephirah.Services;
+
+public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
 {
-    public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
+    [Authorize]
+    public override async Task<DeleteAppSaveFileResponse> DeleteAppSaveFile(DeleteAppSaveFileRequest request,
+        ServerCallContext context)
     {
-        [Authorize]
-        public override async Task<DeleteAppSaveFileResponse> DeleteAppSaveFile(DeleteAppSaveFileRequest request, ServerCallContext context)
+        var id = request.Id.Id;
+        var userId = context.GetInternalIdFromHeader();
+        var appSaveFile = await _dbContext.AppSaveFiles
+            .Where(x => x.Id == id)
+            .Include(x => x.App)
+            .SingleAsync(x => x.Id == id);
+        if (appSaveFile.App.UserId != userId)
+            throw new RpcException(new Status(StatusCode.PermissionDenied,
+                "You do not have permission to remove this file."));
+        var fileMetadata = await _dbContext.FileMetadatas.SingleAsync(x => x.Id == appSaveFile.FileMetadataId);
+        // only remove in minio when status is Stored
+        if (appSaveFile.Status == AppSaveFileStatus.Stored)
         {
-            var id = request.Id.Id;
-            var userId = context.GetInternalIdFromHeader();
-            var appSaveFile = await _dbContext.AppSaveFiles
-                .Where(x => x.Id == id)
-                .Include(x => x.App)
-                .SingleAsync(x => x.Id == id);
-            if (appSaveFile.App.UserId != userId)
-            {
-                throw new RpcException(new Status(StatusCode.PermissionDenied, "You do not have permission to remove this file."));
-            }
-            var fileMetadata = await _dbContext.FileMetadatas.SingleAsync(x => x.Id == appSaveFile.FileMetadataId);
-            // only remove in minio when status is Stored
-            if (appSaveFile.Status == AppSaveFileStatus.Stored)
-            {
-                var minioClient = MinioClientUtil.GetMinioClient();
-                var rmArgs = new RemoveObjectArgs()
-                                 .WithBucket(GlobalContext.SystemConfig.MinioBucket)
-                                 .WithObject(appSaveFile.FileMetadataId.ToString());
-                await minioClient.RemoveObjectAsync(rmArgs);
-            }
-            // update user and app capacity
-            var user = _dbContext.Users.Single(x => x.Id == userId);
-            user.TotalAppSaveFileCount--;
-            user.TotalAppSaveFileSizeBytes -= fileMetadata.SizeBytes;
-            appSaveFile.App.TotalAppSaveFileCount--;
-            appSaveFile.App.TotalAppSaveFileSizeBytes -= fileMetadata.SizeBytes;
-            // remove db entries
-            _dbContext.FileMetadatas.Remove(fileMetadata);
-            _dbContext.AppSaveFiles.Remove(appSaveFile);
-            await _dbContext.SaveChangesAsync();
-            return new DeleteAppSaveFileResponse();
+            var minioClient = MinioClientUtil.GetMinioClient();
+            var rmArgs = new RemoveObjectArgs()
+                .WithBucket(GlobalContext.SystemConfig.MinioBucket)
+                .WithObject(appSaveFile.FileMetadataId.ToString());
+            await minioClient.RemoveObjectAsync(rmArgs);
         }
+
+        // update user and app capacity
+        var user = _dbContext.Users.Single(x => x.Id == userId);
+        user.TotalAppSaveFileCount--;
+        user.TotalAppSaveFileSizeBytes -= fileMetadata.SizeBytes;
+        appSaveFile.App.TotalAppSaveFileCount--;
+        appSaveFile.App.TotalAppSaveFileSizeBytes -= fileMetadata.SizeBytes;
+        // remove db entries
+        _dbContext.FileMetadatas.Remove(fileMetadata);
+        _dbContext.AppSaveFiles.Remove(appSaveFile);
+        await _dbContext.SaveChangesAsync();
+        return new DeleteAppSaveFileResponse();
     }
 }

@@ -1,12 +1,12 @@
 using TuiHub.Protos.Librarian.Porter.V1;
 
-namespace Librarian.ThirdParty.Steam
+namespace Librarian.ThirdParty.Steam;
+
+public partial class SteamApiService
 {
-    public partial class SteamApiService
+    public Task<AppInfo> ParseRawAppInfoAsync(string rawDataJson, CancellationToken ct = default)
     {
-        public Task<AppInfo> ParseRawAppInfoAsync(string rawDataJson, CancellationToken ct = default)
-        {
-            throw new PlatformNotSupportedException("Steam does not support ParseRawAppInfoAsync. Use GetAppInfoAsync instead.");
-        }
+        throw new PlatformNotSupportedException(
+            "Steam does not support ParseRawAppInfoAsync. Use GetAppInfoAsync instead.");
     }
 }

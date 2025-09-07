@@ -1,19 +1,18 @@
-﻿namespace Librarian.Common.Constants
-{
-    public static partial class Enums
-    {
-        public enum AppType
-        {
-            Unspecified,
-            Game,
-        }
+﻿namespace Librarian.Common.Constants;
 
-        public enum AppSaveFileCapacityStrategy
-        {
-            Unspecified,
-            Fail,
-            DeleteOldestOrFail,
-            DeleteOldestUntilSatisfied,
-        }
+public static partial class Enums
+{
+    public enum AppSaveFileCapacityStrategy
+    {
+        Unspecified,
+        Fail,
+        DeleteOldestOrFail,
+        DeleteOldestUntilSatisfied
+    }
+
+    public enum AppType
+    {
+        Unspecified,
+        Game
     }
 }

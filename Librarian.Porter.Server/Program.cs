@@ -11,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Get configuration
 var globalContext = new GlobalContext();
-globalContext.PorterConfig = builder.Configuration.GetSection("PorterConfig").Get<PorterConfig>() ?? throw new Exception("PorterConfig parse failed");
-globalContext.ConsulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ?? throw new Exception("ConsulConfig parse failed");
+globalContext.PorterConfig = builder.Configuration.GetSection("PorterConfig").Get<PorterConfig>() ??
+                             throw new Exception("PorterConfig parse failed");
+globalContext.ConsulConfig = builder.Configuration.GetSection("ConsulConfig").Get<ConsulConfig>() ??
+                             throw new Exception("ConsulConfig parse failed");
 builder.Services.AddSingleton(globalContext);
 
 // Add services to the container.
@@ -28,7 +30,12 @@ if (globalContext.ConsulConfig.IsEnabled)
         c.Address = new Uri(globalContext.ConsulConfig.ConsulAddress);
     }));
 }
-ServicesUtil.ConfigureThirdPartyServices(builder, globalContext, LoggerFactory.Create(b => { b.AddConsole(); b.AddDebug(); }).CreateLogger("startup"));
+
+ServicesUtil.ConfigureThirdPartyServices(builder, globalContext, LoggerFactory.Create(b =>
+{
+    b.AddConsole();
+    b.AddDebug();
+}).CreateLogger("startup"));
 builder.Services.AddSingleton<AppInfoServiceResolver>();
 builder.Services.AddSingleton<AccountServiceResolver>();
 
@@ -38,13 +45,12 @@ var app = builder.Build();
 app.MapGrpcService<PorterService>();
 
 // add server reflection when env is dev
-IWebHostEnvironment env = app.Environment;
-if (env.IsDevelopment())
-{
-    app.MapGrpcReflectionService();
-}
+var env = app.Environment;
+if (env.IsDevelopment()) app.MapGrpcReflectionService();
 
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+app.MapGet("/",
+    () =>
+        "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 if (globalContext.ConsulConfig.IsEnabled)
 {
@@ -56,10 +62,7 @@ if (globalContext.ConsulConfig.IsEnabled)
     ConsulUtil.RegisterConsul(consulClient, globalContext);
 
     // Deregister from consul when app is stopped
-    app.Lifetime.ApplicationStopping.Register(() =>
-    {
-        ConsulUtil.DeregisterConsul(consulClient, globalContext);
-    });
+    app.Lifetime.ApplicationStopping.Register(() => { ConsulUtil.DeregisterConsul(consulClient, globalContext); });
 }
 
 app.Run();

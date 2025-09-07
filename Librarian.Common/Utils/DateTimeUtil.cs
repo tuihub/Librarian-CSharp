@@ -1,12 +1,11 @@
 ﻿using System.Globalization;
 
-namespace Librarian.Common.Utils
+namespace Librarian.Common.Utils;
+
+public static class DateTimeUtil
 {
-    public static class DateTimeUtil
+    public static string ToISO8601String(this DateTime dateTime)
     {
-        public static string ToISO8601String(this DateTime dateTime)
-        {
-            return dateTime.ToString("O", CultureInfo.InvariantCulture);
-        }
+        return dateTime.ToString("O", CultureInfo.InvariantCulture);
     }
 }

@@ -1,31 +1,30 @@
-﻿namespace Librarian.Common.Constants
+﻿namespace Librarian.Common.Constants;
+
+public static partial class Enums
 {
-    public static partial class Enums
+    public enum ChunkTransferStatus
     {
-        public enum FileTransferStatus
-        {
-            Unspecified,
-            Pending,
-            InProgress,
-            Success,
-            Failed,
-        }
+        Unspecified,
+        Pending,
+        InProgress,
+        Success,
+        Failed
+    }
 
-        public enum ChunkTransferStatus
-        {
-            Unspecified,
-            Pending,
-            InProgress,
-            Success,
-            Failed,
-        }
+    public enum FileTransferStatus
+    {
+        Unspecified,
+        Pending,
+        InProgress,
+        Success,
+        Failed
+    }
 
-        public enum FileType
-        {
-            Unspecified,
-            GeburaSave,
-            ChesedImage,
-            GeburaAppInfoImage,
-        }
+    public enum FileType
+    {
+        Unspecified,
+        GeburaSave,
+        ChesedImage,
+        GeburaAppInfoImage
     }
 }

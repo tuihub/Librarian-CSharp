@@ -1,8 +1,7 @@
-namespace Librarian.Common.Models.Mq
+namespace Librarian.Common.Models.Mq;
+
+public record SearchAppInfo : PorterMessageBase
 {
-    public record SearchAppInfo : PorterMessageBase
-    {
-        public string Source { get; set; } = string.Empty;
-        public string NameLike { get; set; } = string.Empty;
-    }
+    public string Source { get; set; } = string.Empty;
+    public string NameLike { get; set; } = string.Empty;
 }

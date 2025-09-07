@@ -2,16 +2,16 @@
 using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sentinel.V1;
 
-namespace Librarian.Sentinel.Services
+namespace Librarian.Sentinel.Services;
+
+public partial class SephirahSentinelService : LibrarianSephirahSentinelService.LibrarianSephirahSentinelServiceBase
 {
-    public partial class SephirahSentinelService : LibrarianSephirahSentinelService.LibrarianSephirahSentinelServiceBase
+    private readonly ApplicationDbContext _dbContext;
+    private readonly ILogger _logger;
+
+    public SephirahSentinelService(ILogger<SephirahSentinelService> logger, ApplicationDbContext dbContext)
     {
-        private readonly ILogger _logger;
-        private readonly ApplicationDbContext _dbContext;
-        public SephirahSentinelService(ILogger<SephirahSentinelService> logger, ApplicationDbContext dbContext)
-        {
-            _logger = logger;
-            _dbContext = dbContext;
-        }
+        _logger = logger;
+        _dbContext = dbContext;
     }
 }

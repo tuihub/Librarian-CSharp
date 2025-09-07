@@ -1,12 +1,11 @@
-﻿namespace Librarian.Common.Configs
+﻿namespace Librarian.Common.Configs;
+
+public class ConsulConfig
 {
-    public partial class ConsulConfig
-    {
-        public bool IsEnabled { get; set; }
-        public string ConsulAddress { get; set; } = null!;
-        public string ServiceName { get; set; } = null!;
-        public string ServiceAddress { get; set; } = null!;
-        public int ServicePort { get; set; }
-        public string HealthCheckUrl { get; set; } = null!;
-    }
+    public bool IsEnabled { get; set; }
+    public string ConsulAddress { get; set; } = null!;
+    public string ServiceName { get; set; } = null!;
+    public string ServiceAddress { get; set; } = null!;
+    public int ServicePort { get; set; }
+    public string HealthCheckUrl { get; set; } = null!;
 }

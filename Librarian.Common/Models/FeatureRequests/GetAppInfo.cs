@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Librarian.Common.Models.FeatureRequests
+namespace Librarian.Common.Models.FeatureRequests;
+
+public class GetAppInfo
 {
-    public class GetAppInfo
-    {
-        [Required, MaxLength(511)]
-        public string AppId { get; set; } = null!;
-    }
+    [Required] [MaxLength(511)] public string AppId { get; set; } = null!;
 }

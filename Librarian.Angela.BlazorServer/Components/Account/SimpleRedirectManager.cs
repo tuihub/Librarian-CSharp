@@ -1,26 +1,25 @@
 using Microsoft.AspNetCore.Components;
 
-namespace Librarian.Angela.BlazorServer.Components.Account
+namespace Librarian.Angela.BlazorServer.Components.Account;
+
+public class SimpleRedirectManager
 {
-    public class SimpleRedirectManager
+    private readonly NavigationManager _navigationManager;
+
+    public SimpleRedirectManager(NavigationManager navigationManager)
     {
-        private readonly NavigationManager _navigationManager;
+        _navigationManager = navigationManager;
+    }
 
-        public SimpleRedirectManager(NavigationManager navigationManager)
-        {
-            _navigationManager = navigationManager;
-        }
+    public void RedirectTo(string? uri)
+    {
+        uri ??= "";
+        _navigationManager.NavigateTo(uri);
+    }
 
-        public void RedirectTo(string? uri)
-        {
-            uri ??= "";
-            _navigationManager.NavigateTo(uri);
-        }
-
-        public void RedirectTo(string uri, Dictionary<string, object?> queryParameters)
-        {
-            var uriWithQuery = _navigationManager.GetUriWithQueryParameters(uri, queryParameters);
-            _navigationManager.NavigateTo(uriWithQuery);
-        }
+    public void RedirectTo(string uri, Dictionary<string, object?> queryParameters)
+    {
+        var uriWithQuery = _navigationManager.GetUriWithQueryParameters(uri, queryParameters);
+        _navigationManager.NavigateTo(uriWithQuery);
     }
 }

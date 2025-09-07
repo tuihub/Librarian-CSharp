@@ -1,6 +1,5 @@
-﻿namespace Librarian.Common.Models.Yesod.BuiltinActions
+﻿namespace Librarian.Common.Models.Yesod.BuiltinActions;
+
+public class DescriptionGenerator
 {
-    public partial class DescriptionGenerator
-    {
-    }
 }

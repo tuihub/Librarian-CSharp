@@ -1,11 +1,8 @@
 using Librarian.Angela.BlazorServer.Components;
 using Librarian.Angela.BlazorServer.Components.Account;
-using Librarian.Angela.BlazorServer.Data;
 using Librarian.Angela.BlazorServer.Services;
 using Librarian.Angela.BlazorServer.Services.Models;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +65,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error", true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }

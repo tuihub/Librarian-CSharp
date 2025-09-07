@@ -1,29 +1,32 @@
+using System.Collections.Concurrent;
 using Consul;
 using Librarian.Common.Configs;
 using Librarian.Common.Constants;
 using Librarian.Common.Helpers;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using TuiHub.Protos.Librarian.V1;
 
 namespace Librarian.Common.Services;
 
 public class PorterManagementService
 {
-    private readonly ILogger<PorterManagementService> _logger;
     private readonly IConsulClient _consulClient;
-    private readonly SystemConfig _systemConfig;
     private readonly ConsulConfig _consulConfig;
+    private readonly Thread? _consulMonitorThread;
 
-    // key: porterId
-    private readonly ConcurrentDictionary<string, PorterInstance> _porterInstances = new();
+    private readonly CancellationTokenSource _cts = new();
+
+    private readonly ILogger<PorterManagementService> _logger;
+
     // key: porterId:feature
     private readonly ConcurrentDictionary<string, PorterInstanceFeatureInfo> _porterInstanceFeatureInfos = new();
 
-    private readonly CancellationTokenSource _cts = new();
-    private readonly Thread? _consulMonitorThread;
+    // key: porterId
+    private readonly ConcurrentDictionary<string, PorterInstance> _porterInstances = new();
+    private readonly SystemConfig _systemConfig;
 
-    public PorterManagementService(ILogger<PorterManagementService> logger, IConsulClient consulClient, SystemConfig systemConfig, ConsulConfig consulConfig)
+    public PorterManagementService(ILogger<PorterManagementService> logger, IConsulClient consulClient,
+        SystemConfig systemConfig, ConsulConfig consulConfig)
     {
         _logger = logger;
         _consulClient = consulClient;
@@ -44,7 +47,7 @@ public class PorterManagementService
 
     public void EnablePorterInstance(string porterId, FeatureSummary featureSummary, string region)
     {
-        if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+        if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
         {
             _logger.LogError("Porter instance not found: {PorterId}", porterId);
             return;
@@ -63,15 +66,14 @@ public class PorterManagementService
             porterInstance.AddRangeFeatures(newFeatures);
             porterInstance.Region = region;
             foreach (var feature in newFeatures)
-            {
-                _porterInstanceFeatureInfos.TryAdd(porterId + ":" + feature, new PorterInstanceFeatureInfo(porterId, region, feature, true, 0, 1, DateTime.UtcNow));
-            }
+                _porterInstanceFeatureInfos.TryAdd(porterId + ":" + feature,
+                    new PorterInstanceFeatureInfo(porterId, region, feature, true, 0, 1, DateTime.UtcNow));
         }
     }
 
     public void DisablePorterInstance(string porterId)
     {
-        if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+        if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
         {
             _logger.LogError("Porter instance not found: {PorterId}", porterId);
             return;
@@ -82,26 +84,24 @@ public class PorterManagementService
             porterInstance.IsEnabled = false;
             // create a copy of features to avoid modifying the collection while iterating
             var features = porterInstance.Features.ToList();
-            foreach (var feature in features)
-            {
-                _porterInstanceFeatureInfos.TryRemove($"{porterId}:{feature}", out _);
-            }
+            foreach (var feature in features) _porterInstanceFeatureInfos.TryRemove($"{porterId}:{feature}", out _);
             UpdatePorterInterfaceStatus(porterId, ([], [], []));
             porterInstance.ClearFeatures();
         }
     }
 
-    public async Task<PorterInstance?> AcquirePorterInstanceAsync(string feature, string? region = null, CancellationToken cancellationToken = default)
+    public async Task<PorterInstance?> AcquirePorterInstanceAsync(string feature, string? region = null,
+        CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Acquiring porter instance for feature: {Feature} in region: {Region}", feature, region);
 
         const int maxRetries = 3;
-        for (int retry = 0; retry < maxRetries; retry++)
+        for (var retry = 0; retry < maxRetries; retry++)
         {
             if (retry > 0)
-            {
-                _logger.LogDebug("Retrying to acquire porter instance for feature: {Feature} in region: {Region}, attempt: {Attempt}", feature, region, retry + 1);
-            }
+                _logger.LogDebug(
+                    "Retrying to acquire porter instance for feature: {Feature} in region: {Region}, attempt: {Attempt}",
+                    feature, region, retry + 1);
 
             // create a copy of candidateInfos to avoid modifying the collection while iterating
             var candidateInfos = _porterInstanceFeatureInfos.Values
@@ -113,13 +113,9 @@ public class PorterManagementService
             if (!string.IsNullOrWhiteSpace(region))
             {
                 if (region.StartsWith('!'))
-                {
                     candidateInfos = candidateInfos.Where(info => info.Region != region[1..]).ToList();
-                }
                 else
-                {
                     candidateInfos = candidateInfos.Where(info => info.Region == region).ToList();
-                }
             }
 
             // sort by remaining concurrency and last access time
@@ -132,38 +128,48 @@ public class PorterManagementService
 
             if (selectedInfo is null)
             {
-                _logger.LogWarning("No available porter instance found for feature: {Feature} in region: {Region}", feature, region);
+                _logger.LogWarning("No available porter instance found for feature: {Feature} in region: {Region}",
+                    feature, region);
                 return null;
             }
 
             if (!_porterInstances.TryGetValue(selectedInfo.InstanceId, out var porterInstance))
             {
-                _logger.LogWarning("Porter instance not found after sorting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                _logger.LogWarning(
+                    "Porter instance not found after sorting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                    selectedInfo.InstanceId, feature, region, retry);
                 continue;
             }
 
             // check the instance status and try to acquire the semaphore in the lock
-            bool acquired = false;
+            var acquired = false;
             lock (porterInstance.Lock)
             {
                 // Recheck the instance status to avoid race conditions
-                if (!porterInstance.IsEnabled || !porterInstance.IsHealthy || !porterInstance.Features.Contains(feature))
+                if (!porterInstance.IsEnabled || !porterInstance.IsHealthy ||
+                    !porterInstance.Features.Contains(feature))
                 {
-                    _logger.LogWarning("Porter instance status changed after sorting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                    _logger.LogWarning(
+                        "Porter instance status changed after sorting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                        selectedInfo.InstanceId, feature, region, retry);
                     continue;
                 }
 
                 // check if the semaphore exists
                 if (!porterInstance.FeatureSemaphores.TryGetValue(feature, out var semaphore))
                 {
-                    _logger.LogWarning("Porter instance feature semaphore not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                    _logger.LogWarning(
+                        "Porter instance feature semaphore not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                        selectedInfo.InstanceId, feature, region, retry);
                     continue;
                 }
 
                 // get the cancellation token
                 if (!porterInstance.FeatureCancellationTokenSources.TryGetValue(feature, out var cts))
                 {
-                    _logger.LogWarning("Porter instance feature cancellation token source not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                    _logger.LogWarning(
+                        "Porter instance feature cancellation token source not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                        selectedInfo.InstanceId, feature, region, retry);
                     continue;
                 }
 
@@ -182,19 +188,22 @@ public class PorterManagementService
                 catch
                 {
                     // ignore the exception and retry
-                    _logger.LogWarning("Failed to acquire semaphore immediately: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                    _logger.LogWarning(
+                        "Failed to acquire semaphore immediately: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                        selectedInfo.InstanceId, feature, region, retry);
                 }
             }
 
             // if not acquired immediately, wait for the semaphore in the lock
             if (!acquired)
-            {
                 try
                 {
                     // get the cancellation token
                     if (!porterInstance.FeatureCancellationTokenSources.TryGetValue(feature, out var cts))
                     {
-                        _logger.LogWarning("Porter instance feature cancellation token source not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                        _logger.LogWarning(
+                            "Porter instance feature cancellation token source not found: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                            selectedInfo.InstanceId, feature, region, retry);
                         continue;
                     }
 
@@ -207,23 +216,28 @@ public class PorterManagementService
                     // recheck the instance status in the lock
                     lock (porterInstance.Lock)
                     {
-                        if (!porterInstance.IsEnabled || !porterInstance.IsHealthy || !porterInstance.Features.Contains(feature))
+                        if (!porterInstance.IsEnabled || !porterInstance.IsHealthy ||
+                            !porterInstance.Features.Contains(feature))
                         {
                             // status changed, release the semaphore and retry
-                            _logger.LogWarning("Porter instance status changed after waiting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}", selectedInfo.InstanceId, feature, region, retry);
+                            _logger.LogWarning(
+                                "Porter instance status changed after waiting: {InstanceId}, feature: {Feature}, region: {Region}, retry: {Retry}",
+                                selectedInfo.InstanceId, feature, region, retry);
                             porterInstance.FeatureSemaphores[feature].Release();
                             continue;
                         }
+
                         porterInstance.FeatureLastAccessTimes[feature] = DateTime.UtcNow;
                         acquired = true;
                     }
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogWarning("Acquisition cancelled for feature: {Feature} in region: {Region}, retry: {Retry}", feature, region, retry);
+                    _logger.LogWarning(
+                        "Acquisition cancelled for feature: {Feature} in region: {Region}, retry: {Retry}", feature,
+                        region, retry);
                     continue;
                 }
-            }
 
             if (acquired)
             {
@@ -235,89 +249,88 @@ public class PorterManagementService
                     selectedInfo.CurrentConcurrency++;
                 }
 
-                _logger.LogInformation("Acquired porter instance: {InstanceId} for feature: {Feature} in region: {Region}", selectedInfo.InstanceId, feature, region);
+                _logger.LogInformation(
+                    "Acquired porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+                    selectedInfo.InstanceId, feature, region);
                 return porterInstance;
             }
         }
 
-        _logger.LogError("Failed to acquire porter instance after {MaxRetries} retries for feature: {Feature} in region: {Region}", maxRetries, feature, region);
+        _logger.LogError(
+            "Failed to acquire porter instance after {MaxRetries} retries for feature: {Feature} in region: {Region}",
+            maxRetries, feature, region);
         return null;
     }
 
     public void ReleasePorterInstance(string porterId, string feature)
     {
-        if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+        if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
         {
             _logger.LogError("Porter instance not found: {PorterId}", porterId);
             return;
         }
 
-        _logger.LogDebug("Releasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+        _logger.LogDebug("Releasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId,
+            feature, porterInstance.Region);
 
         // release the semaphore
         lock (porterInstance.Lock)
         {
-            if (porterInstance.FeatureSemaphores.TryGetValue(feature, out var semaphore))
-            {
-                semaphore.Release();
-            }
+            if (porterInstance.FeatureSemaphores.TryGetValue(feature, out var semaphore)) semaphore.Release();
         }
 
         // update the concurrency information
         var featureInfoKey = $"{porterId}:{feature}";
         if (_porterInstanceFeatureInfos.TryGetValue(featureInfoKey, out var featureInfo))
-        {
             lock (featureInfo.Lock)
             {
                 featureInfo.RemainingConcurrency++;
                 featureInfo.CurrentConcurrency--;
             }
-        }
 
-        _logger.LogInformation("Released porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+        _logger.LogInformation("Released porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+            porterId, feature, porterInstance.Region);
     }
 
     public void IncreasePorterInstanceFeatureConcurrency(string porterId, string feature)
     {
-        if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+        if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
         {
             _logger.LogError("Porter instance not found: {PorterId}", porterId);
             return;
         }
 
-        _logger.LogDebug("Increasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+        _logger.LogDebug("Increasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+            porterId, feature, porterInstance.Region);
 
         // release an extra semaphore permit
         lock (porterInstance.Lock)
         {
-            if (porterInstance.FeatureSemaphores.TryGetValue(feature, out var semaphore))
-            {
-                semaphore.Release();
-            }
+            if (porterInstance.FeatureSemaphores.TryGetValue(feature, out var semaphore)) semaphore.Release();
         }
 
         // update the concurrency information
         var featureInfoKey = $"{porterId}:{feature}";
         if (_porterInstanceFeatureInfos.TryGetValue(featureInfoKey, out var featureInfo))
-        {
             lock (featureInfo.Lock)
             {
                 featureInfo.RemainingConcurrency++;
             }
-        }
 
-        _logger.LogInformation("Increased porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+        _logger.LogInformation("Increased porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+            porterId, feature, porterInstance.Region);
     }
 
     public async Task DecreasePorterInstanceFeatureConcurrencyAsync(string porterId, string feature)
     {
-        if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+        if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
         {
             _logger.LogError("Porter instance not found: {PorterId}", porterId);
             return;
         }
 
-        _logger.LogDebug("Decreasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+        _logger.LogDebug("Decreasing porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+            porterId, feature, porterInstance.Region);
 
         var featureInfoKey = $"{porterId}:{feature}";
         if (!_porterInstanceFeatureInfos.TryGetValue(featureInfoKey, out var featureInfo))
@@ -328,21 +341,16 @@ public class PorterManagementService
 
         // check if the concurrency can be decreased
         SemaphoreSlim? semaphore = null;
-        bool shouldDecrease = false;
+        var shouldDecrease = false;
 
         lock (porterInstance.Lock)
         {
             if (porterInstance.FeatureSemaphores.TryGetValue(feature, out semaphore))
-            {
                 lock (featureInfo.Lock)
                 {
                     // check if the total concurrency capacity is greater than 1
-                    if (semaphore.CurrentCount + featureInfo.CurrentConcurrency > 1)
-                    {
-                        shouldDecrease = true;
-                    }
+                    if (semaphore.CurrentCount + featureInfo.CurrentConcurrency > 1) shouldDecrease = true;
                 }
-            }
         }
 
         // wait for the semaphore in the lock
@@ -356,44 +364,50 @@ public class PorterManagementService
                 featureInfo.RemainingConcurrency--;
             }
 
-            _logger.LogInformation("Decreased porter instance: {InstanceId} for feature: {Feature} in region: {Region}", porterId, feature, porterInstance.Region);
+            _logger.LogInformation("Decreased porter instance: {InstanceId} for feature: {Feature} in region: {Region}",
+                porterId, feature, porterInstance.Region);
         }
         else
         {
-            _logger.LogWarning("Cannot decrease concurrency for porter instance: {InstanceId} feature: {Feature} - would result in zero capacity", porterId, feature);
+            _logger.LogWarning(
+                "Cannot decrease concurrency for porter instance: {InstanceId} feature: {Feature} - would result in zero capacity",
+                porterId, feature);
         }
     }
 
-    private void UpdatePorterInterfaceStatus(string porterId, (ICollection<string> ToRemove, ICollection<string> ToAdd, ICollection<(string OldItem, string NewItem)> ToUpdate) featureChanges)
+    private void UpdatePorterInterfaceStatus(string porterId,
+        (ICollection<string> ToRemove, ICollection<string> ToAdd, ICollection<(string OldItem, string NewItem)> ToUpdate
+            ) featureChanges)
     {
         foreach (var feature in featureChanges.ToRemove)
         {
-            if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+            if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
             {
                 _logger.LogError("Porter instance not found: {PorterId}", porterId);
                 continue;
             }
+
             lock (porterInstance.Lock)
             {
                 porterInstance.RemoveFeature(feature);
             }
         }
+
         foreach (var feature in featureChanges.ToAdd)
         {
-            if (!_porterInstances.TryGetValue(porterId, out PorterInstance? porterInstance))
+            if (!_porterInstances.TryGetValue(porterId, out var porterInstance))
             {
                 _logger.LogError("Porter instance not found: {PorterId}", porterId);
                 continue;
             }
+
             lock (porterInstance.Lock)
             {
                 porterInstance.FeatureSemaphores.TryAdd(feature, new SemaphoreSlim(1, 1));
             }
         }
-        if (featureChanges.ToUpdate.Count != 0)
-        {
-            _logger.LogError("ToUpdate should be empty");
-        }
+
+        if (featureChanges.ToUpdate.Count != 0) _logger.LogError("ToUpdate should be empty");
     }
 
     private static List<string> FeatureSummaryToPorterInterfaces(FeatureSummary featureSummary)
@@ -401,48 +415,33 @@ public class PorterManagementService
         var porterInterfaces = new List<string>();
         // account platform
         foreach (var accountPlatform in featureSummary.AccountPlatforms)
-        {
             porterInterfaces.Add($"{PorterFeature.AccountPlatform}:{accountPlatform}");
-        }
         // app info source
         foreach (var appInfoSource in featureSummary.AppInfoSources)
-        {
             porterInterfaces.Add($"{PorterFeature.AppInfoSource}:{appInfoSource}");
-        }
         // feed source
         foreach (var feedSource in featureSummary.FeedSources)
-        {
             porterInterfaces.Add($"{PorterFeature.FeedSource}:{feedSource}");
-        }
         // notify destination
         foreach (var notifyDestination in featureSummary.NotifyDestinations)
-        {
             porterInterfaces.Add($"{PorterFeature.NotifyDestination}:{notifyDestination}");
-        }
         // feed item action
         foreach (var feedItemAction in featureSummary.FeedItemActions)
-        {
             porterInterfaces.Add($"{PorterFeature.FeedItemAction}:{feedItemAction}");
-        }
         // feed getter
         foreach (var feedGetter in featureSummary.FeedGetters)
-        {
             porterInterfaces.Add($"{PorterFeature.FeedGetter}:{feedGetter}");
-        }
         // feed setter
         foreach (var feedSetter in featureSummary.FeedSetters)
-        {
             porterInterfaces.Add($"{PorterFeature.FeedSetter}:{feedSetter}");
-        }
         return porterInterfaces;
     }
 
     private void InitializeStaticPorterInstances()
     {
         foreach (var porterInstance in _systemConfig.StaticPorterInstances)
-        {
-            _porterInstances.TryAdd(porterInstance.Id, new PorterInstance(porterInstance.Id, porterInstance.Url, [], string.Empty, false, true));
-        }
+            _porterInstances.TryAdd(porterInstance.Id,
+                new PorterInstance(porterInstance.Id, porterInstance.Url, [], string.Empty, false, true));
     }
 
     private async void ConsulMonitorThread(CancellationToken ct)
@@ -477,14 +476,13 @@ public class PorterManagementService
                 {
                     break;
                 }
+
                 continue;
             }
 
             if (response.LastIndex == queryOptions.WaitIndex)
-            {
                 // no changes
                 continue;
-            }
             queryOptions.WaitIndex = response.LastIndex;
 
             var currentServiceIds = response.Response.Select(se => se.Service.ID).ToHashSet();
@@ -501,7 +499,8 @@ public class PorterManagementService
                 {
                     var instance = new PorterInstance(porterId, url, [], string.Empty, healthy, healthy);
                     _porterInstances[porterId] = instance;
-                    _logger.LogInformation("Discovered new porter instance {PorterId} (Healthy={Healthy})", porterId, healthy);
+                    _logger.LogInformation("Discovered new porter instance {PorterId} (Healthy={Healthy})", porterId,
+                        healthy);
                 }
                 else
                 {
@@ -539,10 +538,16 @@ public class PorterManagementService
     }
 }
 
-class PorterInstanceFeatureInfo(string instanceId, string region, string feature, bool isEnabled, int currentConcurrency, int remainingConcurrency, DateTime lastAccessTime)
+internal class PorterInstanceFeatureInfo(
+    string instanceId,
+    string region,
+    string feature,
+    bool isEnabled,
+    int currentConcurrency,
+    int remainingConcurrency,
+    DateTime lastAccessTime)
 {
-    private readonly object _lock = new();
-    public object Lock => _lock;
+    public object Lock { get; } = new();
 
     public string InstanceId { get; } = instanceId;
     public bool IsEnabled { get; } = isEnabled;
@@ -556,8 +561,7 @@ class PorterInstanceFeatureInfo(string instanceId, string region, string feature
 
 public class PorterInstance(string id, string url, List<string> features, string region, bool isEnabled, bool isHealthy)
 {
-    private readonly object _lock = new();
-    public object Lock => _lock;
+    public object Lock { get; } = new();
 
     public string Id { get; set; } = id;
     public string Url { get; set; } = url;
@@ -574,31 +578,30 @@ public class PorterInstance(string id, string url, List<string> features, string
         Features.Clear();
         FeatureSemaphores.Clear();
         foreach (var cancellationTokenSource in FeatureCancellationTokenSources.Values)
-        {
             cancellationTokenSource.Cancel();
-        }
         FeatureCancellationTokenSources.Clear();
         FeatureLastAccessTimes.Clear();
     }
+
     public void AddRangeFeatures(IEnumerable<string> features)
     {
         Features.AddRange(features);
-        foreach (var feature in features)
-        {
-            AddFeature(feature);
-        }
+        foreach (var feature in features) AddFeature(feature);
     }
+
     public void RemoveFeature(string feature)
     {
         Features.Remove(feature);
         FeatureSemaphores.TryRemove(feature, out _);
-        if (FeatureCancellationTokenSources.TryGetValue(feature, out CancellationTokenSource? value))
+        if (FeatureCancellationTokenSources.TryGetValue(feature, out var value))
         {
             value.Cancel();
             FeatureCancellationTokenSources.TryRemove(feature, out _);
         }
+
         FeatureLastAccessTimes.TryRemove(feature, out _);
     }
+
     public void AddFeature(string feature)
     {
         Features.Add(feature);

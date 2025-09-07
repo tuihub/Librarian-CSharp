@@ -3,25 +3,26 @@ using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
+using Device = Librarian.Common.Models.Db.Device;
 
-namespace Librarian.Sephirah.Services
+namespace Librarian.Sephirah.Services;
+
+public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
 {
-    public partial class SephirahService : LibrarianSephirahService.LibrarianSephirahServiceBase
+    [Authorize]
+    public override Task<RegisterDeviceResponse> RegisterDevice(RegisterDeviceRequest request,
+        ServerCallContext context)
     {
-        [Authorize]
-        public override Task<RegisterDeviceResponse> RegisterDevice(RegisterDeviceRequest request, ServerCallContext context)
+        var userId = context.GetInternalIdFromHeader();
+        var deviceInfo = request.DeviceInfo;
+        var deviceId = _idGenerator.CreateId();
+        var device = new Device(deviceId, deviceInfo);
+        _dbContext.Devices.Add(device);
+        _dbContext.Users.Single(x => x.Id == userId).Devices.Add(device);
+        _dbContext.SaveChanges();
+        return Task.FromResult(new RegisterDeviceResponse
         {
-            var userId = context.GetInternalIdFromHeader();
-            var deviceInfo = request.DeviceInfo;
-            var deviceId = _idGenerator.CreateId();
-            var device = new Common.Models.Db.Device(deviceId, deviceInfo);
-            _dbContext.Devices.Add(device);
-            _dbContext.Users.Single(x => x.Id == userId).Devices.Add(device);
-            _dbContext.SaveChanges();
-            return Task.FromResult(new RegisterDeviceResponse
-            {
-                DeviceId = new InternalID { Id = deviceId }
-            });
-        }
+            DeviceId = new InternalID { Id = deviceId }
+        });
     }
 }
