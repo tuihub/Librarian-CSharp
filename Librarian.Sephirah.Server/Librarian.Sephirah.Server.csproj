@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.71.0" />
+    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.71.0" />
     <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
       <PrivateAssets>all</PrivateAssets>
@@ -21,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Librarian.Sephirah\Librarian.Sephirah.csproj" />
+    <ProjectReference Include="..\Librarian.Angela\Librarian.Angela.csproj" />
   </ItemGroup>
 
   <ItemGroup>

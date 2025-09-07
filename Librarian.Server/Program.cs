@@ -125,6 +125,9 @@ if (env.IsDevelopment())
 
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
+// Enable gRPC-Web for browser support
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+
 // Enable Auth
 app.UseAuthentication();
 app.UseAuthorization();
