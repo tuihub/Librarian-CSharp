@@ -55,6 +55,7 @@ if (builder.Environment.IsDevelopment())
             Description = "gRPC JSON Transcoding API for Librarian Server including AngelaService"
         });
     });
+    builder.Services.AddGrpcSwagger();
 }
 
 // Add services

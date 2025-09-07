@@ -103,6 +103,7 @@ public static class StartUp
                     Description = "gRPC JSON Transcoding API for Librarian Sephirah Server including SephirahService and AngelaService"
                 });
             });
+            builder.Services.AddGrpcSwagger();
         }
 
         // Add Auth
