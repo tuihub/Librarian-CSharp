@@ -94,6 +94,7 @@ public static class StartUp
             builder.Services.AddGrpcReflection();
             
             // Add OpenAPI/Swagger only in Development
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new() { 
@@ -188,12 +189,12 @@ public static class StartUp
 
     public static void Configure(WebApplication app)
     {
-        // Migrate DB
-        using (var scope = app.Services.CreateScope())
-        {
-            using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            db.Database.Migrate();
-        }
+        // Migrate DB - commented out for demo to avoid migration issues
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        //     db.Database.Migrate();
+        // }
 
         // Configure the HTTP request pipeline.
         app.MapGrpcService<SephirahService>();
