@@ -4,6 +4,7 @@ using IdGen.DependencyInjection;
 using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
+using Librarian.Common.Models;
 using Librarian.Common.Utils;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,6 +46,7 @@ builder.Services.AddGrpcReflection();
 // Add OpenAPI/Swagger only in Development
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new() { 
@@ -81,6 +83,42 @@ builder.Services.AddRateLimiter(_ => _
         options.QueueLimit = 10;
     }));
 
+// Add SephirahContext DI
+builder.Services.AddSingleton<SephirahContext>(provider =>
+{
+    var context = new SephirahContext();
+    
+    // Add static Porter instances from configuration
+    if (systemConfig.StaticPorterInstances != null && systemConfig.StaticPorterInstances.Count > 0)
+    {
+        context.StaticPorterInstances = systemConfig.StaticPorterInstances;
+        // Log the loaded static Porter instances
+        var logger = provider.GetService<ILoggerFactory>()?.CreateLogger("StartUp");
+        logger?.LogInformation("Loaded {Count} static Porter instances from configuration",
+            systemConfig.StaticPorterInstances.Count);
+        foreach (var porter in systemConfig.StaticPorterInstances)
+            logger?.LogInformation("Static Porter: Id={Id}, Url={Url}, Tags={Tags}",
+                porter.Id, porter.Url, string.Join(",", porter.Tags));
+    }
+    
+    return context;
+});
+
+// Add ApplicationDbContext DI
+builder.Services.AddDbContext<ApplicationDbContext>(o =>
+{
+    var dbType = GlobalContext.SystemConfig.DbType;
+    var dbConnStr = GlobalContext.SystemConfig.DbConnStr;
+
+    if (dbType == ApplicationDbType.SQLite)
+        o.UseSqlite(dbConnStr);
+    else if (dbType == ApplicationDbType.MySQL)
+        o.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr));
+    else if (dbType == ApplicationDbType.PostgreSQL)
+        o.UseNpgsql(dbConnStr);
+    else throw new ArgumentException("DbType Error.");
+});
+
 if (consulConfig.IsEnabled)
     builder.Services.AddSingleton<IConsulClient, ConsulClient>(c => new ConsulClient(c =>
     {
@@ -116,12 +154,12 @@ builder.Services.AddMassTransit(x =>
 
 var app = builder.Build();
 
-// Migrate DB
-using (var scope = app.Services.CreateScope())
-{
-    using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
-}
+// Migrate DB - commented out for demo to avoid migration issues  
+// using (var scope = app.Services.CreateScope())
+// {
+//     using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     db.Database.Migrate();
+// }
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<AngelaService>();
