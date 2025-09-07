@@ -10,6 +10,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Librarian.Sephirah.Server;
 
@@ -88,7 +89,20 @@ public static class StartUp
 
         // Add services to the container.
         builder.Services.AddGrpc().AddJsonTranscoding();
-        if (builder.Environment.IsDevelopment()) builder.Services.AddGrpcReflection();
+        if (builder.Environment.IsDevelopment()) 
+        {
+            builder.Services.AddGrpcReflection();
+            
+            // Add OpenAPI/Swagger only in Development
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new() { 
+                    Title = "Librarian Sephirah Server API", 
+                    Version = "v1",
+                    Description = "gRPC JSON Transcoding API for Librarian Sephirah Server including SephirahService and AngelaService"
+                });
+            });
+        }
 
         // Add Auth
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -186,7 +200,18 @@ public static class StartUp
         app.MapGrpcService<AngelaService>();
 
         // add server reflection when env is dev
-        if (app.Environment.IsDevelopment()) app.MapGrpcReflectionService();
+        if (app.Environment.IsDevelopment()) 
+        {
+            app.MapGrpcReflectionService();
+            
+            // Configure Swagger UI
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Librarian Sephirah Server API V1");
+                c.RoutePrefix = "swagger";
+            });
+        }
 
         app.MapGet("/",
             () =>

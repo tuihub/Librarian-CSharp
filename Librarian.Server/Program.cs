@@ -9,6 +9,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +39,21 @@ builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc().AddJsonTranscoding();
 builder.Services.AddGrpcReflection();
+
+// Add OpenAPI/Swagger only in Development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new() { 
+            Title = "Librarian Server API", 
+            Version = "v1",
+            Description = "gRPC JSON Transcoding API for Librarian Server including AngelaService"
+        });
+    });
+}
 
 // Add services
 builder.Services.AddSingleton<PullMetadataService>();
@@ -114,7 +128,18 @@ app.MapGrpcService<AngelaService>();
 
 // add server reflection when env is dev
 var env = app.Environment;
-if (env.IsDevelopment()) app.MapGrpcReflectionService();
+if (env.IsDevelopment()) 
+{
+    app.MapGrpcReflectionService();
+    
+    // Configure Swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Librarian Server API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 app.MapGet("/",
     () =>
