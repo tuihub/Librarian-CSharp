@@ -16,10 +16,16 @@ public partial class AngelaService
     {
         var internalId = context.GetInternalIdFromHeader();
 
-        // Get user and verify administrator status
+        // Get user and verify status and permissions
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == internalId);
-        if (user == null || user.Type != Enums.UserType.Admin)
-            throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can refresh tokens"));
+        if (user == null) 
+            throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
+        
+        if (user.Status != Enums.UserStatus.Active)
+            throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active"));
+            
+        if (user.Type != Enums.UserType.Admin)
+            throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
 
         // Get new tokens
         var accessToken = JwtUtil.GenerateAccessToken(internalId);
