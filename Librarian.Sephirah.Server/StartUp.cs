@@ -133,7 +133,7 @@ public static class StartUp
                 c.Address = new Uri(consulConfig.ConsulAddress);
             }));
 
-        builder.Services.AddSingleton<PullMetadataService>();
+        builder.Services.AddSingleton<Librarian.Sephirah.Services.PullMetadataService>();
         if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.InMemory)
         {
             builder.Services.AddMassTransit(x =>
@@ -221,14 +221,14 @@ public static class StartUp
         // Enable RateLimiter
         app.UseRateLimiter();
 
-        // Start PullMetadataService
-        if (app.Services.GetService<PullMetadataService>() != null)
+        // Start Librarian.Sephirah.Services.PullMetadataService
+        if (app.Services.GetService<Librarian.Sephirah.Services.PullMetadataService>() != null)
         {
-            app.Services.GetRequiredService<PullMetadataService>().Start();
+            app.Services.GetRequiredService<Librarian.Sephirah.Services.PullMetadataService>().Start();
 
             app.Lifetime.ApplicationStopping.Register(() =>
             {
-                app.Services.GetRequiredService<PullMetadataService>().Cancel();
+                app.Services.GetRequiredService<Librarian.Sephirah.Services.PullMetadataService>().Cancel();
             });
         }
     }

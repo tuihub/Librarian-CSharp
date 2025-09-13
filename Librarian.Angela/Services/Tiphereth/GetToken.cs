@@ -1,35 +1,48 @@
 using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Librarian.Common.Constants;
-using Librarian.Common.Utils;
 using Microsoft.EntityFrameworkCore;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    public override async Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
+    public override async Task<Librarian.Sephirah.Angela.GetTokenResponse> GetToken(Librarian.Sephirah.Angela.GetTokenRequest request, ServerCallContext context)
     {
-        // Find user by username
+        // First verify user exists and is admin using Angela's requirement
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Username);
         if (user == null) throw new RpcException(new Status(StatusCode.NotFound, "User does not exist"));
 
-        // Verify password
-        if (user.Password != request.Password) // Note: In a real project, the password should be stored encrypted
-            throw new RpcException(new Status(StatusCode.Unauthenticated, "Incorrect password"));
+        // Verify user is active
+        if (user.Status != Enums.UserStatus.Active)
+            throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active"));
 
-        // Verify that the user is an administrator
+        // Verify that the user is an administrator for Angela access
         if (user.Type != Enums.UserType.Admin)
-            throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can log in"));
+            throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
 
-        // Generate tokens
-        var accessToken = JwtUtil.GenerateAccessToken(user.Id);
-        var refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
-
-        return new GetTokenResponse
+        // Delegate to Sephirah for actual token generation
+        var sephirahRequest = new TuiHub.Protos.Librarian.Sephirah.V1.GetTokenRequest
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
+            Username = request.Username,
+            Password = request.Password
         };
+
+        try
+        {
+            var sephirahResponse = await _sephirahClient.GetTokenAsync(sephirahRequest);
+            
+            return new Librarian.Sephirah.Angela.GetTokenResponse
+            {
+                AccessToken = sephirahResponse.AccessToken,
+                RefreshToken = sephirahResponse.RefreshToken
+            };
+        }
+        catch (RpcException ex)
+        {
+            // Re-throw Sephirah authentication errors
+            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+        }
     }
 }

@@ -2,7 +2,7 @@ using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 using InternalID = Librarian.Sephirah.Angela.InternalID;
 using PagingResponse = Librarian.Sephirah.Angela.PagingResponse;
@@ -12,65 +12,85 @@ namespace Librarian.Angela.Services;
 public partial class AngelaService
 {
     [Authorize]
-    public override async Task<SearchAppInfosResponse> SearchAppInfos(SearchAppInfosRequest request,
+    public override async Task<Librarian.Sephirah.Angela.SearchAppInfosResponse> SearchAppInfos(Librarian.Sephirah.Angela.SearchAppInfosRequest request,
         ServerCallContext context)
     {
-        // Verify that the user is an administrator
+        // Verify that the user is an administrator for Angela access
         UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
 
-        // Get request parameters
-        var appInfos = _dbContext.AppInfos.AsQueryable();
-
-        // Fuzzy search by name
-        if (!string.IsNullOrEmpty(request.NameLike)) appInfos = appInfos.Where(a => a.Name.Contains(request.NameLike));
-
-        // Filter by source
-        if (request.SourceFilter.Count > 0)
-            appInfos = appInfos.Where(a => request.SourceFilter.Contains(a.Source.ToString()));
-
-        // Apply paging
-        appInfos = ApplyAngelaPagingRequest(appInfos, request.Paging);
-
-        // Get results
-        var appInfosList = await appInfos.ToListAsync();
-        var count = await appInfos.CountAsync();
-
-        // Build response
-        var response = new SearchAppInfosResponse
+        // Delegate to Sephirah for the actual search
+        var sephirahRequest = new TuiHub.Protos.Librarian.Sephirah.V1.SearchAppInfosRequest
         {
-            Paging = new PagingResponse { TotalSize = count }
+            NameLike = request.NameLike
         };
+        
+        if (request.Paging != null)
+        {
+            sephirahRequest.Paging = new TuiHub.Protos.Librarian.V1.PagingRequest
+            {
+                PageSize = request.Paging.PageSize,
+                PageNum = request.Paging.PageNum
+            };
+        }
+        
+        sephirahRequest.SourceFilter.AddRange(request.SourceFilter);
 
-        // Get AppInfo objects and add to response
-        foreach (var appInfo in appInfosList) response.AppInfos.Add(ConvertToProtoAppInfo(appInfo));
+        // Forward the authorization header to Sephirah
+        var headers = new Metadata();
+        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
+        {
+            headers.Add("authorization", authHeader.Value);
+        }
 
-        return response;
+        try
+        {
+            var sephirahResponse = await _sephirahClient.SearchAppInfosAsync(sephirahRequest, headers);
+            
+            // Convert Sephirah response to Angela response format
+            var response = new Librarian.Sephirah.Angela.SearchAppInfosResponse
+            {
+                Paging = new Librarian.Sephirah.Angela.PagingResponse
+                {
+                    TotalSize = sephirahResponse.Paging.TotalSize
+                }
+            };
+
+            // Convert AppInfo from Sephirah to Angela format
+            foreach (var sephirahAppInfo in sephirahResponse.AppInfos)
+            {
+                var appInfo = new Librarian.Sephirah.Angela.AppInfo
+                {
+                    Id = new Librarian.Sephirah.Angela.InternalID { Id = 0 }, // Sephirah AppInfo doesn't have Id, use default
+                    Source = ConvertToAngelaAppInfoSourceFromString(sephirahAppInfo.Source),
+                    SourceAppId = sephirahAppInfo.SourceAppId,
+                    SourceUrl = sephirahAppInfo.SourceUrl,
+                    Name = sephirahAppInfo.Name,
+                    Description = sephirahAppInfo.Description,
+                    IconImageUrl = sephirahAppInfo.IconImageUrl,
+                    BackgroundImageUrl = sephirahAppInfo.BackgroundImageUrl,
+                    CoverImageUrl = sephirahAppInfo.CoverImageUrl
+                };
+                response.AppInfos.Add(appInfo);
+            }
+
+            return response;
+        }
+        catch (RpcException ex)
+        {
+            // Re-throw Sephirah errors
+            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+        }
     }
 
-    private AppInfo ConvertToProtoAppInfo(Common.Models.Db.AppInfo dbAppInfo)
+    private Librarian.Sephirah.Angela.AppInfoSource ConvertToAngelaAppInfoSourceFromString(string sephirahSource)
     {
-        return new AppInfo
+        return sephirahSource switch
         {
-            Id = new InternalID { Id = dbAppInfo.Id },
-            Source = ConvertToProtoAppInfoSource(dbAppInfo.Source),
-            SourceAppId = dbAppInfo.SourceAppId ?? "",
-            SourceUrl = dbAppInfo.SourceUrl ?? "",
-            Name = dbAppInfo.Name ?? "",
-            Description = dbAppInfo.Description ?? "",
-            IconImageUrl = dbAppInfo.IconImageUrl ?? "",
-            BackgroundImageUrl = dbAppInfo.BackgroundImageUrl ?? "",
-            CoverImageUrl = dbAppInfo.CoverImageUrl ?? ""
-        };
-    }
-
-    private AppInfoSource ConvertToProtoAppInfoSource(WellKnownAppInfoSource dbSource)
-    {
-        return dbSource switch
-        {
-            WellKnownAppInfoSource.Steam => AppInfoSource.Steam,
-            WellKnownAppInfoSource.Vndb => AppInfoSource.Vndb,
-            WellKnownAppInfoSource.Bangumi => AppInfoSource.Bangumi,
-            _ => AppInfoSource.Unspecified
+            "Steam" => Librarian.Sephirah.Angela.AppInfoSource.Steam,
+            "Vndb" => Librarian.Sephirah.Angela.AppInfoSource.Vndb,
+            "Bangumi" => Librarian.Sephirah.Angela.AppInfoSource.Bangumi,
+            "Internal" => Librarian.Sephirah.Angela.AppInfoSource.Internal,
+            _ => Librarian.Sephirah.Angela.AppInfoSource.Unspecified
         };
     }
 }

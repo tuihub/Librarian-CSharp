@@ -153,6 +153,84 @@ message SearchAppInfosResponse {
   repeated AppInfo app_infos = 2;
 }
 
+// Sentinel-related messages
+message Sentinel {
+  InternalID id = 1;
+  string url = 2;
+  repeated string alt_urls = 3;
+  string get_token_url_path = 4;
+  string download_file_url_path = 5;
+}
+
+message ListSentinelsRequest {
+  PagingRequest paging = 1;
+}
+
+message ListSentinelsResponse {
+  PagingResponse paging = 1;
+  repeated Sentinel sentinels = 2;
+}
+
+message GetSentinelRequest {
+  InternalID id = 1;
+}
+
+message GetSentinelResponse {
+  Sentinel sentinel = 1;
+}
+
+// StoreApp-related messages  
+message StoreApp {
+  InternalID id = 1;
+  string name = 2;
+  string type = 3;
+  string description = 4;
+  InternalID icon_image_id = 5;
+  InternalID background_image_id = 6;
+  InternalID cover_image_id = 7;
+  string developer = 8;
+  string publisher = 9;
+  repeated string tags = 10;
+  repeated string alt_names = 11;
+  bool is_public = 12;
+}
+
+message StoreAppBinary {
+  InternalID id = 1;
+  string name = 2;
+  InternalID sentinel_id = 3;
+  string sentinel_generated_id = 4;
+  InternalID store_app_id = 5;
+}
+
+message SearchStoreAppsRequest {
+  PagingRequest paging = 1;
+  string name_like = 2;
+}
+
+message SearchStoreAppsResponse {
+  PagingResponse paging = 1;
+  repeated StoreApp store_apps = 2;
+}
+
+message GetStoreAppRequest {
+  InternalID id = 1;
+}
+
+message GetStoreAppResponse {
+  StoreApp store_app = 1;
+}
+
+message ListStoreAppBinariesRequest {
+  InternalID store_app_id = 1;
+  PagingRequest paging = 2;
+}
+
+message ListStoreAppBinariesResponse {
+  PagingResponse paging = 1;
+  repeated StoreAppBinary binaries = 2;
+}
+
 // Angela service combines all admin management services
 service AngelaService {
   // Tiphereth services (user management)
@@ -200,6 +278,38 @@ service AngelaService {
   rpc SearchAppInfos(SearchAppInfosRequest) returns (SearchAppInfosResponse) {
     option (google.api.http) = {
       get: "/api/v1/app-infos"
+    };
+  }
+
+  // Sentinel management
+  rpc ListSentinels(ListSentinelsRequest) returns (ListSentinelsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/sentinels"
+    };
+  }
+
+  rpc GetSentinel(GetSentinelRequest) returns (GetSentinelResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/sentinels/{id.id}"
+    };
+  }
+
+  // StoreApp management
+  rpc SearchStoreApps(SearchStoreAppsRequest) returns (SearchStoreAppsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/store-apps"
+    };
+  }
+
+  rpc GetStoreApp(GetStoreAppRequest) returns (GetStoreAppResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/store-apps/{id.id}"
+    };
+  }
+
+  rpc ListStoreAppBinaries(ListStoreAppBinariesRequest) returns (ListStoreAppBinariesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/store-apps/{store_app_id.id}/binaries"
     };
   }
 }

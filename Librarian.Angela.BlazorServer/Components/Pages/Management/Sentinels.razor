@@ -1,0 +1,75 @@
+@page "/management/sentinels"
+@using Librarian.Angela.BlazorServer.Services
+@using Librarian.Angela.BlazorServer.Services.Models
+@inject IAngelaService AngelaService
+@inject ILogger<Sentinels> Logger
+
+<PageTitle>Sentinel Management</PageTitle>
+
+<h1>Sentinel Management</h1>
+
+<p>Manage Sentinel instances that provide app binaries and files.</p>
+
+@if (sentinels == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!sentinels.Any())
+{
+    <p><em>No sentinels found.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>URL</th>
+                <th>Get Token Path</th>
+                <th>Download Path</th>
+                <th>Alt URLs</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sentinel in sentinels)
+            {
+                <tr>
+                    <td>@sentinel.Id</td>
+                    <td>@sentinel.Url</td>
+                    <td>@sentinel.GetTokenUrlPath</td>
+                    <td>@sentinel.DownloadFileUrlPath</td>
+                    <td>@string.Join(", ", sentinel.AltUrls)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private List<SentinelSummary>? sentinels;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            sentinels = await AngelaService.GetSentinelsAsync();
+            if (sentinels == null)
+            {
+                errorMessage = "Failed to load sentinels. Please check if Angela service is running.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading sentinels");
+            errorMessage = "An error occurred while loading sentinels.";
+        }
+    }
+}
