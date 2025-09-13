@@ -5,18 +5,19 @@ using Librarian.Common.Constants;
 using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
     [Authorize(AuthenticationSchemes = "RefreshToken")]
-    public override async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request,
+    public override async Task<Librarian.Sephirah.Angela.RefreshTokenResponse> RefreshToken(Librarian.Sephirah.Angela.RefreshTokenRequest request,
         ServerCallContext context)
     {
         var internalId = context.GetInternalIdFromHeader();
 
-        // Get user and verify status and permissions
+        // Get user and verify status and permissions for Angela admin-only access
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == internalId);
         if (user == null) 
             throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
@@ -27,19 +28,30 @@ public partial class AngelaService
         if (user.Type != Enums.UserType.Admin)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
 
-        // Get new tokens
-        var accessToken = JwtUtil.GenerateAccessToken(internalId);
-        var refreshToken = context.GetBearerToken()!;
-        var expireTime = JwtUtil.GetTokenExpireTime(refreshToken);
-
-        // Only refresh the token when the expiration time is less than 25% of the refresh token expiration time
-        if (DateTime.UtcNow + TimeSpan.FromMinutes(GlobalContext.JwtConfig.RefreshTokenExpireMinutes * 0.25) >
-            expireTime) refreshToken = JwtUtil.GenerateRefreshToken(internalId);
-
-        return new RefreshTokenResponse
+        // Delegate to Sephirah for actual token refresh
+        var sephirahRequest = new TuiHub.Protos.Librarian.Sephirah.V1.RefreshTokenRequest();
+        
+        // Forward the authorization header to Sephirah
+        var headers = new Metadata();
+        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
-        };
+            headers.Add("authorization", authHeader.Value);
+        }
+
+        try
+        {
+            var sephirahResponse = await _sephirahClient.RefreshTokenAsync(sephirahRequest, headers);
+            
+            return new Librarian.Sephirah.Angela.RefreshTokenResponse
+            {
+                AccessToken = sephirahResponse.AccessToken,
+                RefreshToken = sephirahResponse.RefreshToken
+            };
+        }
+        catch (RpcException ex)
+        {
+            // Re-throw Sephirah authentication errors
+            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+        }
     }
 }

@@ -9,6 +9,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using TuiHub.Protos.Librarian.Sephirah.V1;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,14 @@ builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
+
+// Add SephirahClient for Angela to delegate services to Sephirah
+builder.Services.AddGrpcClient<TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
+{
+    // Configure to use the same server for in-process communication
+    // In a real deployment, this could point to a separate Sephirah server
+    options.Address = new Uri("http://localhost:5678"); // Default Sephirah port
+});
 
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
