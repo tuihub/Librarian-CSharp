@@ -23,7 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Librarian.Common\Librarian.Common.csproj"/>
-        <ProjectReference Include="..\Librarian.Sephirah\Librarian.Sephirah.csproj"/>
     </ItemGroup>
 
 </Project>

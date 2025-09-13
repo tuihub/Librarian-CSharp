@@ -11,8 +11,6 @@ public partial class AngelaService
     public override async Task<ListStoreAppBinariesResponse> ListStoreAppBinaries(ListStoreAppBinariesRequest request,
         ServerCallContext context)
     {
-        // Note: This service currently accesses database directly because Sephirah's StoreAppBinary
-        // doesn't include SentinelId and SentinelGeneratedId fields needed by Angela's API
         var query = _dbContext.StoreAppBinaries
             .Where(x => x.StoreAppId == request.StoreAppId.Id);
 

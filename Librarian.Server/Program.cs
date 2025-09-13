@@ -41,9 +41,6 @@ builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 
-// Add services
-builder.Services.AddSingleton<PullMetadataService>();
-
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     // AccessToken Auth (Default)

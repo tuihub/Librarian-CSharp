@@ -1,59 +1,56 @@
 using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using Microsoft.EntityFrameworkCore;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
     [Authorize]
-    public override async Task<Librarian.Sephirah.Angela.SearchStoreAppsResponse> SearchStoreApps(Librarian.Sephirah.Angela.SearchStoreAppsRequest request,
+    public override async Task<SearchStoreAppsResponse> SearchStoreApps(SearchStoreAppsRequest request,
         ServerCallContext context)
     {
-        // Convert Angela request to Sephirah request
-        var sephirahRequest = new TuiHub.Protos.Librarian.Sephirah.V1.SearchStoreAppsRequest
+        var query = _dbContext.StoreApps.AsQueryable();
+
+        // Apply name filter
+        if (!string.IsNullOrWhiteSpace(request.NameLike))
+            query = query.Where(x => x.Name.Contains(request.NameLike));
+
+        // Apply pagination
+        var pageSize = (int)(request.Paging?.PageSize ?? 10);
+        var pageNum = (int)(request.Paging?.PageNum ?? 1);
+        var skip = (pageNum - 1) * pageSize;
+
+        var totalCount = await query.CountAsync();
+        var storeApps = await query.Skip(skip).Take(pageSize).ToListAsync();
+
+        var response = new SearchStoreAppsResponse
         {
-            NameLike = request.NameLike,
-            Paging = request.Paging != null ? new TuiHub.Protos.Librarian.V1.PagingRequest
+            Paging = new PagingResponse
             {
-                PageSize = request.Paging.PageSize,
-                PageNum = request.Paging.PageNum
-            } : null
-        };
-
-        // Forward authorization header
-        var headers = new Metadata();
-        if (context.RequestHeaders.Any(h => h.Key == "authorization"))
-        {
-            var authHeader = context.RequestHeaders.First(h => h.Key == "authorization");
-            headers.Add(authHeader);
-        }
-
-        // Call Sephirah service
-        var sephirahResponse = await _sephirahClient.SearchStoreAppsAsync(sephirahRequest, headers);
-
-        // Convert Sephirah response to Angela response
-        var response = new Librarian.Sephirah.Angela.SearchStoreAppsResponse
-        {
-            Paging = new Librarian.Sephirah.Angela.PagingResponse
-            {
-                TotalSize = sephirahResponse.Paging?.TotalSize ?? 0
+                TotalSize = totalCount
             }
         };
 
-        foreach (var sephirahStoreApp in sephirahResponse.AppInfos)
+        foreach (var storeApp in storeApps)
         {
-            var angelaStoreApp = new Librarian.Sephirah.Angela.StoreApp
+            var storeAppPb = new StoreApp
             {
-                Id = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.Id.Id },
-                Name = sephirahStoreApp.Name,
-                Type = sephirahStoreApp.Type.ToString(),
-                Description = sephirahStoreApp.ShortDescription,
-                CoverImageId = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.CoverImageId.Id }
+                Id = new InternalID { Id = storeApp.Id },
+                Name = storeApp.Name,
+                Type = storeApp.Type.ToString(),
+                Description = storeApp.Description,
+                IconImageId = new InternalID { Id = storeApp.IconImageId },
+                BackgroundImageId = new InternalID { Id = storeApp.BackgroundImageId },
+                CoverImageId = new InternalID { Id = storeApp.CoverImageId },
+                Developer = storeApp.Developer,
+                Publisher = storeApp.Publisher,
+                IsPublic = storeApp.IsPublic
             };
-            angelaStoreApp.Tags.AddRange(sephirahStoreApp.Tags);
-            response.StoreApps.Add(angelaStoreApp);
+            storeAppPb.Tags.AddRange(storeApp.Tags);
+            storeAppPb.AltNames.AddRange(storeApp.AltNames);
+            response.StoreApps.Add(storeAppPb);
         }
 
         return response;
