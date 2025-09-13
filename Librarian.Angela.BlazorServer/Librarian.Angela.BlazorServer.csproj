@@ -40,10 +40,4 @@
       <_ContentIncludedByDefault Remove="Components\Account\Pages\Manage\_Imports.razor" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Librarian.Angela\Librarian.Angela.csproj" />
-      <ProjectReference Include="..\Librarian.Sephirah\Librarian.Sephirah.csproj" />
-      <ProjectReference Include="..\Librarian.Common\Librarian.Common.csproj" />
-    </ItemGroup>
-
 </Project>

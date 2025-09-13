@@ -1,0 +1,120 @@
+@page "/management/store-apps"
+@using Librarian.Angela.BlazorServer.Services
+@using Librarian.Angela.BlazorServer.Services.Models
+@inject IAngelaService AngelaService
+@inject ILogger<StoreApps> Logger
+
+<PageTitle>Store App Management</PageTitle>
+
+<h1>Store App Management</h1>
+
+<p>Manage store applications available in the system.</p>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input @bind="searchFilter" @onkeypress="OnSearchKeyPress" class="form-control" placeholder="Search store apps..." />
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" @onclick="SearchApps">Search</button>
+    </div>
+</div>
+
+@if (storeApps == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!storeApps.Any())
+{
+    <p><em>No store apps found.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Developer</th>
+                <th>Publisher</th>
+                <th>Public</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in storeApps)
+            {
+                <tr>
+                    <td>@app.Id</td>
+                    <td><strong>@app.Name</strong></td>
+                    <td><span class="badge bg-secondary">@app.Type</span></td>
+                    <td>@app.Developer</td>
+                    <td>@app.Publisher</td>
+                    <td>
+                        @if (app.IsPublic)
+                        {
+                            <span class="badge bg-success">Public</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Private</span>
+                        }
+                    </td>
+                    <td>@(app.Description.Length > 100 ? app.Description.Substring(0, 100) + "..." : app.Description)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private List<StoreAppSummary>? storeApps;
+    private string? errorMessage;
+    private string searchFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStoreApps();
+    }
+
+    private async Task LoadStoreApps()
+    {
+        try
+        {
+            storeApps = await AngelaService.SearchStoreAppsAsync(string.IsNullOrWhiteSpace(searchFilter) ? null : searchFilter);
+            if (storeApps == null)
+            {
+                errorMessage = "Failed to load store apps. Please check if Angela service is running.";
+            }
+            else
+            {
+                errorMessage = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading store apps");
+            errorMessage = "An error occurred while loading store apps.";
+        }
+    }
+
+    private async Task SearchApps()
+    {
+        await LoadStoreApps();
+    }
+
+    private async Task OnSearchKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchApps();
+        }
+    }
+}
