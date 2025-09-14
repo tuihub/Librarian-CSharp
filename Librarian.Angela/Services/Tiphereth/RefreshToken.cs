@@ -28,8 +28,8 @@ public partial class AngelaService
         if (user.Type != Enums.UserType.Admin)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
 
-        // Delegate to Sephirah for actual token refresh
-        var sephirahRequest = new TuiHub.Protos.Librarian.Sephirah.V1.RefreshTokenRequest();
+        // Use AutoMapper to convert request and delegate to Sephirah
+        var sephirahRequest = _mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.RefreshTokenRequest>(request);
         
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -42,11 +42,8 @@ public partial class AngelaService
         {
             var sephirahResponse = await _sephirahClient.RefreshTokenAsync(sephirahRequest, headers);
             
-            return new Librarian.Sephirah.Angela.RefreshTokenResponse
-            {
-                AccessToken = sephirahResponse.AccessToken,
-                RefreshToken = sephirahResponse.RefreshToken
-            };
+            // Use AutoMapper to convert response
+            return _mapper.Map<Librarian.Sephirah.Angela.RefreshTokenResponse>(sephirahResponse);
         }
         catch (RpcException ex)
         {

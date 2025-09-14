@@ -12,17 +12,8 @@ public partial class AngelaService
     public override async Task<Librarian.Sephirah.Angela.ListStoreAppBinariesResponse> ListStoreAppBinaries(Librarian.Sephirah.Angela.ListStoreAppBinariesRequest request,
         ServerCallContext context)
     {
-        // For binaries, we'll use GetStoreAppSummary with binary limit
-        // Note: This doesn't support pagination exactly like the original, but provides the binaries
-        var pageSize = (int)(request.Paging?.PageSize ?? 10);
-        
-        var sephirahRequest = new GetStoreAppSummaryRequest
-        {
-            StoreAppId = new TuiHub.Protos.Librarian.V1.InternalID { Id = request.StoreAppId.Id },
-            AppBinaryLimit = pageSize,
-            AppSaveFileLimit = 0,
-            AcquiredUserLimit = 0
-        };
+        // Use AutoMapper to convert request
+        var sephirahRequest = _mapper.Map<GetStoreAppSummaryRequest>(request);
 
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -43,19 +34,12 @@ public partial class AngelaService
                 }
             };
 
-            // Convert Sephirah StoreAppBinary to Angela StoreAppBinary format
+            // Use AutoMapper to convert binaries
             foreach (var sephirahBinary in sephirahResponse.StoreApp.Binaries)
             {
-                var binary = new Librarian.Sephirah.Angela.StoreAppBinary
-                {
-                    Id = new Librarian.Sephirah.Angela.InternalID { Id = sephirahBinary.Id.Id },
-                    Name = sephirahBinary.Name,
-                    // Note: Sephirah binary format is different, we may need to adjust this
-                    // based on what fields are actually available
-                    SentinelId = new Librarian.Sephirah.Angela.InternalID { Id = 0 }, // Default value, adjust as needed
-                    SentinelGeneratedId = "", // Default value, adjust as needed
-                    StoreAppId = new Librarian.Sephirah.Angela.InternalID { Id = request.StoreAppId.Id }
-                };
+                var binary = _mapper.Map<Librarian.Sephirah.Angela.StoreAppBinary>(sephirahBinary);
+                // Set required fields that AutoMapper can't infer
+                binary.StoreAppId = request.StoreAppId;
                 response.Binaries.Add(binary);
             }
 

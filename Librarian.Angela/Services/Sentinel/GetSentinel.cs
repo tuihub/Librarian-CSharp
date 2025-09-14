@@ -17,14 +17,8 @@ public partial class AngelaService
         if (sentinel == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Sentinel not found"));
 
-        var sentinelPb = new Sentinel
-        {
-            Id = new InternalID { Id = sentinel.Id },
-            Url = sentinel.Url,
-            GetTokenUrlPath = sentinel.GetTokenUrlPath,
-            DownloadFileUrlPath = sentinel.DownloadFileUrlPath
-        };
-        sentinelPb.AltUrls.AddRange(sentinel.AltUrls);
+        // Use AutoMapper to convert entity to protobuf object
+        var sentinelPb = _mapper.Map<Sentinel>(sentinel);
 
         return new GetSentinelResponse
         {

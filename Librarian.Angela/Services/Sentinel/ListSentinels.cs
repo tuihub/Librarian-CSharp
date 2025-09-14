@@ -29,16 +29,10 @@ public partial class AngelaService
             }
         };
 
+        // Use AutoMapper to convert entities to protobuf objects
         foreach (var sentinel in sentinels)
         {
-            var sentinelPb = new Sentinel
-            {
-                Id = new InternalID { Id = sentinel.Id },
-                Url = sentinel.Url,
-                GetTokenUrlPath = sentinel.GetTokenUrlPath,
-                DownloadFileUrlPath = sentinel.DownloadFileUrlPath
-            };
-            sentinelPb.AltUrls.AddRange(sentinel.AltUrls);
+            var sentinelPb = _mapper.Map<Sentinel>(sentinel);
             response.Sentinels.Add(sentinelPb);
         }
 

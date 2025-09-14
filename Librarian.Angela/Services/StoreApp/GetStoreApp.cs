@@ -12,15 +12,8 @@ public partial class AngelaService
     public override async Task<GetStoreAppResponse> GetStoreApp(GetStoreAppRequest request,
         ServerCallContext context)
     {
-        // Delegate to Sephirah GetStoreAppSummary for the actual data
-        var sephirahRequest = new GetStoreAppSummaryRequest
-        {
-            StoreAppId = new TuiHub.Protos.Librarian.V1.InternalID { Id = request.Id.Id },
-            // Don't need binaries or save files for basic GetStoreApp
-            AppBinaryLimit = 0,
-            AppSaveFileLimit = 0,
-            AcquiredUserLimit = 0
-        };
+        // Use AutoMapper to convert request
+        var sephirahRequest = _mapper.Map<GetStoreAppSummaryRequest>(request);
 
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -33,23 +26,8 @@ public partial class AngelaService
         {
             var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
             
-            // Convert Sephirah StoreApp to Angela StoreApp format
-            var sephirahStoreApp = sephirahResponse.StoreApp.StoreApp;
-            var storeApp = new Librarian.Sephirah.Angela.StoreApp
-            {
-                Id = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.Id.Id },
-                Name = sephirahStoreApp.Name,
-                Type = sephirahStoreApp.Type.ToString(),
-                Description = sephirahStoreApp.Description,
-                IconImageId = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.IconImageId.Id },
-                BackgroundImageId = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.BackgroundImageId.Id },
-                CoverImageId = new Librarian.Sephirah.Angela.InternalID { Id = sephirahStoreApp.CoverImageId.Id },
-                Developer = sephirahStoreApp.Developer,
-                Publisher = sephirahStoreApp.Publisher,
-                IsPublic = sephirahStoreApp.Public
-            };
-            storeApp.Tags.AddRange(sephirahStoreApp.Tags);
-            storeApp.AltNames.AddRange(sephirahStoreApp.NameAlternatives);
+            // Use AutoMapper to convert StoreApp
+            var storeApp = _mapper.Map<Librarian.Sephirah.Angela.StoreApp>(sephirahResponse.StoreApp.StoreApp);
 
             return new Librarian.Sephirah.Angela.GetStoreAppResponse
             {
