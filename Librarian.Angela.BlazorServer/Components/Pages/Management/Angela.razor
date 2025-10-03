@@ -1,0 +1,41 @@
+@page "/management/angela"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Angela Administration</PageTitle>
+
+<h1>Angela Administration</h1>
+
+<p>Welcome to Angela administration interface. This is the central hub for managing the Librarian system.</p>
+
+<div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">Angela Management Features</h4>
+    <p>Use the navigation menu to access various management features:</p>
+    <ul>
+        <li><strong>Sentinels:</strong> Manage Sentinel instances that provide app binaries and files</li>
+        <li><strong>Store Apps:</strong> Manage store applications available in the system</li>
+    </ul>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">System Information</h5>
+        <p class="card-text">You are accessing the Angela administration interface.</p>
+        <p class="card-text"><small class="text-muted">Current user: @(context?.User.Identity?.Name ?? "Unknown")</small></p>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+    
+    private AuthenticationState? context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null)
+        {
+            context = await authenticationStateTask;
+        }
+    }
+}

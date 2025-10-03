@@ -11,7 +11,7 @@ namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    [Authorize]
+    [Authorize(Policy = "AngelaAccess")]
     public override async Task<Librarian.Sephirah.Angela.SearchAppInfosResponse> SearchAppInfos(Librarian.Sephirah.Angela.SearchAppInfosRequest request,
         ServerCallContext context)
     {

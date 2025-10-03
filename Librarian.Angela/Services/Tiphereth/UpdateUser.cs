@@ -8,7 +8,7 @@ namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    [Authorize]
+    [Authorize(Policy = "AngelaAccess")]
     public override async Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
     {
         // Verify that the user is an administrator
