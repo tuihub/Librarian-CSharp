@@ -21,6 +21,9 @@ Add trusted IP addresses to the `SystemConfig` section in your `appsettings.json
 - IPv4: `127.0.0.1`, `192.168.1.100`
 - IPv6: `::1`, `2001:db8::1`
 
+### Proxy Support
+The feature automatically handles X-Forwarded-For headers when the server is behind a proxy or load balancer. The original client IP will be used for trusted IP checking.
+
 ### Security Considerations
 ⚠️ **Important**: Only add IP addresses you fully trust to this list. These IPs will have full administrative access to Angela management functions.
 
@@ -78,7 +81,8 @@ All Angela management services now use the `AngelaAccess` policy:
 1. Verify the IP address format in configuration matches exactly
 2. Check that the application has restarted after configuration change
 3. Verify the actual remote IP being sent by checking logs
-4. If behind a proxy, the actual IP might be different (check X-Forwarded-For header)
+4. If behind a proxy, ensure the proxy is forwarding the X-Forwarded-For header
+5. The handler automatically checks X-Forwarded-For, but ensure your proxy is configured correctly
 
 ### LocalAdmin Not Appearing
 

@@ -36,7 +36,20 @@ public class AngelaAuthorizationHandler : AuthorizationHandler<AngelaAuthorizati
             return Task.CompletedTask;
         }
 
+        // Get remote IP address, considering X-Forwarded-For for proxied requests
         var remoteIpAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+        
+        // Check X-Forwarded-For header if behind a proxy
+        if (httpContext.Request.Headers.ContainsKey("X-Forwarded-For"))
+        {
+            var forwardedFor = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                // Take the first IP in the chain (client's original IP)
+                remoteIpAddress = forwardedFor.Split(',')[0].Trim();
+            }
+        }
+        
         if (string.IsNullOrEmpty(remoteIpAddress))
         {
             return Task.CompletedTask;
