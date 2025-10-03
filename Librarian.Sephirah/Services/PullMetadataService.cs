@@ -4,7 +4,7 @@ using Librarian.Common.Models;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Librarian.Angela.Services;
+namespace Librarian.Sephirah.Services;
 
 public class PullMetadataService
 {

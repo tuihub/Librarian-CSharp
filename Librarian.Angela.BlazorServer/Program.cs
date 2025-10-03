@@ -10,12 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Configure Sephirah API settings
+// Configure API settings for both Sephirah and Angela
 builder.Services.Configure<SephirahApiConfig>(
     builder.Configuration.GetSection("SephirahApi"));
+builder.Services.Configure<AngelaApiConfig>(
+    builder.Configuration.GetSection("AngelaApi"));
 
-// Add HttpClient for Sephirah API
+// Add HttpClient for both APIs
 builder.Services.AddHttpClient<ISephirahAuthService, SephirahAuthService>();
+builder.Services.AddHttpClient<IAngelaService, AngelaService>();
 
 // Add HTTP context accessor
 builder.Services.AddHttpContextAccessor();

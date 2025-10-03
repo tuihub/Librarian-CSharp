@@ -1,5 +1,4 @@
 ﻿using IdGen;
-using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Models;
 using MassTransit;

@@ -1,6 +1,8 @@
 ﻿using System.Threading.RateLimiting;
+using AutoMapper;
 using Consul;
 using IdGen.DependencyInjection;
+using Librarian.Angela.Mapping;
 using Librarian.Angela.Services;
 using Librarian.Common;
 using Librarian.Common.Configs;
@@ -89,6 +91,23 @@ public static class StartUp
 
         // Add grpc
         builder.Services.AddGrpc().AddJsonTranscoding();
+        
+        // Add AutoMapper for Angela service
+        var mapperConfig = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<StoreAppMappingProfile>();
+            cfg.AddProfile<TipherethMappingProfile>();
+            cfg.AddProfile<SentinelMappingProfile>();
+        });
+        builder.Services.AddSingleton(mapperConfig.CreateMapper());
+        
+        // Add SephirahClient for Angela service delegation
+        builder.Services.AddGrpcClient<TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
+        {
+            // Use localhost for in-process calls
+            options.Address = new Uri("http://localhost:5148"); // Default Sephirah server port
+        });
+        
         if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddGrpcReflection();
@@ -133,7 +152,7 @@ public static class StartUp
                 c.Address = new Uri(consulConfig.ConsulAddress);
             }));
 
-        builder.Services.AddSingleton<PullMetadataService>();
+        builder.Services.AddSingleton<Librarian.Sephirah.Services.PullMetadataService>();
         if (GlobalContext.MassTransitConfig.TransportType == MassTransitType.InMemory)
         {
             builder.Services.AddMassTransit(x =>
@@ -221,14 +240,14 @@ public static class StartUp
         // Enable RateLimiter
         app.UseRateLimiter();
 
-        // Start PullMetadataService
-        if (app.Services.GetService<PullMetadataService>() != null)
+        // Start Librarian.Sephirah.Services.PullMetadataService
+        if (app.Services.GetService<Librarian.Sephirah.Services.PullMetadataService>() != null)
         {
-            app.Services.GetRequiredService<PullMetadataService>().Start();
+            app.Services.GetRequiredService<Librarian.Sephirah.Services.PullMetadataService>().Start();
 
             app.Lifetime.ApplicationStopping.Register(() =>
             {
-                app.Services.GetRequiredService<PullMetadataService>().Cancel();
+                app.Services.GetRequiredService<Librarian.Sephirah.Services.PullMetadataService>().Cancel();
             });
         }
     }
