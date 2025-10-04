@@ -34,6 +34,17 @@ The feature automatically handles X-Forwarded-For headers when the server is beh
    - The system automatically creates a "LocalAdmin" identity
    - This identity has full admin privileges for Angela operations
    - The username displayed will be "LocalAdmin"
+   - A visual indicator (warning badge) appears in the navigation menu and admin page
+
+## Visual Indicators
+
+When accessing as LocalAdmin via trusted IP:
+
+- **Navigation Menu**: A warning badge appears at the top showing "⚠️ LocalAdmin Mode - Trusted IP Access"
+- **Angela Admin Page**: A prominent warning alert displays the authentication type and user identity
+- **User Display**: Shows "LocalAdmin" with a "Trusted IP" badge in system information
+
+This makes it immediately clear when you're accessing the system via trusted IP authentication rather than a regular login.
 
 ## Angela Management Features
 
