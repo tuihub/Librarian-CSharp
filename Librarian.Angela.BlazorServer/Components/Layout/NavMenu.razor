@@ -38,6 +38,19 @@
 
         <AuthorizeView>
             <Authorized>
+                @if (context.User.HasClaim(c => c.Type == "AuthType" && c.Value == "TrustedIP"))
+                {
+                    <div class="nav-item px-3">
+                        <div class="alert alert-warning mb-2 py-2" role="alert">
+                            <small><strong>⚠️ LocalAdmin Mode</strong><br/>Trusted IP Access</small>
+                        </div>
+                    </div>
+                }
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="management/angela">
+                        <span class="bi bi-gear-nav-menu" aria-hidden="true"></span> Angela Admin
+                    </NavLink>
+                </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="management/sentinels">
                         <span class="bi bi-server-nav-menu" aria-hidden="true"></span> Sentinels

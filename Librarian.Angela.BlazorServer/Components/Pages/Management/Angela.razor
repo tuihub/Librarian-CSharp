@@ -1,0 +1,51 @@
+@page "/management/angela"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Angela Administration</PageTitle>
+
+<h1>Angela Administration</h1>
+
+<AuthorizeView>
+    <Authorized>
+        @if (context.User.HasClaim(c => c.Type == "AuthType" && c.Value == "TrustedIP"))
+        {
+            <div class="alert alert-warning" role="alert">
+                <h5 class="alert-heading">⚠️ LocalAdmin Mode Active</h5>
+                <p>You are accessing the Angela administration interface via a trusted IP address.</p>
+                <hr>
+                <p class="mb-0">
+                    <strong>Authentication Type:</strong> Trusted IP-based authentication<br/>
+                    <strong>User Identity:</strong> @context.User.Identity?.Name
+                </p>
+            </div>
+        }
+
+        <p>Welcome to Angela administration interface. This is the central hub for managing the Librarian system.</p>
+
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Angela Management Features</h4>
+            <p>Use the navigation menu to access various management features:</p>
+            <ul>
+                <li><strong>Sentinels:</strong> Manage Sentinel instances that provide app binaries and files</li>
+                <li><strong>Store Apps:</strong> Manage store applications available in the system</li>
+            </ul>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">System Information</h5>
+                <p class="card-text">You are accessing the Angela administration interface.</p>
+                <p class="card-text">
+                    <small class="text-muted">Current user: <strong>@context.User.Identity?.Name</strong></small>
+                </p>
+                @if (context.User.HasClaim(c => c.Type == "AuthType" && c.Value == "TrustedIP"))
+                {
+                    <p class="card-text">
+                        <small class="text-muted">Authentication: <span class="badge bg-warning text-dark">Trusted IP</span></small>
+                    </p>
+                }
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>

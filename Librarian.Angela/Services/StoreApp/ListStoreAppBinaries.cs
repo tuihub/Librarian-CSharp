@@ -8,7 +8,7 @@ namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    [Authorize]
+    [Authorize(Policy = "AngelaAccess")]
     public override async Task<Librarian.Sephirah.Angela.ListStoreAppBinariesResponse> ListStoreAppBinaries(Librarian.Sephirah.Angela.ListStoreAppBinariesRequest request,
         ServerCallContext context)
     {

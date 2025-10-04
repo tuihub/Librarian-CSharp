@@ -11,6 +11,7 @@ public interface IAngelaService
     Task<LoginResponse?> RefreshTokenAsync(string refreshToken);
     Task<List<SentinelSummary>?> GetSentinelsAsync();
     Task<List<StoreAppSummary>?> SearchStoreAppsAsync(string? nameFilter = null);
+    Task<CheckLocalAdminResponse?> CheckLocalAdminAsync();
 }
 
 public class AngelaService : IAngelaService
@@ -166,6 +167,35 @@ public class AngelaService : IAngelaService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while searching store apps");
+            return null;
+        }
+    }
+
+    public async Task<CheckLocalAdminResponse?> CheckLocalAdminAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_config.BaseUrl}/api/v1/auth/check-local-admin");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var checkResponse = JsonSerializer.Deserialize<CheckLocalAdminResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                _logger.LogInformation("CheckLocalAdmin returned: IsLocalAdmin={IsLocalAdmin}, Username={Username}", 
+                    checkResponse?.IsLocalAdmin, checkResponse?.Username);
+                return checkResponse;
+            }
+
+            _logger.LogWarning("CheckLocalAdmin failed with status: {StatusCode}", response.StatusCode);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while checking LocalAdmin status");
             return null;
         }
     }

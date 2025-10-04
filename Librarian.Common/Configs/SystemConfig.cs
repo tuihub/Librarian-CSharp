@@ -23,6 +23,9 @@ public class SystemConfig
 
     // Configuration for static Porter instances that don't need to be discovered via Consul
     public List<StaticPorterInstance> StaticPorterInstances { get; set; } = [];
+    
+    // IP addresses that can access Angela management without authentication (LocalAdmin access)
+    public List<string> AngelaTrustedIPs { get; set; } = [];
 }
 
 public class StaticPorterInstance
