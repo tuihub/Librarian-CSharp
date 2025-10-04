@@ -1,12 +1,14 @@
 @page "/management/angela"
 @using Microsoft.AspNetCore.Authorization
+@using Librarian.Angela.BlazorServer.Services
+@inject IAngelaService AngelaService
 @attribute [Authorize]
 
 <PageTitle>Angela Administration</PageTitle>
 
 <h1>Angela Administration</h1>
 
-@if (context?.User.Identity?.Name == "LocalAdmin")
+@if (isLocalAdmin)
 {
     <div class="alert alert-warning" role="alert">
         <h5 class="alert-heading">⚠️ LocalAdmin Mode Active</h5>
@@ -14,7 +16,7 @@
         <hr>
         <p class="mb-0">
             <strong>Authentication Type:</strong> Trusted IP-based authentication<br/>
-            <strong>User Identity:</strong> LocalAdmin
+            <strong>User Identity:</strong> @localAdminUsername
         </p>
     </div>
 }
@@ -35,9 +37,9 @@
         <h5 class="card-title">System Information</h5>
         <p class="card-text">You are accessing the Angela administration interface.</p>
         <p class="card-text">
-            <small class="text-muted">Current user: <strong>@(context?.User.Identity?.Name ?? "Unknown")</strong></small>
+            <small class="text-muted">Current user: <strong>@(localAdminUsername ?? context?.User.Identity?.Name ?? "Unknown")</strong></small>
         </p>
-        @if (context?.User.Identity?.Name == "LocalAdmin")
+        @if (isLocalAdmin)
         {
             <p class="card-text">
                 <small class="text-muted">Authentication: <span class="badge bg-warning text-dark">Trusted IP</span></small>
@@ -51,12 +53,30 @@
     private Task<AuthenticationState>? authenticationStateTask { get; set; }
     
     private AuthenticationState? context;
+    private bool isLocalAdmin = false;
+    private string? localAdminUsername = null;
 
     protected override async Task OnInitializedAsync()
     {
         if (authenticationStateTask != null)
         {
             context = await authenticationStateTask;
+        }
+        
+        // Check if current session is LocalAdmin
+        try
+        {
+            var result = await AngelaService.CheckLocalAdminAsync();
+            if (result != null)
+            {
+                isLocalAdmin = result.IsLocalAdmin;
+                localAdminUsername = result.Username;
+            }
+        }
+        catch (Exception)
+        {
+            // Silently fail - user is simply not LocalAdmin
+            isLocalAdmin = false;
         }
     }
 }

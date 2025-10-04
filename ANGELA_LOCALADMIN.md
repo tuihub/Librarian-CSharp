@@ -40,11 +40,12 @@ The feature automatically handles X-Forwarded-For headers when the server is beh
 
 When accessing as LocalAdmin via trusted IP:
 
-- **Navigation Menu**: A warning badge appears at the top showing "⚠️ LocalAdmin Mode - Trusted IP Access"
+- **Navigation Menu**: A warning badge appears showing "⚠️ LocalAdmin Mode - Trusted IP Access"
 - **Angela Admin Page**: A prominent warning alert displays the authentication type and user identity
 - **User Display**: Shows "LocalAdmin" with a "Trusted IP" badge in system information
+- **Automatic Detection**: The BlazorServer calls Angela's `CheckLocalAdmin` endpoint to detect if the current request is from a trusted IP
 
-This makes it immediately clear when you're accessing the system via trusted IP authentication rather than a regular login.
+This provides immediate visual feedback so users can easily identify their authentication method. The detection is performed by calling the Angela backend service, which checks the actual request IP against the configured trusted IPs list.
 
 ## Angela Management Features
 
@@ -69,6 +70,16 @@ The feature uses a custom authorization policy called `AngelaAccess`:
 - Checks if user is authenticated via JWT token
 - If not authenticated, checks if request IP is in the trusted list
 - Grants access with "LocalAdmin" identity for trusted IPs
+
+### LocalAdmin Detection Service
+
+A dedicated `CheckLocalAdmin` RPC endpoint is provided:
+- **Endpoint**: `GET /api/v1/auth/check-local-admin`
+- **Purpose**: Allows BlazorServer to detect if current request is from trusted IP
+- **Response**: Returns `isLocalAdmin` boolean and username
+- **Used by**: BlazorServer navigation menu and admin pages for visual indicators
+
+The BlazorServer calls this endpoint on initialization to determine if the user is accessing via trusted IP, enabling appropriate UI elements even when not authenticated through traditional means.
 
 ### Modified Services
 
