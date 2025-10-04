@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Librarian.Angela.BlazorServer.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Librarian.Angela.BlazorServer.Components.Account;
@@ -8,24 +9,51 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<JwtAuthenticationStateProvider> _logger;
+    private readonly IAngelaService _angelaService;
 
     public JwtAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor,
-        ILogger<JwtAuthenticationStateProvider> logger)
+        ILogger<JwtAuthenticationStateProvider> logger,
+        IAngelaService angelaService)
     {
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _angelaService = angelaService;
     }
 
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
-            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         var token = httpContext.Request.Cookies["AccessToken"];
 
         if (string.IsNullOrEmpty(token))
-            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+        {
+            // Check if user is LocalAdmin via trusted IP
+            try
+            {
+                var localAdminCheck = await _angelaService.CheckLocalAdminAsync();
+                if (localAdminCheck != null && localAdminCheck.IsLocalAdmin)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, localAdminCheck.Username),
+                        new Claim(ClaimTypes.Role, "Admin"),
+                        new Claim("AuthType", "TrustedIP")
+                    };
+                    var identity = new ClaimsIdentity(claims, "TrustedIP");
+                    var user = new ClaimsPrincipal(identity);
+                    return new AuthenticationState(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error checking LocalAdmin status");
+            }
+            
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
 
         try
         {
@@ -34,7 +62,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
             // Check if token is expired
             if (jwt.ValidTo < DateTime.UtcNow)
-                return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
             var claims = jwt.Claims.ToList();
 
@@ -42,12 +70,12 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             var identity = new ClaimsIdentity(claims, "jwt");
             var user = new ClaimsPrincipal(identity);
 
-            return Task.FromResult(new AuthenticationState(user));
+            return new AuthenticationState(user);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error parsing JWT token");
-            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
     }
 
