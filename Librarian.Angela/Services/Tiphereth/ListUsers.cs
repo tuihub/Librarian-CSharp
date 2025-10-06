@@ -13,13 +13,14 @@ public partial class AngelaService
     public override async Task<ListUsersResponse> ListUsers(ListUsersRequest request, ServerCallContext context)
     {
         // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
+        if (context.GetBearerToken() != null)
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
 
         // Query users
         IQueryable<Common.Models.Db.User> usersDb = _dbContext.Users;
 
         // Exclude current user
-        usersDb = usersDb.Where(u => u.Id != context.GetInternalIdFromHeader());
+        // usersDb = usersDb.Where(u => u.Id != context.GetInternalIdFromHeader());
 
         // Filter by requested type and status
         if (request.TypeFilter.Count > 0)

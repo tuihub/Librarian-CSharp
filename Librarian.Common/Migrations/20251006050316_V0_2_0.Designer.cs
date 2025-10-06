@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Librarian.Common.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250907120448_V0_2_0")]
+    [Migration("20251006050316_V0_2_0")]
     partial class V0_2_0
     {
         /// <inheritdoc />
@@ -934,6 +934,11 @@ namespace Librarian.Common.Migrations
                         .HasMaxLength(511)
                         .HasColumnType("varchar(511)");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(1023)
+                        .HasColumnType("varchar(1023)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -942,7 +947,7 @@ namespace Librarian.Common.Migrations
                         .HasMaxLength(511)
                         .HasColumnType("varchar(511)");
 
-                    b.Property<long?>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -1462,9 +1467,13 @@ namespace Librarian.Common.Migrations
 
             modelBuilder.Entity("Librarian.Common.Models.Db.Sentinel", b =>
                 {
-                    b.HasOne("Librarian.Common.Models.Db.User", null)
+                    b.HasOne("Librarian.Common.Models.Db.User", "User")
                         .WithMany("Sentinels")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Librarian.Common.Models.Db.SentinelAppBinary", b =>

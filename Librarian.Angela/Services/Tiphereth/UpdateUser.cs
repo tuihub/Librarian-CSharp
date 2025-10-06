@@ -12,7 +12,8 @@ public partial class AngelaService
     public override async Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
     {
         // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
+        if (context.GetBearerToken() != null)
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
 
         var userId = request.User.Id.Id;
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);

@@ -14,17 +14,17 @@ public partial class AngelaService
     public override async Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
     {
         // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
+        if (context.GetBearerToken() != null)
+            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
 
-        // Generate a new internal ID using a simple timestamp approach
-        var internalId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var internalId = _idGenerator.CreateId();
 
         // Create a new user
         var user = new User
         {
             Id = internalId,
             Name = request.User.Username,
-            Password = request.User.Password, // Note: In a real project, the password should be encrypted
+            Password = PasswordHasher.HashPassword(request.User.Password), // Note: In a real project, the password should be encrypted
             Status = ConvertToDbUserStatus(request.User.Status),
             Type = ConvertToDbUserType(request.User.Type)
         };

@@ -42,7 +42,7 @@ public class SephirahAuthService : ISephirahAuthService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Use the gRPC JSON transcoding endpoint
-            var response = await _httpClient.PostAsync($"{_config.BaseUrl}/v1/GetToken", content);
+            var response = await _httpClient.PostAsync($"{_config.BaseUrl}/api/v1/auth/token", content);
 
             if (response.IsSuccessStatusCode)
             {
