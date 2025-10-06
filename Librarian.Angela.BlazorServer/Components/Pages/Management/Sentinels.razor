@@ -159,38 +159,38 @@ else
                         
                         <div class="mb-3">
                             <label for="editUserId" class="form-label">User ID</label>
-                            <InputNumber id="editUserId" class="form-control" @bind-Value="editModel.UserId" />
-                            <div class="form-text">Leave 0 to keep current value (@editingSentinel.UserId)</div>
+                            <InputNumber id="editUserId" class="form-control" @bind-Value="editModel.UserId" placeholder="@editingSentinel.UserId" />
+                            <div class="form-text">Leave empty to keep current value: @editingSentinel.UserId</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editUrl" class="form-label">URL</label>
-                            <InputText id="editUrl" class="form-control" @bind-Value="editModel.Url" />
-                            <div class="form-text">Leave empty to keep current value</div>
+                            <InputText id="editUrl" class="form-control" @bind-Value="editModel.Url" placeholder="@editingSentinel.Url" />
+                            <div class="form-text">Leave empty to keep current value: @editingSentinel.Url</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editGetTokenPath" class="form-label">Get Token Path</label>
-                            <InputText id="editGetTokenPath" class="form-control" @bind-Value="editModel.GetTokenPath" />
-                            <div class="form-text">Leave empty to keep current value</div>
+                            <InputText id="editGetTokenPath" class="form-control" @bind-Value="editModel.GetTokenPath" placeholder="@editingSentinel.GetTokenUrlPath" />
+                            <div class="form-text">Leave empty to keep current value: @editingSentinel.GetTokenUrlPath</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editDownloadPath" class="form-label">Download File Path</label>
-                            <InputText id="editDownloadPath" class="form-control" @bind-Value="editModel.DownloadPath" />
-                            <div class="form-text">Leave empty to keep current value</div>
+                            <InputText id="editDownloadPath" class="form-control" @bind-Value="editModel.DownloadPath" placeholder="@editingSentinel.DownloadFileUrlPath" />
+                            <div class="form-text">Leave empty to keep current value: @editingSentinel.DownloadFileUrlPath</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editRefreshToken" class="form-label">Refresh Token</label>
-                            <InputText id="editRefreshToken" type="password" class="form-control" @bind-Value="editModel.RefreshToken" />
+                            <InputText id="editRefreshToken" type="password" class="form-control" @bind-Value="editModel.RefreshToken" placeholder="(current token hidden)" />
                             <div class="form-text">Leave empty to keep current token</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editAltUrls" class="form-label">Alternative URLs (comma-separated)</label>
-                            <InputText id="editAltUrls" class="form-control" @bind-Value="editModel.AltUrlsString" />
-                            <div class="form-text">Leave empty to keep current URLs</div>
+                            <InputText id="editAltUrls" class="form-control" @bind-Value="editModel.AltUrlsString" placeholder="@string.Join(", ", editingSentinel.AltUrls)" />
+                            <div class="form-text">Leave empty to keep current URLs: @string.Join(", ", editingSentinel.AltUrls)</div>
                         </div>
                         
                         <div class="modal-footer">
@@ -252,7 +252,7 @@ else
     private bool showDeleteConfirm = false;
     private bool isProcessing = false;
     private SentinelFormModel newSentinel = new();
-    private SentinelFormModel editModel = new();
+    private SentinelEditModel editModel = new();
     private SentinelSummary? editingSentinel;
     private SentinelSummary? deletingSentinel;
 
@@ -339,9 +339,9 @@ else
     private void ShowEditForm(SentinelSummary sentinel)
     {
         editingSentinel = sentinel;
-        editModel = new SentinelFormModel
+        editModel = new SentinelEditModel
         {
-            UserId = 0, // Will be treated as "keep current"
+            UserId = null, // Will be treated as "keep current"
             Url = "",
             GetTokenPath = "",
             DownloadPath = "",
@@ -357,7 +357,7 @@ else
     {
         showEditForm = false;
         editingSentinel = null;
-        editModel = new SentinelFormModel();
+        editModel = new SentinelEditModel();
     }
 
     private async Task HandleUpdateSentinel()
@@ -378,7 +378,7 @@ else
 
             var result = await AngelaService.UpdateSentinelAsync(
                 editingSentinel.Id,
-                editModel.UserId == 0 ? null : editModel.UserId,
+                editModel.UserId,
                 string.IsNullOrEmpty(editModel.Url) ? null : editModel.Url,
                 string.IsNullOrEmpty(editModel.GetTokenPath) ? null : editModel.GetTokenPath,
                 string.IsNullOrEmpty(editModel.DownloadPath) ? null : editModel.DownloadPath,
@@ -391,7 +391,7 @@ else
                 successMessage = $"Sentinel {editingSentinel.Id} updated successfully.";
                 showEditForm = false;
                 editingSentinel = null;
-                editModel = new SentinelFormModel();
+                editModel = new SentinelEditModel();
                 await LoadSentinels();
             }
             else
@@ -476,6 +476,17 @@ else
         [System.ComponentModel.DataAnnotations.Required]
         public string RefreshToken { get; set; } = string.Empty;
 
+        public string AltUrlsString { get; set; } = string.Empty;
+    }
+
+    public class SentinelEditModel
+    {
+        // No Required attributes - all fields are optional for partial updates
+        public long? UserId { get; set; }
+        public string Url { get; set; } = string.Empty;
+        public string GetTokenPath { get; set; } = string.Empty;
+        public string DownloadPath { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
         public string AltUrlsString { get; set; } = string.Empty;
     }
 }

@@ -142,13 +142,13 @@ else
                         
                         <div class="mb-3">
                             <label for="editUsername" class="form-label">Username</label>
-                            <InputText id="editUsername" class="form-control" @bind-Value="editModel.Username" />
-                            <div class="form-text">Leave empty to keep current value</div>
+                            <InputText id="editUsername" class="form-control" @bind-Value="editModel.Username" placeholder="@editingUser.Username" />
+                            <div class="form-text">Leave empty to keep current value: @editingUser.Username</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="editPassword" class="form-label">Password</label>
-                            <InputText id="editPassword" type="password" class="form-control" @bind-Value="editModel.Password" />
+                            <InputText id="editPassword" type="password" class="form-control" @bind-Value="editModel.Password" placeholder="(current password hidden)" />
                             <div class="form-text">Leave empty to keep current password</div>
                         </div>
                         
@@ -195,7 +195,7 @@ else
     private bool showEditForm = false;
     private bool isProcessing = false;
     private UserFormModel newUser = new();
-    private UserFormModel editModel = new();
+    private UserEditModel editModel = new();
     private UserSummary? editingUser;
 
     protected override async Task OnInitializedAsync()
@@ -275,7 +275,7 @@ else
     private void ShowEditForm(UserSummary user)
     {
         editingUser = user;
-        editModel = new UserFormModel
+        editModel = new UserEditModel
         {
             Username = "",
             Password = "",
@@ -291,7 +291,7 @@ else
     {
         showEditForm = false;
         editingUser = null;
-        editModel = new UserFormModel();
+        editModel = new UserEditModel();
     }
 
     private async Task HandleUpdateUser()
@@ -317,7 +317,7 @@ else
                 successMessage = $"User '{editingUser.Username}' updated successfully.";
                 showEditForm = false;
                 editingUser = null;
-                editModel = new UserFormModel();
+                editModel = new UserEditModel();
                 await LoadUsers();
             }
             else
@@ -368,6 +368,15 @@ else
         public string Type { get; set; } = string.Empty;
 
         [System.ComponentModel.DataAnnotations.Required]
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class UserEditModel
+    {
+        // No Required attributes - all fields are optional for partial updates
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
     }
 }
