@@ -1,0 +1,372 @@
+@page "/management/users"
+@using Librarian.Angela.BlazorServer.Services
+@using Librarian.Angela.BlazorServer.Services.Models
+@using Microsoft.AspNetCore.Authorization
+@inject IAngelaService AngelaService
+@inject ILogger<Users> Logger
+@attribute [Authorize(Policy = "AngelaAccess")]
+
+<PageTitle>User Management</PageTitle>
+
+<h1>User Management</h1>
+
+<p>Manage system users, their types, and status.</p>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" @onclick="@(() => successMessage = null)"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" @onclick="@(() => errorMessage = null)"></button>
+    </div>
+}
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ShowCreateForm">
+        <span class="bi bi-plus-circle"></span> Create New User
+    </button>
+</div>
+
+@if (showCreateForm)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Create New User</h5>
+        </div>
+        <div class="card-body">
+            <EditForm Model="@newUser" OnValidSubmit="HandleCreateUser">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                
+                <div class="mb-3">
+                    <label for="newUsername" class="form-label">Username</label>
+                    <InputText id="newUsername" class="form-control" @bind-Value="newUser.Username" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">Password</label>
+                    <InputText id="newPassword" type="password" class="form-control" @bind-Value="newUser.Password" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="newType" class="form-label">Type</label>
+                    <InputSelect id="newType" class="form-select" @bind-Value="newUser.Type">
+                        <option value="">Select Type...</option>
+                        <option value="USER_TYPE_ADMIN">Admin</option>
+                        <option value="USER_TYPE_NORMAL">Normal</option>
+                    </InputSelect>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="newStatus" class="form-label">Status</label>
+                    <InputSelect id="newStatus" class="form-select" @bind-Value="newUser.Status">
+                        <option value="">Select Status...</option>
+                        <option value="USER_STATUS_ACTIVE">Active</option>
+                        <option value="USER_STATUS_BLOCKED">Blocked</option>
+                    </InputSelect>
+                </div>
+                
+                <div>
+                    <button type="submit" class="btn btn-primary" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        Create User
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" @onclick="CancelCreateForm" disabled="@isProcessing">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!users.Any())
+{
+    <p><em>No users found.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Username</td>
+                    <td>@GetDisplayType(user.Type)</td>
+                    <td>@GetDisplayStatus(user.Status)</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="@(() => ShowEditForm(user))" disabled="@isProcessing">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showEditForm && editingUser != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User: @editingUser.Username</h5>
+                    <button type="button" class="btn-close" @onclick="CancelEditForm" disabled="@isProcessing"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@editModel" OnValidSubmit="HandleUpdateUser">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        
+                        <div class="mb-3">
+                            <label for="editUsername" class="form-label">Username</label>
+                            <InputText id="editUsername" class="form-control" @bind-Value="editModel.Username" />
+                            <div class="form-text">Leave empty to keep current value</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editPassword" class="form-label">Password</label>
+                            <InputText id="editPassword" type="password" class="form-control" @bind-Value="editModel.Password" />
+                            <div class="form-text">Leave empty to keep current password</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editType" class="form-label">Type</label>
+                            <InputSelect id="editType" class="form-select" @bind-Value="editModel.Type">
+                                <option value="">Keep Current (@GetDisplayType(editingUser.Type))</option>
+                                <option value="USER_TYPE_ADMIN">Admin</option>
+                                <option value="USER_TYPE_NORMAL">Normal</option>
+                            </InputSelect>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Status</label>
+                            <InputSelect id="editStatus" class="form-select" @bind-Value="editModel.Status">
+                                <option value="">Keep Current (@GetDisplayStatus(editingUser.Status))</option>
+                                <option value="USER_STATUS_ACTIVE">Active</option>
+                                <option value="USER_STATUS_BLOCKED">Blocked</option>
+                            </InputSelect>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CancelEditForm" disabled="@isProcessing">Cancel</button>
+                            <button type="submit" class="btn btn-primary" disabled="@isProcessing">
+                                @if (isProcessing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                }
+                                Save Changes
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<UserSummary>? users;
+    private string? errorMessage;
+    private string? successMessage;
+    private bool showCreateForm = false;
+    private bool showEditForm = false;
+    private bool isProcessing = false;
+    private UserFormModel newUser = new();
+    private UserFormModel editModel = new();
+    private UserSummary? editingUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            users = await AngelaService.GetUsersAsync();
+            if (users == null)
+            {
+                errorMessage = "Failed to load users. Please check if Angela service is running.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading users");
+            errorMessage = "An error occurred while loading users.";
+        }
+    }
+
+    private void ShowCreateForm()
+    {
+        showCreateForm = true;
+        newUser = new UserFormModel();
+        errorMessage = null;
+        successMessage = null;
+    }
+
+    private void CancelCreateForm()
+    {
+        showCreateForm = false;
+        newUser = new UserFormModel();
+    }
+
+    private async Task HandleCreateUser()
+    {
+        isProcessing = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var result = await AngelaService.CreateUserAsync(
+                newUser.Username,
+                newUser.Password,
+                newUser.Type,
+                newUser.Status
+            );
+
+            if (result)
+            {
+                successMessage = $"User '{newUser.Username}' created successfully.";
+                showCreateForm = false;
+                newUser = new UserFormModel();
+                await LoadUsers();
+            }
+            else
+            {
+                errorMessage = "Failed to create user. Please check the logs for details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error creating user");
+            errorMessage = "An error occurred while creating the user.";
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private void ShowEditForm(UserSummary user)
+    {
+        editingUser = user;
+        editModel = new UserFormModel
+        {
+            Username = "",
+            Password = "",
+            Type = "",
+            Status = ""
+        };
+        showEditForm = true;
+        errorMessage = null;
+        successMessage = null;
+    }
+
+    private void CancelEditForm()
+    {
+        showEditForm = false;
+        editingUser = null;
+        editModel = new UserFormModel();
+    }
+
+    private async Task HandleUpdateUser()
+    {
+        if (editingUser == null) return;
+
+        isProcessing = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var result = await AngelaService.UpdateUserAsync(
+                editingUser.Id,
+                string.IsNullOrEmpty(editModel.Username) ? null : editModel.Username,
+                string.IsNullOrEmpty(editModel.Password) ? null : editModel.Password,
+                string.IsNullOrEmpty(editModel.Type) ? null : editModel.Type,
+                string.IsNullOrEmpty(editModel.Status) ? null : editModel.Status
+            );
+
+            if (result)
+            {
+                successMessage = $"User '{editingUser.Username}' updated successfully.";
+                showEditForm = false;
+                editingUser = null;
+                editModel = new UserFormModel();
+                await LoadUsers();
+            }
+            else
+            {
+                errorMessage = "Failed to update user. Please check the logs for details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating user");
+            errorMessage = "An error occurred while updating the user.";
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private string GetDisplayType(string type)
+    {
+        return type switch
+        {
+            "USER_TYPE_ADMIN" => "Admin",
+            "USER_TYPE_NORMAL" => "Normal",
+            _ => type
+        };
+    }
+
+    private string GetDisplayStatus(string status)
+    {
+        return status switch
+        {
+            "USER_STATUS_ACTIVE" => "Active",
+            "USER_STATUS_BLOCKED" => "Blocked",
+            _ => status
+        };
+    }
+
+    public class UserFormModel
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Username { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Password { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Type { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Status { get; set; } = string.Empty;
+    }
+}
