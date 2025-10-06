@@ -13,6 +13,8 @@ public class SentinelMappingProfile : Profile
         // Mapping from Entity Sentinel to Angela Sentinel protobuf
         CreateMap<Sentinel, Librarian.Sephirah.Angela.Sentinel>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new Librarian.Sephirah.Angela.InternalID { Id = src.Id }))
-            .ForMember(dest => dest.AltUrls, opt => opt.MapFrom(src => src.AltUrls));
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => new Librarian.Sephirah.Angela.InternalID { Id = src.UserId }))
+            .ForMember(dest => dest.AltUrls, opt => opt.MapFrom(src => src.AltUrls))
+            .ForMember(dest => dest.RefreshToken, opt => opt.MapFrom(src => src.RefreshToken));
     }
 }

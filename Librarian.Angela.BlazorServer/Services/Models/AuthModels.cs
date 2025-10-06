@@ -40,6 +40,8 @@ public class SentinelSummary
     public string[] AltUrls { get; set; } = Array.Empty<string>();
     public string GetTokenUrlPath { get; set; } = string.Empty;
     public string DownloadFileUrlPath { get; set; } = string.Empty;
+    public long UserId { get; set; }
+    public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class StoreAppSummary

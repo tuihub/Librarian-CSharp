@@ -160,6 +160,8 @@ message Sentinel {
   repeated string alt_urls = 3;
   string get_token_url_path = 4;
   string download_file_url_path = 5;
+  InternalID user_id = 6;
+  string refresh_token = 7;
 }
 
 message ListSentinelsRequest {
@@ -177,6 +179,28 @@ message GetSentinelRequest {
 
 message GetSentinelResponse {
   Sentinel sentinel = 1;
+}
+
+message CreateSentinelRequest {
+  Sentinel sentinel = 1;
+}
+
+message CreateSentinelResponse {
+  InternalID id = 1;
+}
+
+message UpdateSentinelRequest {
+  Sentinel sentinel = 1;
+}
+
+message UpdateSentinelResponse {
+}
+
+message DeleteSentinelRequest {
+  InternalID id = 1;
+}
+
+message DeleteSentinelResponse {
 }
 
 // StoreApp-related messages  
@@ -301,6 +325,26 @@ service AngelaService {
   rpc GetSentinel(GetSentinelRequest) returns (GetSentinelResponse) {
     option (google.api.http) = {
       get: "/api/v1/sentinels/{id.id}"
+    };
+  }
+
+  rpc CreateSentinel(CreateSentinelRequest) returns (CreateSentinelResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/sentinels"
+      body: "*"
+    };
+  }
+
+  rpc UpdateSentinel(UpdateSentinelRequest) returns (UpdateSentinelResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/sentinels/{sentinel.id.id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSentinel(DeleteSentinelRequest) returns (DeleteSentinelResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/sentinels/{id.id}"
     };
   }
 
