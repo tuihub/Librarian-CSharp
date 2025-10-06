@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Librarian.Tests", "Librarian.Tests\Librarian.Tests.csproj", "{FB097C98-FA12-4070-97ED-8D6CC43B90B2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E1A59A03-0276-4479-91E7-FAD1A6258298} = {E1A59A03-0276-4479-91E7-FAD1A6258298}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Librarian.Common", "Librarian.Common\Librarian.Common.csproj", "{949AC5C1-9540-41ED-8B0F-BA991F788527}"
 EndProject
