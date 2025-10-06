@@ -10,6 +10,7 @@ using Librarian.Common.Utils;
 using Librarian.Sephirah.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -91,23 +92,16 @@ public static class StartUp
 
         // Add grpc
         builder.Services.AddGrpc().AddJsonTranscoding();
-        
-        // Add AutoMapper for Angela service
-        var mapperConfig = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<StoreAppMappingProfile>();
-            cfg.AddProfile<TipherethMappingProfile>();
-            cfg.AddProfile<SentinelMappingProfile>();
-        });
-        builder.Services.AddSingleton(mapperConfig.CreateMapper());
-        
+
         // Add SephirahClient for Angela service delegation
-        builder.Services.AddGrpcClient<TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
-        {
-            // Use localhost for in-process calls
-            options.Address = new Uri("http://localhost:5148"); // Default Sephirah server port
-        });
-        
+        builder.Services
+            .AddGrpcClient<
+                TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
+            {
+                // Use localhost for in-process calls
+                options.Address = new Uri("http://localhost:5148"); // Default Sephirah server port
+            });
+
         if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddGrpcReflection();
@@ -134,7 +128,12 @@ public static class StartUp
             // DownloadToken Auth
             .AddJwtBearer("DownloadToken",
                 options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.DownloadTokenAudience));
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("AngelaAccess", policy =>
+                policy.Requirements.Add(new Librarian.Angela.Authorization.AngelaAuthorizationRequirement()));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services
+            .AddSingleton<IAuthorizationHandler, Librarian.Angela.Authorization.AngelaAuthorizationHandler>();
 
         // Add RateLimiter
         builder.Services.AddRateLimiter(_ => _
