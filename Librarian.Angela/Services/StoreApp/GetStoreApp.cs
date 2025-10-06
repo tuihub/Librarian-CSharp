@@ -13,7 +13,7 @@ public partial class AngelaService
         ServerCallContext context)
     {
         // Use AutoMapper to convert request
-        var sephirahRequest = _mapper.Map<GetStoreAppSummaryRequest>(request);
+        var sephirahRequest = s_mapper.Map<GetStoreAppSummaryRequest>(request);
 
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -27,7 +27,7 @@ public partial class AngelaService
             var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
             
             // Use AutoMapper to convert StoreApp
-            var storeApp = _mapper.Map<Librarian.Sephirah.Angela.StoreApp>(sephirahResponse.StoreApp.StoreApp);
+            var storeApp = s_mapper.Map<Librarian.Sephirah.Angela.StoreApp>(sephirahResponse.StoreApp.StoreApp);
 
             return new Librarian.Sephirah.Angela.GetStoreAppResponse
             {

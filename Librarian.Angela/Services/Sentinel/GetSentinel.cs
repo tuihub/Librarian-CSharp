@@ -18,7 +18,7 @@ public partial class AngelaService
             throw new RpcException(new Status(StatusCode.NotFound, "Sentinel not found"));
 
         // Use AutoMapper to convert entity to protobuf object
-        var sentinelPb = _mapper.Map<Sentinel>(sentinel);
+        var sentinelPb = s_mapper.Map<Sentinel>(sentinel);
 
         return new GetSentinelResponse
         {

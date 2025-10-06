@@ -3,6 +3,8 @@ using Librarian.Angela.BlazorServer.Components.Account;
 using Librarian.Angela.BlazorServer.Services;
 using Librarian.Angela.BlazorServer.Services.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Librarian.Angela.BlazorServer.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,21 @@ builder.Services.AddAuthentication(options =>
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
+// 注册 AngelaAccess 策略，并设为默认策略：
+// 规则：Cookie/现有身份优先，TrustedIP 作为兜底
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddRequirements(new AngelaAccessRequirement())
+        .Build();
+    options.AddPolicy("AngelaAccess", policy =>
+    {
+        policy.Requirements.Add(new AngelaAccessRequirement());
+    });
+});
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IAuthorizationHandler, LocalAngelaAuthorizationHandler>();
+
 // Database temporarily disabled for testing
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -76,6 +93,11 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

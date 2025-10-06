@@ -13,7 +13,7 @@ public partial class AngelaService
         ServerCallContext context)
     {
         // Use AutoMapper to convert request
-        var sephirahRequest = _mapper.Map<GetStoreAppSummaryRequest>(request);
+        var sephirahRequest = s_mapper.Map<GetStoreAppSummaryRequest>(request);
 
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -37,7 +37,7 @@ public partial class AngelaService
             // Use AutoMapper to convert binaries
             foreach (var sephirahBinary in sephirahResponse.StoreApp.Binaries)
             {
-                var binary = _mapper.Map<Librarian.Sephirah.Angela.StoreAppBinary>(sephirahBinary);
+                var binary = s_mapper.Map<Librarian.Sephirah.Angela.StoreAppBinary>(sephirahBinary);
                 // Set required fields that AutoMapper can't infer
                 binary.StoreAppId = request.StoreAppId;
                 response.Binaries.Add(binary);

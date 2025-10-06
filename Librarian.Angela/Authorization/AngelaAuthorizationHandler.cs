@@ -22,7 +22,7 @@ public class AngelaAuthorizationHandler : AuthorizationHandler<AngelaAuthorizati
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
         AngelaAuthorizationRequirement requirement)
     {
-        // If user is already authenticated, allow
+        // 如果已有认证（Cookie/JWT），直接放行（优先级高于 TrustedIP）
         if (context.User.Identity?.IsAuthenticated == true)
         {
             context.Succeed(requirement);
@@ -62,7 +62,8 @@ public class AngelaAuthorizationHandler : AuthorizationHandler<AngelaAuthorizati
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, "LocalAdmin"),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim("AuthType", "TrustedIP")
             };
             var identity = new ClaimsIdentity(claims, "TrustedIP");
             var principal = new ClaimsPrincipal(identity);

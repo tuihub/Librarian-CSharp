@@ -32,7 +32,7 @@ public partial class AngelaService
         // Use AutoMapper to convert entities to protobuf objects
         foreach (var sentinel in sentinels)
         {
-            var sentinelPb = _mapper.Map<Sentinel>(sentinel);
+            var sentinelPb = s_mapper.Map<Sentinel>(sentinel);
             response.Sentinels.Add(sentinelPb);
         }
 

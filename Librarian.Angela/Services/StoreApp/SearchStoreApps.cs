@@ -13,7 +13,7 @@ public partial class AngelaService
         ServerCallContext context)
     {
         // Use AutoMapper to convert request
-        var sephirahRequest = _mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.SearchStoreAppsRequest>(request);
+        var sephirahRequest = s_mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.SearchStoreAppsRequest>(request);
 
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
@@ -27,7 +27,7 @@ public partial class AngelaService
             var sephirahResponse = await _sephirahClient.SearchStoreAppsAsync(sephirahRequest, headers);
             
             // Use AutoMapper to convert response
-            return _mapper.Map<Librarian.Sephirah.Angela.SearchStoreAppsResponse>(sephirahResponse);
+            return s_mapper.Map<Librarian.Sephirah.Angela.SearchStoreAppsResponse>(sephirahResponse);
         }
         catch (RpcException ex)
         {

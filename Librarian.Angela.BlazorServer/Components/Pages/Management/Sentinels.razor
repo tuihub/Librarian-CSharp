@@ -1,8 +1,10 @@
 @page "/management/sentinels"
 @using Librarian.Angela.BlazorServer.Services
 @using Librarian.Angela.BlazorServer.Services.Models
+@using Microsoft.AspNetCore.Authorization
 @inject IAngelaService AngelaService
 @inject ILogger<Sentinels> Logger
+@attribute [Authorize(Policy = "AngelaAccess")]
 
 <PageTitle>Sentinel Management</PageTitle>
 

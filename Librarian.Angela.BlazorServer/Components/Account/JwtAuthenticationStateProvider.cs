@@ -26,11 +26,17 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
         if (httpContext == null)
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
-        var token = httpContext.Request.Cookies["AccessToken"];
+        // 1) 优先使用服务器端 Cookie 身份（若已登录）
+        if (httpContext.User?.Identity?.IsAuthenticated == true)
+        {
+            return new AuthenticationState(httpContext.User);
+        }
 
+        // 2) 其次尝试 AccessToken（JWT）Cookie
+        var token = httpContext.Request.Cookies["AccessToken"];
         if (string.IsNullOrEmpty(token))
         {
-            // Check if user is LocalAdmin via trusted IP
+            // 3) 最后回退：调用接口探测 TrustedIP
             try
             {
                 var localAdminCheck = await _angelaService.CheckLocalAdminAsync();
@@ -51,7 +57,6 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             {
                 _logger.LogWarning(ex, "Error checking LocalAdmin status");
             }
-            
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
