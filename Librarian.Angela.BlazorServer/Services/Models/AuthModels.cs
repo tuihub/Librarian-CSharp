@@ -53,3 +53,9 @@ public class StoreAppSummary
     public string[] Tags { get; set; } = Array.Empty<string>();
     public bool IsPublic { get; set; }
 }
+
+public class CheckLocalAdminResponse
+{
+    public bool IsLocalAdmin { get; set; }
+    public string Username { get; set; } = string.Empty;
+}

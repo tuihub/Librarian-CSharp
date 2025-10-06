@@ -7,7 +7,7 @@ namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    [Authorize]
+    [Authorize(Policy = "AngelaAccess")]
     public override async Task<GetSentinelResponse> GetSentinel(GetSentinelRequest request,
         ServerCallContext context)
     {

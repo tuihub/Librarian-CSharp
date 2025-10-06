@@ -231,6 +231,16 @@ message ListStoreAppBinariesResponse {
   repeated StoreAppBinary binaries = 2;
 }
 
+// CheckLocalAdmin - Check if current request is from trusted IP (LocalAdmin)
+message CheckLocalAdminRequest {
+  // Empty - checks current request context
+}
+
+message CheckLocalAdminResponse {
+  bool is_local_admin = 1;
+  string username = 2; // Returns "LocalAdmin" if trusted IP, or actual username if authenticated
+}
+
 // Angela service combines all admin management services
 service AngelaService {
   // Tiphereth services (user management)
@@ -310,6 +320,13 @@ service AngelaService {
   rpc ListStoreAppBinaries(ListStoreAppBinariesRequest) returns (ListStoreAppBinariesResponse) {
     option (google.api.http) = {
       get: "/api/v1/store-apps/{store_app_id.id}/binaries"
+    };
+  }
+
+  // Check if current session is LocalAdmin (trusted IP)
+  rpc CheckLocalAdmin(CheckLocalAdminRequest) returns (CheckLocalAdminResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/check-local-admin"
     };
   }
 }

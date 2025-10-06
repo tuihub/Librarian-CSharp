@@ -7,6 +7,7 @@ using Librarian.Common.Configs;
 using Librarian.Common.Utils;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using TuiHub.Protos.Librarian.Sephirah.V1;
@@ -42,6 +43,9 @@ builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 
+// Add HTTP context accessor for getting client IP in gRPC services
+builder.Services.AddHttpContextAccessor();
+
 // Add SephirahClient for Angela to delegate services to Sephirah
 builder.Services.AddGrpcClient<TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
 {
@@ -61,7 +65,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     // DownloadToken Auth
     .AddJwtBearer("DownloadToken",
         options => options.GetJwtBearerOptions(GlobalContext.JwtConfig.DownloadTokenAudience));
-builder.Services.AddAuthorization();
+
+// Add Authorization with custom Angela policy
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AngelaAccess", policy =>
+        policy.Requirements.Add(new Librarian.Angela.Authorization.AngelaAuthorizationRequirement()));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, Librarian.Angela.Authorization.AngelaAuthorizationHandler>();
 
 // Add RateLimiter
 builder.Services.AddRateLimiter(_ => _
