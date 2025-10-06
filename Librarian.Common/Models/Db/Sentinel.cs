@@ -5,6 +5,7 @@ using TuiHub.Protos.Librarian.Sentinel.V1;
 
 namespace Librarian.Common.Models.Db;
 
+[Index(nameof(UserId))]
 [Index(nameof(CreatedAt))]
 [Index(nameof(UpdatedAt))]
 public class Sentinel
@@ -32,10 +33,15 @@ public class Sentinel
     [MaxLength(4095)] public ICollection<string> AltUrls { get; set; } = [];
     [MaxLength(511)] public string GetTokenUrlPath { get; set; } = null!;
     [MaxLength(511)] public string DownloadFileUrlPath { get; set; } = null!;
+    [MaxLength(1023)] public string RefreshToken { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // relations
+    // one-to-many relation(required, to parent)
+    public long UserId { get; set; }
+    public User User { get; set; } = null!;
+
     // one-to-many relation(required, to child)
     public ICollection<SentinelLibrary> SentinelLibraries { get; } = [];
 

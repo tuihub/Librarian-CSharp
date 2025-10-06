@@ -40,6 +40,8 @@ public class SentinelSummary
     public string[] AltUrls { get; set; } = Array.Empty<string>();
     public string GetTokenUrlPath { get; set; } = string.Empty;
     public string DownloadFileUrlPath { get; set; } = string.Empty;
+    public long UserId { get; set; }
+    public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class StoreAppSummary
@@ -58,4 +60,12 @@ public class CheckLocalAdminResponse
 {
     public bool IsLocalAdmin { get; set; }
     public string Username { get; set; } = string.Empty;
+}
+
+public class UserSummary
+{
+    public long Id { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
 }
