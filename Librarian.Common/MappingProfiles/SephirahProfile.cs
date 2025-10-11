@@ -35,11 +35,22 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.CreatorDeviceId, opt => opt.MapFrom(src => src.CreatorDeviceId.Id))
             .ForMember(dest => dest.AppSources, opt => opt.MapFrom(src => src.AppSources.ToDictionary(kv =>
                 kv.Key.ToEnum<WellKnowns.AppInfoSource>(), kv => kv.Value)))
+            .ForMember(dest => dest.IsPublic, opt => opt.MapFrom(src => src.Public))
+            .ForMember(dest => dest.BoundStoreAppId, opt => opt.MapFrom(src => src.BoundStoreAppId.Id == 0 ? (long?)null : src.BoundStoreAppId.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToEnumByString<Enums.AppType>()))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+            .ForMember(dest => dest.IconImageUrl, opt => opt.MapFrom(src => src.IconImageUrl))
             .ForMember(dest => dest.IconImageId, opt => opt.MapFrom(src => src.IconImageId.Id))
+            .ForMember(dest => dest.BackgroundImageUrl, opt => opt.MapFrom(src => src.BackgroundImageUrl))
             .ForMember(dest => dest.BackgroundImageId, opt => opt.MapFrom(src => src.BackgroundImageId.Id))
+            .ForMember(dest => dest.CoverImageUrl, opt => opt.MapFrom(src => src.CoverImageUrl))
             .ForMember(dest => dest.CoverImageId, opt => opt.MapFrom(src => src.CoverImageId.Id))
+            .ForMember(dest => dest.Developer, opt => opt.MapFrom(src => src.Developer))
+            .ForMember(dest => dest.Publisher, opt => opt.MapFrom(src => src.Publisher))
             .ForMember(dest => dest.AltNames, opt => opt.MapFrom(src => src.NameAlternatives.ToList()))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.ToList()))
+            .ForMember(dest => dest.StopStoreManage, opt => opt.MapFrom(src => src.StopStoreManage))
             .ReverseMap();
 
         CreateMap<AppCategory, TuiHub.Protos.Librarian.Sephirah.V1.AppCategory>()

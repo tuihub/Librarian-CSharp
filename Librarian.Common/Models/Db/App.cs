@@ -15,29 +15,33 @@ public class App
     // functions
     public App(long internalId, TuiHub.Protos.Librarian.Sephirah.V1.App app)
     {
+        // Map from protobuf using AutoMapper
+        var mapped = StaticContext.Mapper.Map<App>(app);
+        
+        // Set the internal ID explicitly (not from protobuf)
         Id = internalId;
-        RevisedVersion = app.VersionNumber;
-        RevisedAt = app.VersionDate.ToDateTime();
-        CreatorDeviceId = app.CreatorDeviceId.Id;
-        AppSources = app.AppSources.ToDictionary(
-            kv => kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
-            kv => kv.Value);
-        IsPublic = app.Public;
-        BoundStoreAppId = app.BoundStoreAppId.Id;
-        StopStoreManage = app.StopStoreManage;
-        Name = app.Name;
-        Type = app.Type.ToEnumByString<Enums.AppType>();
-        Description = app.Description;
-        IconImageUrl = app.IconImageUrl;
-        IconImageId = app.IconImageId.Id;
-        BackgroundImageUrl = app.BackgroundImageUrl;
-        BackgroundImageId = app.BackgroundImageId.Id;
-        CoverImageUrl = app.CoverImageUrl;
-        CoverImageId = app.CoverImageId.Id;
-        Developer = app.Developer;
-        Publisher = app.Publisher;
-        AltNames = [.. app.NameAlternatives];
-        Tags = [.. app.Tags];
+        
+        // Copy all mapped properties
+        RevisedVersion = mapped.RevisedVersion;
+        RevisedAt = mapped.RevisedAt;
+        CreatorDeviceId = mapped.CreatorDeviceId;
+        AppSources = mapped.AppSources;
+        IsPublic = mapped.IsPublic;
+        BoundStoreAppId = mapped.BoundStoreAppId;
+        StopStoreManage = mapped.StopStoreManage;
+        Name = mapped.Name;
+        Type = mapped.Type;
+        Description = mapped.Description;
+        IconImageUrl = mapped.IconImageUrl;
+        IconImageId = mapped.IconImageId;
+        BackgroundImageUrl = mapped.BackgroundImageUrl;
+        BackgroundImageId = mapped.BackgroundImageId;
+        CoverImageUrl = mapped.CoverImageUrl;
+        CoverImageId = mapped.CoverImageId;
+        Developer = mapped.Developer;
+        Publisher = mapped.Publisher;
+        AltNames = mapped.AltNames;
+        Tags = mapped.Tags;
     }
 
     public App()
@@ -54,7 +58,7 @@ public class App
     public long CreatorDeviceId { get; set; }
     public Dictionary<WellKnowns.AppInfoSource, string> AppSources { get; set; } = new();
     public bool IsPublic { get; set; }
-    public long BoundStoreAppId { get; set; }
+    public long? BoundStoreAppId { get; set; }
 
     public bool StopStoreManage { get; set; }
 
@@ -106,28 +110,30 @@ public class App
 
     public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.App app)
     {
-        RevisedVersion = app.VersionNumber;
-        RevisedAt = app.VersionDate.ToDateTime();
-        CreatorDeviceId = app.CreatorDeviceId.Id;
-        AppSources = app.AppSources.ToDictionary(
-            kv => kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
-            kv => kv.Value);
-        IsPublic = app.Public;
-        BoundStoreAppId = app.BoundStoreAppId.Id;
-        StopStoreManage = app.StopStoreManage;
-        Name = app.Name;
-        Type = app.Type.ToEnumByString<Enums.AppType>();
-        Description = app.Description;
-        IconImageUrl = app.IconImageUrl;
-        IconImageId = app.IconImageId.Id;
-        BackgroundImageUrl = app.BackgroundImageUrl;
-        BackgroundImageId = app.BackgroundImageId.Id;
-        CoverImageUrl = app.CoverImageUrl;
-        CoverImageId = app.CoverImageId.Id;
-        Developer = app.Developer;
-        Publisher = app.Publisher;
-        AltNames = [.. app.NameAlternatives];
-        Tags = [.. app.Tags];
+        // Map from protobuf using AutoMapper
+        var mapped = StaticContext.Mapper.Map<App>(app);
+        
+        // Update all properties (except Id which should not change)
+        RevisedVersion = mapped.RevisedVersion;
+        RevisedAt = mapped.RevisedAt;
+        CreatorDeviceId = mapped.CreatorDeviceId;
+        AppSources = mapped.AppSources;
+        IsPublic = mapped.IsPublic;
+        BoundStoreAppId = mapped.BoundStoreAppId;
+        StopStoreManage = mapped.StopStoreManage;
+        Name = mapped.Name;
+        Type = mapped.Type;
+        Description = mapped.Description;
+        IconImageUrl = mapped.IconImageUrl;
+        IconImageId = mapped.IconImageId;
+        BackgroundImageUrl = mapped.BackgroundImageUrl;
+        BackgroundImageId = mapped.BackgroundImageId;
+        CoverImageUrl = mapped.CoverImageUrl;
+        CoverImageId = mapped.CoverImageId;
+        Developer = mapped.Developer;
+        Publisher = mapped.Publisher;
+        AltNames = mapped.AltNames;
+        Tags = mapped.Tags;
     }
 
     public TuiHub.Protos.Librarian.Sephirah.V1.App ToPb()
