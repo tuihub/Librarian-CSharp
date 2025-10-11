@@ -50,8 +50,30 @@ public class SephirahProfile : Profile
             .ForMember(dest => dest.Publisher, opt => opt.MapFrom(src => src.Publisher))
             .ForMember(dest => dest.AltNames, opt => opt.MapFrom(src => src.NameAlternatives.ToList()))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.ToList()))
-            .ForMember(dest => dest.StopStoreManage, opt => opt.MapFrom(src => src.StopStoreManage))
-            .ReverseMap();
+            .ForMember(dest => dest.StopStoreManage, opt => opt.MapFrom(src => src.StopStoreManage));
+
+        CreateMap<Models.Db.App, App>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new InternalID { Id = src.Id }))
+            .ForMember(dest => dest.VersionNumber, opt => opt.MapFrom(src => src.RevisedVersion))
+            .ForMember(dest => dest.VersionDate, opt => opt.MapFrom(src => Timestamp.FromDateTime(src.RevisedAt.ToUniversalTime())))
+            .ForMember(dest => dest.CreatorDeviceId, opt => opt.MapFrom(src => new InternalID { Id = src.CreatorDeviceId }))
+            .ForMember(dest => dest.AppSources, opt => opt.MapFrom(src => src.AppSources))
+            .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.IsPublic))
+            .ForMember(dest => dest.BoundStoreAppId, opt => opt.MapFrom(src => new InternalID { Id = src.BoundStoreAppId ?? 0 }))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+            .ForMember(dest => dest.IconImageUrl, opt => opt.MapFrom(src => src.IconImageUrl))
+            .ForMember(dest => dest.IconImageId, opt => opt.MapFrom(src => new InternalID { Id = src.IconImageId }))
+            .ForMember(dest => dest.BackgroundImageUrl, opt => opt.MapFrom(src => src.BackgroundImageUrl))
+            .ForMember(dest => dest.BackgroundImageId, opt => opt.MapFrom(src => new InternalID { Id = src.BackgroundImageId }))
+            .ForMember(dest => dest.CoverImageUrl, opt => opt.MapFrom(src => src.CoverImageUrl))
+            .ForMember(dest => dest.CoverImageId, opt => opt.MapFrom(src => new InternalID { Id = src.CoverImageId }))
+            .ForMember(dest => dest.Developer, opt => opt.MapFrom(src => src.Developer))
+            .ForMember(dest => dest.Publisher, opt => opt.MapFrom(src => src.Publisher))
+            .ForMember(dest => dest.NameAlternatives, opt => opt.MapFrom(src => src.AltNames))
+            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
+            .ForMember(dest => dest.StopStoreManage, opt => opt.MapFrom(src => src.StopStoreManage));
 
         CreateMap<AppCategory, TuiHub.Protos.Librarian.Sephirah.V1.AppCategory>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new InternalID { Id = src.Id }))
