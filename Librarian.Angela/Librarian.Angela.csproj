@@ -16,7 +16,6 @@
         <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All"/>
         <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.19" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8"/>
-        <PackageReference Include="TuiHub.Protos" Version="0.6.0"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -4,5 +4,5 @@ namespace Librarian.Common;
 
 public static class StaticContext
 {
-    public static Mapper Mapper = null!;
+    public static IMapper Mapper = null!;
 }

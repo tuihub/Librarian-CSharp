@@ -14,7 +14,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
         if (app == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
         // update App
-        app.UpdateFromPB(appReq);
+        app.UpdateFromPb(appReq);
         _dbContext.SaveChanges();
         return Task.FromResult(new UpdateAppResponse());
     }

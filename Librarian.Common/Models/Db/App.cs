@@ -104,7 +104,7 @@ public class App
     // many-to-many relation(optional)
     public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
 
-    public void UpdateFromPB(TuiHub.Protos.Librarian.Sephirah.V1.App app)
+    public void UpdateFromPb(TuiHub.Protos.Librarian.Sephirah.V1.App app)
     {
         RevisedVersion = app.VersionNumber;
         RevisedAt = app.VersionDate.ToDateTime();

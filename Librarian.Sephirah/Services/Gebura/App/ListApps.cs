@@ -26,7 +26,8 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
             apps = apps.Where(x => ownerIdFilter.Select(y => y.Id).Contains(x.UserId));
             apps = apps.Where(x => x.IsPublic == true);
         }
-
+        
+        apps = apps.OrderByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id);
         apps = apps.ApplyPagingRequest(request.Paging);
         var response = new ListAppsResponse
         {

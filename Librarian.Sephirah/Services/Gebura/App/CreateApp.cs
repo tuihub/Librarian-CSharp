@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Librarian.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
@@ -12,8 +13,12 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
     public override Task<CreateAppResponse> CreateApp(CreateAppRequest request, ServerCallContext context)
     {
         // create app
+        var userId = context.GetInternalIdFromHeader();
         var internalId = _idGenerator.CreateId();
-        var app = new App(internalId, request.App);
+        var app = new App(internalId, request.App)
+        {
+            UserId = userId
+        };
         _dbContext.Apps.Add(app);
 
         if (app.AppInfoId != null)

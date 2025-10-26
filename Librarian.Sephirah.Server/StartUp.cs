@@ -90,6 +90,18 @@ public static class StartUp
         // Add IdGen DI
         builder.Services.AddIdGen(GlobalContext.SystemConfig.GeneratorId);
 
+        // Add AutoMapper
+        var mapperConfig = new MapperConfiguration(mc =>
+        {
+            mc.AddProfile<Librarian.Common.MappingProfiles.SephirahProfile>();
+            mc.AddProfile<Librarian.Angela.Mapping.SentinelMappingProfile>();
+            mc.AddProfile<Librarian.Angela.Mapping.StoreAppMappingProfile>();
+            mc.AddProfile<Librarian.Angela.Mapping.TipherethMappingProfile>();
+        });
+        var mapper = mapperConfig.CreateMapper();
+        StaticContext.Mapper = mapper;
+        builder.Services.AddSingleton<IMapper>(mapper);
+
         // Add grpc
         builder.Services.AddGrpc().AddJsonTranscoding();
 
@@ -99,7 +111,16 @@ public static class StartUp
                 TuiHub.Protos.Librarian.Sephirah.V1.LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
             {
                 // Use localhost for in-process calls
-                options.Address = new Uri("http://localhost:5148"); // Default Sephirah server port
+                options.Address = new Uri("http://localhost:5147");
+                options.ChannelOptionsActions.Add(channelOptions =>
+                {
+                    // Allow unencrypted HTTP/2
+                    channelOptions.HttpHandler = new HttpClientHandler
+                    {
+                        // Return `true` to allow certificates that are untrusted/invalid
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                });
             });
 
         if (builder.Environment.IsDevelopment())
