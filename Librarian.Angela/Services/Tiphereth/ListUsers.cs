@@ -35,16 +35,17 @@ public partial class AngelaService
             usersDb = usersDb.Where(u => statusFilters.Contains(u.Status));
         }
 
-        // Apply paging
-        usersDb = ApplyAngelaPagingRequest(usersDb, request.Paging);
+        // Total count before pagination
+        var totalSize = await usersDb.CountAsync();
 
-        // Get final results
+        // Apply paging and get final results
+        usersDb = ApplyAngelaPagingRequest(usersDb, request.Paging);
         var users = await usersDb.ToListAsync();
 
         // Build response
         var response = new ListUsersResponse
         {
-            Paging = new PagingResponse { TotalSize = users.Count }
+            Paging = new PagingResponse { TotalSize = totalSize }
         };
 
         // Add users to response

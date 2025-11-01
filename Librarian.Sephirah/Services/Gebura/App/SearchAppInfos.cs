@@ -20,11 +20,12 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         if (!string.IsNullOrEmpty(nameLike)) appInfos = appInfos.Where(a => a.Name.Contains(nameLike));
         if (sourceFilter.Count > 0) appInfos = appInfos.Where(a => sourceFilter.Contains(a.Source.ToString()));
 
+        var totalSize = appInfos.Count();
         appInfos = appInfos.ApplyPagingRequest(request.Paging);
 
         var response = new SearchAppInfosResponse
         {
-            Paging = new PagingResponse { TotalSize = appInfos.Count() }
+            Paging = new PagingResponse { TotalSize = totalSize }
         };
         response.AppInfos.Add(appInfos.Select(x => x.Flatten().ToPb()));
         return Task.FromResult(response);

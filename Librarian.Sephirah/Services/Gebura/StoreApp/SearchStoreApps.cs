@@ -21,10 +21,11 @@ public partial class SephirahService
 
         if (!string.IsNullOrWhiteSpace(request.NameLike)) query = query.Where(x => x.Name.Contains(request.NameLike));
 
-        // Apply pagination
-        query = query.ApplyPagingRequest(request.Paging);
+        // Total count before pagination
+        var totalSize = await query.CountAsync();
 
-        // Execute query
+        // Apply pagination and execute
+        query = query.ApplyPagingRequest(request.Paging);
         var storeApps = await query.ToListAsync();
 
         // Map to response
@@ -32,7 +33,7 @@ public partial class SephirahService
         {
             Paging = new PagingResponse
             {
-                TotalSize = storeApps.Count
+                TotalSize = totalSize
             }
         };
 

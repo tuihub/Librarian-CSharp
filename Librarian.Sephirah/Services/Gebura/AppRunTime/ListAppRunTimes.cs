@@ -46,6 +46,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         }
 
         query = query.OrderByDescending(x => x.StartDateTime);
+        var totalSize = query.Count();
         query = query.ApplyPagingRequest(request.Paging);
         var appRunTimes = query.ToList();
 
@@ -54,7 +55,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         {
             Paging = new PagingResponse
             {
-                TotalSize = appRunTimes.Count
+                TotalSize = totalSize
             }
         };
         response.AppRunTimes.AddRange(appRunTimes.Select(x => x.ToPb()));

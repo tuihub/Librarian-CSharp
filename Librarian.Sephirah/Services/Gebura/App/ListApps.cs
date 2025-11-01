@@ -28,10 +28,11 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         }
         
         apps = apps.OrderByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id);
+        var totalSize = apps.Count();
         apps = apps.ApplyPagingRequest(request.Paging);
         var response = new ListAppsResponse
         {
-            Paging = new PagingResponse { TotalSize = apps.Count() }
+            Paging = new PagingResponse { TotalSize = totalSize }
         };
         response.Apps.Add(apps.Select(x => x.ToPb()));
         return Task.FromResult(response);
