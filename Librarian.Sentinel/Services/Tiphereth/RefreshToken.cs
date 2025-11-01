@@ -17,7 +17,7 @@ public partial class SephirahSentinelService
         var internalId = context.GetInternalIdFromHeader();
         // get sentinel
         if (!await _dbContext.Sentinels.AnyAsync(x => x.Id == internalId))
-            throw new RpcException(new Status(StatusCode.Unauthenticated, "Sentinel not exists"));
+            throw new RpcException(new Status(StatusCode.NotFound, "Sentinel not exists"));
         // get new token
         var accessToken = JwtUtil.GenerateSentinelAccessToken(internalId);
         var refreshToken = context.GetBearerToken()!;

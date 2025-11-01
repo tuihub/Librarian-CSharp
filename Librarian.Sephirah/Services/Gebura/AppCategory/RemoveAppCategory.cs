@@ -19,7 +19,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
             .Include(x => x.Apps)
             .SingleOrDefault(x => x.Id == request.Id.Id);
         if (appCategory == null)
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "AppCategory not exists."));
+            throw new RpcException(new Status(StatusCode.NotFound, "AppCategory not exists."));
         if (appCategory.UserId != userId)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "AppCategory is not owned by user."));
         appCategory.Apps.Clear();

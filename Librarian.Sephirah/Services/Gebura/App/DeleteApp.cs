@@ -19,7 +19,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appId && x.UserId == userId);
         
         if (app == null)
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
+            throw new RpcException(new Status(StatusCode.NotFound, "App not exists."));
         
         _dbContext.Apps.Remove(app);
 

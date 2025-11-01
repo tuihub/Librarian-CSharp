@@ -12,7 +12,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         // check App exists
         var appReq = request.App;
         var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appReq.Id.Id);
-        if (app == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
+        if (app == null) throw new RpcException(new Status(StatusCode.NotFound, "App not exists."));
         // update App
         app.UpdateFromPb(appReq);
         _dbContext.SaveChanges();

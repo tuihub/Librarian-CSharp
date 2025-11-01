@@ -25,7 +25,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         {
             var appInfo = _dbContext.AppInfos.SingleOrDefault(x => x.Id == app.AppInfoId);
             if (appInfo == null)
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "AssignedAppInfo not exists."));
+                throw new RpcException(new Status(StatusCode.NotFound, "AssignedAppInfo not exists."));
         }
 
         _dbContext.SaveChanges();

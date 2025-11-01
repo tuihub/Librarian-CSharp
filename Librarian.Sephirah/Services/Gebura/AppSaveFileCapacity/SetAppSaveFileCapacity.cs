@@ -23,7 +23,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
             throw new RpcException(new Status(StatusCode.InvalidArgument, "ApplyToAll or AppId is required."));
 
         var app = _dbContext.Apps.SingleOrDefault(x => x.Id == request.AppId.Id);
-        if (app == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
+        if (app == null) throw new RpcException(new Status(StatusCode.NotFound, "App not exists."));
         if (app.UserId != userId)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "App is not owned by user."));
         internalId = request.AppId.Id;

@@ -20,7 +20,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         if (userReq.Id.Id != userIdFromJwt)
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext, "You don't have permission to update this user.");
         var user = _dbContext.Users.SingleOrDefault(x => x.Id == userReq.Id.Id);
-        if (user == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "User not exists."));
+        if (user == null) throw new RpcException(new Status(StatusCode.NotFound, "User not exists."));
         if (!string.IsNullOrEmpty(userReq.Username)) user.Name = userReq.Username;
         if (!string.IsNullOrEmpty(userReq.Password)) user.Password = PasswordHasher.HashPassword(userReq.Password);
         if (userReq.Type != UserType.Unspecified) user.Type = userReq.Type.ToString().ToEnum<Enums.UserType>();

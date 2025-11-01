@@ -19,7 +19,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         var deviceId = request.DeviceId?.Id;
         // get user
         var user = _dbContext.Users.SingleOrDefault(u => u.Name == username);
-        if (user == null) throw new RpcException(new Status(StatusCode.Unauthenticated, "User not exists."));
+        if (user == null) throw new RpcException(new Status(StatusCode.NotFound, "User not exists."));
         if (user.Status != Enums.UserStatus.Active)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active."));
         if (PasswordHasher.VerifyHashedPassword(user.Password, password))

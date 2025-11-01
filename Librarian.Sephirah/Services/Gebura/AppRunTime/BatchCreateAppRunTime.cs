@@ -20,14 +20,14 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         {
             // Check App
             var app = _dbContext.Apps.SingleOrDefault(x => x.Id == appRunTimeReq.AppId.Id);
-            if (app == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "App not exists."));
+            if (app == null) throw new RpcException(new Status(StatusCode.NotFound, "App not exists."));
             if (app.UserId != userId)
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "App is not owned by user."));
 
             // Check Device
             var device = _dbContext.Devices.Include(x => x.Users)
                 .SingleOrDefault(x => x.Id == appRunTimeReq.DeviceId.Id);
-            if (device == null) throw new RpcException(new Status(StatusCode.InvalidArgument, "Device not exists."));
+            if (device == null) throw new RpcException(new Status(StatusCode.NotFound, "Device not exists."));
             if (!device.Users.Select(x => x.Id).Contains(userId))
                 throw new RpcException(new Status(StatusCode.PermissionDenied, "Device is not owned by user."));
 

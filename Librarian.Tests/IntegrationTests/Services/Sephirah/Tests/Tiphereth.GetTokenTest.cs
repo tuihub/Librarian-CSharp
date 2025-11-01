@@ -36,9 +36,9 @@ public class SephirahTest : SephirahTestBase
         var passwords = new[] { "test", "test1", "test1" };
         var statuses = new[]
         {
-            new Status(StatusCode.Unauthenticated, "User not exists."),
+            new Status(StatusCode.NotFound, "User not exists."),
             new Status(StatusCode.Unauthenticated, "Username and password not match."),
-            new Status(StatusCode.Unauthenticated, "User not exists.")
+            new Status(StatusCode.NotFound, "User not exists.")
         };
 
         for (var i = 0; i < usernames.Length; i++)

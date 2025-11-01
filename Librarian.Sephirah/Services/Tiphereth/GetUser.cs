@@ -16,7 +16,7 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
             UserUtil.VerifyUserAdminAndThrow(context, _dbContext, "You don't have permission to get this user.");
         // get user
         var user = _dbContext.Users.SingleOrDefault(u => u.Id == userIdToGet);
-        if (user == null) throw new RpcException(new Status(StatusCode.PermissionDenied, "User not exists."));
+        if (user == null) throw new RpcException(new Status(StatusCode.NotFound, "User not exists."));
         return Task.FromResult(new GetUserResponse
         {
             User = user.ToPb()
