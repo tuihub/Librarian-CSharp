@@ -23,8 +23,17 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
         }
         else
         {
-            apps = apps.Where(x => ownerIdFilter.Select(y => y.Id).Contains(x.UserId));
-            apps = apps.Where(x => x.IsPublic == true);
+            var ownerIds = ownerIdFilter.Select(y => y.Id).ToList();
+            var includesSelf = ownerIds.Contains(userId);
+            if (includesSelf)
+            {
+                var otherOwnerIds = ownerIds.Where(id => id != userId).ToList();
+                apps = apps.Where(x => (x.UserId == userId) || (otherOwnerIds.Contains(x.UserId) && x.IsPublic == true));
+            }
+            else
+            {
+                apps = apps.Where(x => ownerIds.Contains(x.UserId) && x.IsPublic == true);
+            }
         }
         
         apps = apps.OrderByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id);
