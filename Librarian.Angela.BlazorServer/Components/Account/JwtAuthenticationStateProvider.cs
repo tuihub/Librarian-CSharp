@@ -7,9 +7,9 @@ namespace Librarian.Angela.BlazorServer.Components.Account;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
+    private readonly IAngelaService _angelaService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<JwtAuthenticationStateProvider> _logger;
-    private readonly IAngelaService _angelaService;
 
     public JwtAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor,
         ILogger<JwtAuthenticationStateProvider> logger,
@@ -27,10 +27,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         // 1) 优先使用服务器端 Cookie 身份（若已登录）
-        if (httpContext.User?.Identity?.IsAuthenticated == true)
-        {
-            return new AuthenticationState(httpContext.User);
-        }
+        if (httpContext.User?.Identity?.IsAuthenticated == true) return new AuthenticationState(httpContext.User);
 
         // 2) 其次尝试 AccessToken（JWT）Cookie
         var token = httpContext.Request.Cookies["AccessToken"];
@@ -44,9 +41,9 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, localAdminCheck.Username),
-                        new Claim(ClaimTypes.Role, "Admin"),
-                        new Claim("AuthType", "TrustedIP")
+                        new(ClaimTypes.Name, localAdminCheck.Username),
+                        new(ClaimTypes.Role, "Admin"),
+                        new("AuthType", "TrustedIP")
                     };
                     var identity = new ClaimsIdentity(claims, "TrustedIP");
                     var user = new ClaimsPrincipal(identity);
@@ -57,6 +54,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             {
                 _logger.LogWarning(ex, "Error checking LocalAdmin status");
             }
+
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 

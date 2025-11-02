@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
-using Librarian.Sephirah.Angela;
 using Librarian.Common.Utils;
+using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using User = Librarian.Common.Models.Db.User;
@@ -24,7 +24,8 @@ public partial class AngelaService
         {
             Id = internalId,
             Name = request.User.Username,
-            Password = PasswordHasher.HashPassword(request.User.Password), // Note: In a real project, the password should be encrypted
+            Password = PasswordHasher.HashPassword(request.User
+                .Password), // Note: In a real project, the password should be encrypted
             Status = ConvertToDbUserStatus(request.User.Status),
             Type = ConvertToDbUserType(request.User.Type)
         };

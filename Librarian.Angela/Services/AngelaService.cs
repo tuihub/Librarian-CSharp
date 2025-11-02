@@ -7,7 +7,7 @@ using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services;
 
-public partial class AngelaService : Librarian.Sephirah.Angela.AngelaService.AngelaServiceBase
+public partial class AngelaService : Sephirah.Angela.AngelaService.AngelaServiceBase
 {
     private static readonly IMapper s_mapper = new MapperConfiguration(cfg =>
     {
@@ -17,9 +17,9 @@ public partial class AngelaService : Librarian.Sephirah.Angela.AngelaService.Ang
     }).CreateMapper();
 
     private readonly ApplicationDbContext _dbContext;
+    private readonly IdGenerator _idGenerator;
     private readonly ILogger _logger;
     private readonly LibrarianSephirahService.LibrarianSephirahServiceClient _sephirahClient;
-    private readonly IdGenerator _idGenerator;
 
     public AngelaService(ILogger<AngelaService> logger, ApplicationDbContext dbContext,
         LibrarianSephirahService.LibrarianSephirahServiceClient sephirahClient, IdGenerator idGenerator)

@@ -2,7 +2,7 @@ using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using StoreApp = Librarian.Sephirah.Angela.StoreApp;
 
 namespace Librarian.Angela.Services;
 
@@ -18,18 +18,16 @@ public partial class AngelaService
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
         if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-        {
             headers.Add("authorization", authHeader.Value);
-        }
 
         try
         {
             var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
-            
-            // Use AutoMapper to convert StoreApp
-            var storeApp = s_mapper.Map<Librarian.Sephirah.Angela.StoreApp>(sephirahResponse.StoreApp.StoreApp);
 
-            return new Librarian.Sephirah.Angela.GetStoreAppResponse
+            // Use AutoMapper to convert StoreApp
+            var storeApp = s_mapper.Map<StoreApp>(sephirahResponse.StoreApp.StoreApp);
+
+            return new GetStoreAppResponse
             {
                 StoreApp = storeApp
             };

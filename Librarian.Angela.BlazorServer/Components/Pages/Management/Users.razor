@@ -1,8 +1,9 @@
 @page "/management/users"
-@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
 @using Librarian.Angela.BlazorServer.Services
 @using Librarian.Angela.BlazorServer.Services.Models
 @using Microsoft.AspNetCore.Authorization
+@rendermode InteractiveServer
 @inject IAngelaService AngelaService
 @inject ILogger<Users> Logger
 @attribute [Authorize(Policy = "AngelaAccess")]
@@ -43,19 +44,19 @@
         </div>
         <div class="card-body">
             <EditForm Model="@newUser" OnValidSubmit="HandleCreateUser">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+
                 <div class="mb-3">
                     <label for="newUsername" class="form-label">Username</label>
-                    <InputText id="newUsername" class="form-control" @bind-Value="newUser.Username" />
+                    <InputText id="newUsername" class="form-control" @bind-Value="newUser.Username"/>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newPassword" class="form-label">Password</label>
-                    <InputText id="newPassword" type="password" class="form-control" @bind-Value="newUser.Password" />
+                    <InputText id="newPassword" type="password" class="form-control" @bind-Value="newUser.Password"/>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newType" class="form-label">Type</label>
                     <InputSelect id="newType" class="form-select" @bind-Value="newUser.Type">
@@ -64,7 +65,7 @@
                         <option value="USER_TYPE_NORMAL">Normal</option>
                     </InputSelect>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newStatus" class="form-label">Status</label>
                     <InputSelect id="newStatus" class="form-select" @bind-Value="newUser.Status">
@@ -73,7 +74,7 @@
                         <option value="USER_STATUS_BLOCKED">Blocked</option>
                     </InputSelect>
                 </div>
-                
+
                 <div>
                     <button type="submit" class="btn btn-primary" disabled="@isProcessing">
                         @if (isProcessing)
@@ -82,7 +83,9 @@
                         }
                         Create User
                     </button>
-                    <button type="button" class="btn btn-secondary ms-2" @onclick="CancelCreateForm" disabled="@isProcessing">Cancel</button>
+                    <button type="button" class="btn btn-secondary ms-2" @onclick="CancelCreateForm"
+                            disabled="@isProcessing">Cancel
+                    </button>
                 </div>
             </EditForm>
         </div>
@@ -101,27 +104,29 @@ else
 {
     <table class="table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var user in users)
-            {
-                <tr>
-                    <td>@user.Id</td>
-                    <td>@user.Username</td>
-                    <td>@GetDisplayType(user.Type)</td>
-                    <td>@GetDisplayStatus(user.Status)</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" @onclick="@(() => ShowEditForm(user))" disabled="@isProcessing">Edit</button>
-                    </td>
-                </tr>
-            }
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.Username</td>
+                <td>@GetDisplayType(user.Type)</td>
+                <td>@GetDisplayStatus(user.Status)</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" @onclick="@(() => ShowEditForm(user))"
+                            disabled="@isProcessing">Edit
+                    </button>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
@@ -137,21 +142,23 @@ else
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@editModel" OnValidSubmit="HandleUpdateUser">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-                        
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+
                         <div class="mb-3">
                             <label for="editUsername" class="form-label">Username</label>
-                            <InputText id="editUsername" class="form-control" @bind-Value="editModel.Username" placeholder="@editingUser.Username" />
+                            <InputText id="editUsername" class="form-control" @bind-Value="editModel.Username"
+                                       placeholder="@editingUser.Username"/>
                             <div class="form-text">Leave empty to keep current value: @editingUser.Username</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editPassword" class="form-label">Password</label>
-                            <InputText id="editPassword" type="password" class="form-control" @bind-Value="editModel.Password" placeholder="(current password hidden)" />
+                            <InputText id="editPassword" type="password" class="form-control"
+                                       @bind-Value="editModel.Password" placeholder="(current password hidden)"/>
                             <div class="form-text">Leave empty to keep current password</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editType" class="form-label">Type</label>
                             <InputSelect id="editType" class="form-select" @bind-Value="editModel.Type">
@@ -160,7 +167,7 @@ else
                                 <option value="USER_TYPE_NORMAL">Normal</option>
                             </InputSelect>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editStatus" class="form-label">Status</label>
                             <InputSelect id="editStatus" class="form-select" @bind-Value="editModel.Status">
@@ -169,13 +176,16 @@ else
                                 <option value="USER_STATUS_BLOCKED">Blocked</option>
                             </InputSelect>
                         </div>
-                        
+
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CancelEditForm" disabled="@isProcessing">Cancel</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CancelEditForm"
+                                    disabled="@isProcessing">Cancel
+                            </button>
                             <button type="submit" class="btn btn-primary" disabled="@isProcessing">
                                 @if (isProcessing)
                                 {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                          aria-hidden="true"></span>
                                 }
                                 Save Changes
                             </button>
@@ -191,9 +201,9 @@ else
     private List<UserSummary>? users;
     private string? errorMessage;
     private string? successMessage;
-    private bool showCreateForm = false;
-    private bool showEditForm = false;
-    private bool isProcessing = false;
+    private bool showCreateForm;
+    private bool showEditForm;
+    private bool isProcessing;
     private UserFormModel newUser = new();
     private UserEditModel editModel = new();
     private UserSummary? editingUser;
@@ -358,16 +368,16 @@ else
 
     public class UserFormModel
     {
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Username { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Password { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Type { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Status { get; set; } = string.Empty;
     }
 
@@ -379,4 +389,5 @@ else
         public string Type { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
     }
+
 }

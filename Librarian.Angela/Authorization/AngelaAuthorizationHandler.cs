@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Grpc.Core;
 using Librarian.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,29 +30,21 @@ public class AngelaAuthorizationHandler : AuthorizationHandler<AngelaAuthorizati
 
         // Check if request is from trusted IP
         var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null)
-        {
-            return Task.CompletedTask;
-        }
+        if (httpContext == null) return Task.CompletedTask;
 
         // Get remote IP address, considering X-Forwarded-For for proxied requests
         var remoteIpAddress = httpContext.Connection.RemoteIpAddress?.ToString();
-        
+
         // Check X-Forwarded-For header if behind a proxy
         if (httpContext.Request.Headers.ContainsKey("X-Forwarded-For"))
         {
             var forwardedFor = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrEmpty(forwardedFor))
-            {
                 // Take the first IP in the chain (client's original IP)
                 remoteIpAddress = forwardedFor.Split(',')[0].Trim();
-            }
         }
-        
-        if (string.IsNullOrEmpty(remoteIpAddress))
-        {
-            return Task.CompletedTask;
-        }
+
+        if (string.IsNullOrEmpty(remoteIpAddress)) return Task.CompletedTask;
 
         var trustedIPs = GlobalContext.SystemConfig.AngelaTrustedIPs;
         if (trustedIPs != null && trustedIPs.Contains(remoteIpAddress))

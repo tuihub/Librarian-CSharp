@@ -2,14 +2,16 @@ using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
 using TuiHub.Protos.Librarian.Sephirah.V1;
-using TuiHub.Protos.Librarian.V1;
+using ListStoreAppBinariesRequest = Librarian.Sephirah.Angela.ListStoreAppBinariesRequest;
+using ListStoreAppBinariesResponse = Librarian.Sephirah.Angela.ListStoreAppBinariesResponse;
+using StoreAppBinary = Librarian.Sephirah.Angela.StoreAppBinary;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
     [Authorize(Policy = "AngelaAccess")]
-    public override async Task<Librarian.Sephirah.Angela.ListStoreAppBinariesResponse> ListStoreAppBinaries(Librarian.Sephirah.Angela.ListStoreAppBinariesRequest request,
+    public override async Task<ListStoreAppBinariesResponse> ListStoreAppBinaries(ListStoreAppBinariesRequest request,
         ServerCallContext context)
     {
         // Use AutoMapper to convert request
@@ -18,17 +20,15 @@ public partial class AngelaService
         // Forward the authorization header to Sephirah
         var headers = new Metadata();
         if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-        {
             headers.Add("authorization", authHeader.Value);
-        }
 
         try
         {
             var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
-            
-            var response = new Librarian.Sephirah.Angela.ListStoreAppBinariesResponse
+
+            var response = new ListStoreAppBinariesResponse
             {
-                Paging = new Librarian.Sephirah.Angela.PagingResponse
+                Paging = new PagingResponse
                 {
                     TotalSize = sephirahResponse.StoreApp.AppBinaryCount
                 }
@@ -37,7 +37,7 @@ public partial class AngelaService
             // Use AutoMapper to convert binaries
             foreach (var sephirahBinary in sephirahResponse.StoreApp.Binaries)
             {
-                var binary = s_mapper.Map<Librarian.Sephirah.Angela.StoreAppBinary>(sephirahBinary);
+                var binary = s_mapper.Map<StoreAppBinary>(sephirahBinary);
                 // Set required fields that AutoMapper can't infer
                 binary.StoreAppId = request.StoreAppId;
                 response.Binaries.Add(binary);

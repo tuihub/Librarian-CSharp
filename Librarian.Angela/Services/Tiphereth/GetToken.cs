@@ -1,14 +1,13 @@
 using Grpc.Core;
-using Librarian.Sephirah.Angela;
 using Librarian.Common.Constants;
+using Librarian.Sephirah.Angela;
 using Microsoft.EntityFrameworkCore;
-using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    public override async Task<Librarian.Sephirah.Angela.GetTokenResponse> GetToken(Librarian.Sephirah.Angela.GetTokenRequest request, ServerCallContext context)
+    public override async Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
     {
         // First verify user exists and is admin using Angela's requirement
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Username);
@@ -28,9 +27,9 @@ public partial class AngelaService
         try
         {
             var sephirahResponse = await _sephirahClient.GetTokenAsync(sephirahRequest);
-            
+
             // Use AutoMapper to convert response
-            return s_mapper.Map<Librarian.Sephirah.Angela.GetTokenResponse>(sephirahResponse);
+            return s_mapper.Map<GetTokenResponse>(sephirahResponse);
         }
         catch (RpcException ex)
         {

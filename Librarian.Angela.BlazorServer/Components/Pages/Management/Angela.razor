@@ -43,7 +43,8 @@
                 @if (context.User.HasClaim(c => c.Type == "AuthType" && c.Value == "TrustedIP"))
                 {
                     <p class="card-text">
-                        <small class="text-muted">Authentication: <span class="badge bg-warning text-dark">Trusted IP</span></small>
+                        <small class="text-muted">Authentication: <span
+                                class="badge bg-warning text-dark">Trusted IP</span></small>
                     </p>
                 }
             </div>

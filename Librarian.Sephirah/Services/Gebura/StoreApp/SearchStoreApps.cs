@@ -21,7 +21,7 @@ public partial class SephirahService
         // Default to showing only public store apps
         var query = _dbContext.StoreApps.Where(x => x.IsPublic);
 
-        if (!string.IsNullOrWhiteSpace(request.NameLike)) 
+        if (!string.IsNullOrWhiteSpace(request.NameLike))
             query = query.Where(x => x.Name.Contains(request.NameLike));
 
         // Total count before pagination
@@ -47,7 +47,7 @@ public partial class SephirahService
             {
                 Id = new InternalID { Id = storeApp.Id },
                 Name = storeApp.Name,
-                Type = EnumConverter.ToEnumByString<AppType>(storeApp.Type),
+                Type = storeApp.Type.ToEnumByString<AppType>(),
                 ShortDescription = storeApp.Description.Length > 100
                     ? storeApp.Description[..100]
                     : storeApp.Description,

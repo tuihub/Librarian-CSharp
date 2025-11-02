@@ -2,6 +2,7 @@ using Grpc.Core;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
+using Sentinel = Librarian.Common.Models.Db.Sentinel;
 
 namespace Librarian.Angela.Services;
 
@@ -18,7 +19,7 @@ public partial class AngelaService
         var internalId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         // Create a new sentinel
-        var sentinel = new Common.Models.Db.Sentinel
+        var sentinel = new Sentinel
         {
             Id = internalId,
             UserId = request.Sentinel.UserId.Id,

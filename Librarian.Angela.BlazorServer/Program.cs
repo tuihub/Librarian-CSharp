@@ -1,10 +1,10 @@
+using Librarian.Angela.BlazorServer.Authorization;
 using Librarian.Angela.BlazorServer.Components;
 using Librarian.Angela.BlazorServer.Components.Account;
 using Librarian.Angela.BlazorServer.Services;
 using Librarian.Angela.BlazorServer.Services.Models;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Librarian.Angela.BlazorServer.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,10 +55,7 @@ builder.Services.AddAuthorization(options =>
     options.DefaultPolicy = new AuthorizationPolicyBuilder()
         .AddRequirements(new AngelaAccessRequirement())
         .Build();
-    options.AddPolicy("AngelaAccess", policy =>
-    {
-        policy.Requirements.Add(new AngelaAccessRequirement());
-    });
+    options.AddPolicy("AngelaAccess", policy => { policy.Requirements.Add(new AngelaAccessRequirement()); });
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, LocalAngelaAuthorizationHandler>();

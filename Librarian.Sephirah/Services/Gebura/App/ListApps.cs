@@ -28,14 +28,14 @@ public partial class SephirahService : LibrarianSephirahService.LibrarianSephira
             if (includesSelf)
             {
                 var otherOwnerIds = ownerIds.Where(id => id != userId).ToList();
-                apps = apps.Where(x => (x.UserId == userId) || (otherOwnerIds.Contains(x.UserId) && x.IsPublic == true));
+                apps = apps.Where(x => x.UserId == userId || (otherOwnerIds.Contains(x.UserId) && x.IsPublic == true));
             }
             else
             {
                 apps = apps.Where(x => ownerIds.Contains(x.UserId) && x.IsPublic == true);
             }
         }
-        
+
         apps = apps.OrderByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id);
         var totalSize = apps.Count();
         apps = apps.ApplyPagingRequest(request.Paging);

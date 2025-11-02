@@ -1,8 +1,9 @@
 @page "/management/sentinels"
-@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
 @using Librarian.Angela.BlazorServer.Services
 @using Librarian.Angela.BlazorServer.Services.Models
 @using Microsoft.AspNetCore.Authorization
+@rendermode InteractiveServer
 @inject IAngelaService AngelaService
 @inject ILogger<Sentinels> Logger
 @attribute [Authorize(Policy = "AngelaAccess")]
@@ -11,7 +12,8 @@
 
 <h1>Sentinel Management</h1>
 
-<p>Manage Sentinel instances that provide app binaries and files. Sentinels are created by users and assigned long-lived RefreshTokens.</p>
+<p>Manage Sentinel instances that provide app binaries and files. Sentinels are created by users and assigned long-lived
+    RefreshTokens.</p>
 
 @if (!string.IsNullOrEmpty(successMessage))
 {
@@ -43,42 +45,43 @@
         </div>
         <div class="card-body">
             <EditForm Model="@newSentinel" OnValidSubmit="HandleCreateSentinel">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+
                 <div class="mb-3">
                     <label for="newUserId" class="form-label">User ID (Owner)</label>
-                    <InputNumber id="newUserId" class="form-control" @bind-Value="newSentinel.UserId" />
+                    <InputNumber id="newUserId" class="form-control" @bind-Value="newSentinel.UserId"/>
                     <div class="form-text">The ID of the user who owns this Sentinel</div>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newUrl" class="form-label">URL</label>
-                    <InputText id="newUrl" class="form-control" @bind-Value="newSentinel.Url" />
+                    <InputText id="newUrl" class="form-control" @bind-Value="newSentinel.Url"/>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newGetTokenPath" class="form-label">Get Token Path</label>
-                    <InputText id="newGetTokenPath" class="form-control" @bind-Value="newSentinel.GetTokenPath" />
+                    <InputText id="newGetTokenPath" class="form-control" @bind-Value="newSentinel.GetTokenPath"/>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newDownloadPath" class="form-label">Download File Path</label>
-                    <InputText id="newDownloadPath" class="form-control" @bind-Value="newSentinel.DownloadPath" />
+                    <InputText id="newDownloadPath" class="form-control" @bind-Value="newSentinel.DownloadPath"/>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newRefreshToken" class="form-label">Refresh Token</label>
-                    <InputText id="newRefreshToken" type="password" class="form-control" @bind-Value="newSentinel.RefreshToken" />
+                    <InputText id="newRefreshToken" type="password" class="form-control"
+                               @bind-Value="newSentinel.RefreshToken"/>
                     <div class="form-text">Long-lived token for Sentinel authentication</div>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="newAltUrls" class="form-label">Alternative URLs (comma-separated)</label>
-                    <InputText id="newAltUrls" class="form-control" @bind-Value="newSentinel.AltUrlsString" />
+                    <InputText id="newAltUrls" class="form-control" @bind-Value="newSentinel.AltUrlsString"/>
                     <div class="form-text">Optional: Enter multiple URLs separated by commas</div>
                 </div>
-                
+
                 <div>
                     <button type="submit" class="btn btn-primary" disabled="@isProcessing">
                         @if (isProcessing)
@@ -87,7 +90,9 @@
                         }
                         Create Sentinel
                     </button>
-                    <button type="button" class="btn btn-secondary ms-2" @onclick="CancelCreateForm" disabled="@isProcessing">Cancel</button>
+                    <button type="button" class="btn btn-secondary ms-2" @onclick="CancelCreateForm"
+                            disabled="@isProcessing">Cancel
+                    </button>
                 </div>
             </EditForm>
         </div>
@@ -106,32 +111,36 @@ else
 {
     <table class="table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>URL</th>
-                <th>Get Token Path</th>
-                <th>Download Path</th>
-                <th>Has Token</th>
-                <th>Actions</th>
-            </tr>
+        <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>URL</th>
+            <th>Get Token Path</th>
+            <th>Download Path</th>
+            <th>Has Token</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var sentinel in sentinels)
-            {
-                <tr>
-                    <td>@sentinel.Id</td>
-                    <td>@sentinel.UserId</td>
-                    <td>@sentinel.Url</td>
-                    <td>@sentinel.GetTokenUrlPath</td>
-                    <td>@sentinel.DownloadFileUrlPath</td>
-                    <td>@(!string.IsNullOrEmpty(sentinel.RefreshToken) ? "Yes" : "No")</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary me-1" @onclick="@(() => ShowEditForm(sentinel))" disabled="@isProcessing">Edit</button>
-                        <button class="btn btn-sm btn-danger" @onclick="@(() => ShowDeleteConfirm(sentinel))" disabled="@isProcessing">Delete</button>
-                    </td>
-                </tr>
-            }
+        @foreach (var sentinel in sentinels)
+        {
+            <tr>
+                <td>@sentinel.Id</td>
+                <td>@sentinel.UserId</td>
+                <td>@sentinel.Url</td>
+                <td>@sentinel.GetTokenUrlPath</td>
+                <td>@sentinel.DownloadFileUrlPath</td>
+                <td>@(!string.IsNullOrEmpty(sentinel.RefreshToken) ? "Yes" : "No")</td>
+                <td>
+                    <button class="btn btn-sm btn-primary me-1" @onclick="@(() => ShowEditForm(sentinel))"
+                            disabled="@isProcessing">Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="@(() => ShowDeleteConfirm(sentinel))"
+                            disabled="@isProcessing">Delete
+                    </button>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
@@ -154,51 +163,63 @@ else
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@editModel" OnValidSubmit="HandleUpdateSentinel">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-                        
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+
                         <div class="mb-3">
                             <label for="editUserId" class="form-label">User ID</label>
-                            <InputNumber id="editUserId" class="form-control" @bind-Value="editModel.UserId" placeholder="@editingSentinel.UserId" />
+                            <InputNumber id="editUserId" class="form-control" @bind-Value="editModel.UserId"
+                                         placeholder="@editingSentinel.UserId"/>
                             <div class="form-text">Leave empty to keep current value: @editingSentinel.UserId</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editUrl" class="form-label">URL</label>
-                            <InputText id="editUrl" class="form-control" @bind-Value="editModel.Url" placeholder="@editingSentinel.Url" />
+                            <InputText id="editUrl" class="form-control" @bind-Value="editModel.Url"
+                                       placeholder="@editingSentinel.Url"/>
                             <div class="form-text">Leave empty to keep current value: @editingSentinel.Url</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editGetTokenPath" class="form-label">Get Token Path</label>
-                            <InputText id="editGetTokenPath" class="form-control" @bind-Value="editModel.GetTokenPath" placeholder="@editingSentinel.GetTokenUrlPath" />
-                            <div class="form-text">Leave empty to keep current value: @editingSentinel.GetTokenUrlPath</div>
+                            <InputText id="editGetTokenPath" class="form-control" @bind-Value="editModel.GetTokenPath"
+                                       placeholder="@editingSentinel.GetTokenUrlPath"/>
+                            <div class="form-text">Leave empty to keep current
+                                value: @editingSentinel.GetTokenUrlPath</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editDownloadPath" class="form-label">Download File Path</label>
-                            <InputText id="editDownloadPath" class="form-control" @bind-Value="editModel.DownloadPath" placeholder="@editingSentinel.DownloadFileUrlPath" />
-                            <div class="form-text">Leave empty to keep current value: @editingSentinel.DownloadFileUrlPath</div>
+                            <InputText id="editDownloadPath" class="form-control" @bind-Value="editModel.DownloadPath"
+                                       placeholder="@editingSentinel.DownloadFileUrlPath"/>
+                            <div class="form-text">Leave empty to keep current
+                                value: @editingSentinel.DownloadFileUrlPath</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editRefreshToken" class="form-label">Refresh Token</label>
-                            <InputText id="editRefreshToken" type="password" class="form-control" @bind-Value="editModel.RefreshToken" placeholder="(current token hidden)" />
+                            <InputText id="editRefreshToken" type="password" class="form-control"
+                                       @bind-Value="editModel.RefreshToken" placeholder="(current token hidden)"/>
                             <div class="form-text">Leave empty to keep current token</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editAltUrls" class="form-label">Alternative URLs (comma-separated)</label>
-                            <InputText id="editAltUrls" class="form-control" @bind-Value="editModel.AltUrlsString" placeholder="@string.Join(", ", editingSentinel.AltUrls)" />
-                            <div class="form-text">Leave empty to keep current URLs: @string.Join(", ", editingSentinel.AltUrls)</div>
+                            <InputText id="editAltUrls" class="form-control" @bind-Value="editModel.AltUrlsString"
+                                       placeholder="@string.Join(", ", editingSentinel.AltUrls)"/>
+                            <div class="form-text">Leave empty to keep current
+                                URLs: @string.Join(", ", editingSentinel.AltUrls)</div>
                         </div>
-                        
+
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CancelEditForm" disabled="@isProcessing">Cancel</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CancelEditForm"
+                                    disabled="@isProcessing">Cancel
+                            </button>
                             <button type="submit" class="btn btn-primary" disabled="@isProcessing">
                                 @if (isProcessing)
                                 {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                          aria-hidden="true"></span>
                                 }
                                 Save Changes
                             </button>
@@ -229,8 +250,11 @@ else
                     <p class="text-danger">This action cannot be undone!</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete" disabled="@isProcessing">Cancel</button>
-                    <button type="button" class="btn btn-danger" @onclick="HandleDeleteSentinel" disabled="@isProcessing">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete" disabled="@isProcessing">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="HandleDeleteSentinel"
+                            disabled="@isProcessing">
                         @if (isProcessing)
                         {
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -247,10 +271,10 @@ else
     private List<SentinelSummary>? sentinels;
     private string? errorMessage;
     private string? successMessage;
-    private bool showCreateForm = false;
-    private bool showEditForm = false;
-    private bool showDeleteConfirm = false;
-    private bool isProcessing = false;
+    private bool showCreateForm;
+    private bool showEditForm;
+    private bool showDeleteConfirm;
+    private bool isProcessing;
     private SentinelFormModel newSentinel = new();
     private SentinelEditModel editModel = new();
     private SentinelSummary? editingSentinel;
@@ -300,8 +324,8 @@ else
 
         try
         {
-            var altUrls = string.IsNullOrEmpty(newSentinel.AltUrlsString) 
-                ? null 
+            var altUrls = string.IsNullOrEmpty(newSentinel.AltUrlsString)
+                ? null
                 : newSentinel.AltUrlsString.Split(',').Select(u => u.Trim()).Where(u => !string.IsNullOrEmpty(u)).ToArray();
 
             var result = await AngelaService.CreateSentinelAsync(
@@ -461,19 +485,19 @@ else
 
     public class SentinelFormModel
     {
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public long UserId { get; set; }
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Url { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string GetTokenPath { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string DownloadPath { get; set; } = string.Empty;
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string RefreshToken { get; set; } = string.Empty;
 
         public string AltUrlsString { get; set; } = string.Empty;
@@ -489,4 +513,5 @@ else
         public string RefreshToken { get; set; } = string.Empty;
         public string AltUrlsString { get; set; } = string.Empty;
     }
+
 }

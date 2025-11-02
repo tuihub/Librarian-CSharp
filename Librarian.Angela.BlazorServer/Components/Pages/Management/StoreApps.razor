@@ -12,7 +12,8 @@
 
 <div class="row mb-3">
     <div class="col-md-6">
-        <input @bind="searchFilter" @onkeypress="OnSearchKeyPress" class="form-control" placeholder="Search store apps..." />
+        <input @bind="searchFilter" @onkeypress="OnSearchKeyPress" class="form-control"
+               placeholder="Search store apps..."/>
     </div>
     <div class="col-md-2">
         <button class="btn btn-primary" @onclick="SearchApps">Search</button>
@@ -31,38 +32,38 @@ else
 {
     <table class="table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Developer</th>
-                <th>Publisher</th>
-                <th>Public</th>
-                <th>Description</th>
-            </tr>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Developer</th>
+            <th>Publisher</th>
+            <th>Public</th>
+            <th>Description</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var app in storeApps)
-            {
-                <tr>
-                    <td>@app.Id</td>
-                    <td><strong>@app.Name</strong></td>
-                    <td><span class="badge bg-secondary">@app.Type</span></td>
-                    <td>@app.Developer</td>
-                    <td>@app.Publisher</td>
-                    <td>
-                        @if (app.IsPublic)
-                        {
-                            <span class="badge bg-success">Public</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">Private</span>
-                        }
-                    </td>
-                    <td>@(app.Description.Length > 100 ? app.Description.Substring(0, 100) + "..." : app.Description)</td>
-                </tr>
-            }
+        @foreach (var app in storeApps)
+        {
+            <tr>
+                <td>@app.Id</td>
+                <td><strong>@app.Name</strong></td>
+                <td><span class="badge bg-secondary">@app.Type</span></td>
+                <td>@app.Developer</td>
+                <td>@app.Publisher</td>
+                <td>
+                    @if (app.IsPublic)
+                    {
+                        <span class="badge bg-success">Public</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Private</span>
+                    }
+                </td>
+                <td>@(app.Description.Length > 100 ? app.Description.Substring(0, 100) + "..." : app.Description)</td>
+            </tr>
+        }
         </tbody>
     </table>
 }
@@ -117,4 +118,5 @@ else
             await SearchApps();
         }
     }
+
 }

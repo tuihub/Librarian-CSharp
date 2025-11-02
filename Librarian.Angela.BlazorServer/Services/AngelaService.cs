@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Librarian.Angela.BlazorServer.Services.Models;
@@ -15,8 +16,13 @@ public interface IAngelaService
     Task<List<UserSummary>?> GetUsersAsync();
     Task<bool> CreateUserAsync(string username, string password, string type, string status);
     Task<bool> UpdateUserAsync(long userId, string? username, string? password, string? type, string? status);
-    Task<bool> CreateSentinelAsync(long userId, string url, string getTokenPath, string downloadPath, string refreshToken, string[]? altUrls = null);
-    Task<bool> UpdateSentinelAsync(long sentinelId, long? userId, string? url, string? getTokenPath, string? downloadPath, string? refreshToken, string[]? altUrls = null);
+
+    Task<bool> CreateSentinelAsync(long userId, string url, string getTokenPath, string downloadPath,
+        string refreshToken, string[]? altUrls = null);
+
+    Task<bool> UpdateSentinelAsync(long sentinelId, long? userId, string? url, string? getTokenPath,
+        string? downloadPath, string? refreshToken, string[]? altUrls = null);
+
     Task<bool> DeleteSentinelAsync(long sentinelId);
 }
 
@@ -89,8 +95,8 @@ public class AngelaService : IAngelaService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Add authorization header with refresh token
-            _httpClient.DefaultRequestHeaders.Authorization = 
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", refreshToken);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", refreshToken);
 
             var response = await _httpClient.PostAsync($"{_config.BaseUrl}/api/v1/auth/refresh", content);
 
@@ -125,48 +131,35 @@ public class AngelaService : IAngelaService
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var sentinelsResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-                
+
                 var sentinels = new List<SentinelSummary>();
-                
-                if (sentinelsResponse.TryGetProperty("sentinels", out JsonElement sentinelsArray))
-                {
+
+                if (sentinelsResponse.TryGetProperty("sentinels", out var sentinelsArray))
                     foreach (var sentinelElement in sentinelsArray.EnumerateArray())
                     {
                         var sentinel = new SentinelSummary();
-                        
-                        if (sentinelElement.TryGetProperty("id", out JsonElement idObj) && 
-                            idObj.TryGetProperty("id", out JsonElement idValue))
-                        {
+
+                        if (sentinelElement.TryGetProperty("id", out var idObj) &&
+                            idObj.TryGetProperty("id", out var idValue))
                             sentinel.Id = idValue.GetInt64();
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("userId", out JsonElement userIdObj) && 
-                            userIdObj.TryGetProperty("id", out JsonElement userIdValue))
-                        {
+
+                        if (sentinelElement.TryGetProperty("userId", out var userIdObj) &&
+                            userIdObj.TryGetProperty("id", out var userIdValue))
                             sentinel.UserId = userIdValue.GetInt64();
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("url", out JsonElement url))
-                        {
+
+                        if (sentinelElement.TryGetProperty("url", out var url))
                             sentinel.Url = url.GetString() ?? string.Empty;
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("getTokenUrlPath", out JsonElement getTokenPath))
-                        {
+
+                        if (sentinelElement.TryGetProperty("getTokenUrlPath", out var getTokenPath))
                             sentinel.GetTokenUrlPath = getTokenPath.GetString() ?? string.Empty;
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("downloadFileUrlPath", out JsonElement downloadPath))
-                        {
+
+                        if (sentinelElement.TryGetProperty("downloadFileUrlPath", out var downloadPath))
                             sentinel.DownloadFileUrlPath = downloadPath.GetString() ?? string.Empty;
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("refreshToken", out JsonElement refreshToken))
-                        {
+
+                        if (sentinelElement.TryGetProperty("refreshToken", out var refreshToken))
                             sentinel.RefreshToken = refreshToken.GetString() ?? string.Empty;
-                        }
-                        
-                        if (sentinelElement.TryGetProperty("altUrls", out JsonElement altUrls))
+
+                        if (sentinelElement.TryGetProperty("altUrls", out var altUrls))
                         {
                             var altUrlsList = new List<string>();
                             foreach (var altUrl in altUrls.EnumerateArray())
@@ -174,13 +167,13 @@ public class AngelaService : IAngelaService
                                 var urlStr = altUrl.GetString();
                                 if (urlStr != null) altUrlsList.Add(urlStr);
                             }
+
                             sentinel.AltUrls = altUrlsList.ToArray();
                         }
-                        
+
                         sentinels.Add(sentinel);
                     }
-                }
-                
+
                 _logger.LogInformation("Retrieved {Count} sentinels successfully", sentinels.Count);
                 return sentinels;
             }
@@ -200,10 +193,7 @@ public class AngelaService : IAngelaService
         try
         {
             var url = $"{_config.BaseUrl}/api/v1/store-apps";
-            if (!string.IsNullOrEmpty(nameFilter))
-            {
-                url += $"?nameLike={Uri.EscapeDataString(nameFilter)}";
-            }
+            if (!string.IsNullOrEmpty(nameFilter)) url += $"?nameLike={Uri.EscapeDataString(nameFilter)}";
 
             var response = await _httpClient.GetAsync(url);
 
@@ -211,10 +201,10 @@ public class AngelaService : IAngelaService
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var storeAppsResponse = JsonSerializer.Deserialize<dynamic>(responseContent);
-                
+
                 // Parse the response - this would need to match the actual proto JSON structure
                 var storeApps = new List<StoreAppSummary>();
-                
+
                 _logger.LogInformation("Retrieved store apps successfully");
                 return storeApps;
             }
@@ -238,12 +228,13 @@ public class AngelaService : IAngelaService
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var checkResponse = JsonSerializer.Deserialize<CheckLocalAdminResponse>(responseContent, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
+                var checkResponse = JsonSerializer.Deserialize<CheckLocalAdminResponse>(responseContent,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
 
-                _logger.LogInformation("CheckLocalAdmin returned: IsLocalAdmin={IsLocalAdmin}, Username={Username}", 
+                _logger.LogInformation("CheckLocalAdmin returned: IsLocalAdmin={IsLocalAdmin}, Username={Username}",
                     checkResponse?.IsLocalAdmin, checkResponse?.Username);
                 return checkResponse;
             }
@@ -268,40 +259,30 @@ public class AngelaService : IAngelaService
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var usersResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-                
+
                 var users = new List<UserSummary>();
-                
-                if (usersResponse.TryGetProperty("users", out JsonElement usersArray))
-                {
+
+                if (usersResponse.TryGetProperty("users", out var usersArray))
                     foreach (var userElement in usersArray.EnumerateArray())
                     {
                         var user = new UserSummary();
-                        
-                        if (userElement.TryGetProperty("id", out JsonElement idObj) && 
-                            idObj.TryGetProperty("id", out JsonElement idValue))
-                        {
+
+                        if (userElement.TryGetProperty("id", out var idObj) &&
+                            idObj.TryGetProperty("id", out var idValue))
                             user.Id = idValue.GetInt64();
-                        }
-                        
-                        if (userElement.TryGetProperty("username", out JsonElement username))
-                        {
+
+                        if (userElement.TryGetProperty("username", out var username))
                             user.Username = username.GetString() ?? string.Empty;
-                        }
-                        
-                        if (userElement.TryGetProperty("type", out JsonElement type))
-                        {
+
+                        if (userElement.TryGetProperty("type", out var type))
                             user.Type = type.GetString() ?? string.Empty;
-                        }
-                        
-                        if (userElement.TryGetProperty("status", out JsonElement status))
-                        {
+
+                        if (userElement.TryGetProperty("status", out var status))
                             user.Status = status.GetString() ?? string.Empty;
-                        }
-                        
+
                         users.Add(user);
                     }
-                }
-                
+
                 _logger.LogInformation("Retrieved {Count} users successfully", users.Count);
                 return users;
             }
@@ -324,10 +305,10 @@ public class AngelaService : IAngelaService
             {
                 user = new
                 {
-                    username = username,
-                    password = password,
-                    type = type,
-                    status = status
+                    username,
+                    password,
+                    type,
+                    status
                 }
             };
 
@@ -356,7 +337,8 @@ public class AngelaService : IAngelaService
         }
     }
 
-    public async Task<bool> UpdateUserAsync(long userId, string? username, string? password, string? type, string? status)
+    public async Task<bool> UpdateUserAsync(long userId, string? username, string? password, string? type,
+        string? status)
     {
         try
         {
@@ -367,13 +349,13 @@ public class AngelaService : IAngelaService
 
             if (!string.IsNullOrEmpty(username))
                 userObj["username"] = username;
-            
+
             if (!string.IsNullOrEmpty(password))
                 userObj["password"] = password;
-            
+
             if (!string.IsNullOrEmpty(type))
                 userObj["type"] = type;
-            
+
             if (!string.IsNullOrEmpty(status))
                 userObj["status"] = status;
 
@@ -407,7 +389,8 @@ public class AngelaService : IAngelaService
         }
     }
 
-    public async Task<bool> CreateSentinelAsync(long userId, string url, string getTokenPath, string downloadPath, string refreshToken, string[]? altUrls = null)
+    public async Task<bool> CreateSentinelAsync(long userId, string url, string getTokenPath, string downloadPath,
+        string refreshToken, string[]? altUrls = null)
     {
         try
         {
@@ -416,11 +399,11 @@ public class AngelaService : IAngelaService
                 sentinel = new
                 {
                     userId = new { id = userId },
-                    url = url,
+                    url,
                     altUrls = altUrls ?? Array.Empty<string>(),
                     getTokenUrlPath = getTokenPath,
                     downloadFileUrlPath = downloadPath,
-                    refreshToken = refreshToken
+                    refreshToken
                 }
             };
 
@@ -449,7 +432,8 @@ public class AngelaService : IAngelaService
         }
     }
 
-    public async Task<bool> UpdateSentinelAsync(long sentinelId, long? userId, string? url, string? getTokenPath, string? downloadPath, string? refreshToken, string[]? altUrls = null)
+    public async Task<bool> UpdateSentinelAsync(long sentinelId, long? userId, string? url, string? getTokenPath,
+        string? downloadPath, string? refreshToken, string[]? altUrls = null)
     {
         try
         {
@@ -460,19 +444,19 @@ public class AngelaService : IAngelaService
 
             if (userId.HasValue && userId.Value != 0)
                 sentinelObj["userId"] = new { id = userId.Value };
-            
+
             if (!string.IsNullOrEmpty(url))
                 sentinelObj["url"] = url;
-            
+
             if (altUrls != null && altUrls.Length > 0)
                 sentinelObj["altUrls"] = altUrls;
-            
+
             if (!string.IsNullOrEmpty(getTokenPath))
                 sentinelObj["getTokenUrlPath"] = getTokenPath;
-            
+
             if (!string.IsNullOrEmpty(downloadPath))
                 sentinelObj["downloadFileUrlPath"] = downloadPath;
-            
+
             if (!string.IsNullOrEmpty(refreshToken))
                 sentinelObj["refreshToken"] = refreshToken;
 

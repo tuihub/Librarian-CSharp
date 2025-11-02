@@ -11,6 +11,6 @@ public static class HumanizeUtil
         var bytes = Math.Abs(byteCount);
         var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
         var num = Math.Round(bytes / Math.Pow(1024, place), 2);
-        return (Math.Sign(byteCount) * num) + " " + suf[place];
+        return Math.Sign(byteCount) * num + " " + suf[place];
     }
 }

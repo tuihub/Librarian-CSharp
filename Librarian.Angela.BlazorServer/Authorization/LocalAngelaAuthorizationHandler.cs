@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Librarian.Angela.BlazorServer.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 
 namespace Librarian.Angela.BlazorServer.Authorization;
 
@@ -11,8 +10,8 @@ public class AngelaAccessRequirement : IAuthorizationRequirement
 
 public class LocalAngelaAuthorizationHandler : AuthorizationHandler<AngelaAccessRequirement>
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAngelaService _angelaService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public LocalAngelaAuthorizationHandler(IHttpContextAccessor httpContextAccessor, IAngelaService angelaService)
     {
@@ -31,10 +30,7 @@ public class LocalAngelaAuthorizationHandler : AuthorizationHandler<AngelaAccess
         }
 
         var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null)
-        {
-            return;
-        }
+        if (httpContext == null) return;
 
         // 兜底：调用后端接口探测 TrustedIP（不依赖本地配置）
         try
@@ -44,9 +40,9 @@ public class LocalAngelaAuthorizationHandler : AuthorizationHandler<AngelaAccess
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, localAdmin.Username ?? "LocalAdmin"),
-                    new Claim(ClaimTypes.Role, "Admin"),
-                    new Claim("AuthType", "TrustedIP")
+                    new(ClaimTypes.Name, localAdmin.Username ?? "LocalAdmin"),
+                    new(ClaimTypes.Role, "Admin"),
+                    new("AuthType", "TrustedIP")
                 };
                 var identity = new ClaimsIdentity(claims, "TrustedIP");
                 httpContext.User = new ClaimsPrincipal(identity);
@@ -60,5 +56,3 @@ public class LocalAngelaAuthorizationHandler : AuthorizationHandler<AngelaAccess
         }
     }
 }
-
-

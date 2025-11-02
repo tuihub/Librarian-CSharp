@@ -29,7 +29,7 @@ public partial class SephirahService
         {
             Id = new InternalID { Id = storeApp.Id },
             Name = storeApp.Name,
-            Type = EnumConverter.ToEnumByString<AppType>(storeApp.Type),
+            Type = storeApp.Type.ToEnumByString<AppType>(),
             Description = storeApp.Description,
             IconImageId = new InternalID { Id = storeApp.IconImageId },
             BackgroundImageId = new InternalID { Id = storeApp.BackgroundImageId },
