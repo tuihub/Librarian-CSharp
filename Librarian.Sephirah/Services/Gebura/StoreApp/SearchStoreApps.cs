@@ -12,14 +12,17 @@ public partial class SephirahService
 {
     /// <summary>
     ///     Search store apps with optional name filter
+    ///     By default, only returns public store apps
     /// </summary>
     [Authorize]
     public override async Task<SearchStoreAppsResponse> SearchStoreApps(SearchStoreAppsRequest request,
         ServerCallContext context)
     {
-        var query = _dbContext.StoreApps.AsQueryable();
+        // Default to showing only public store apps
+        var query = _dbContext.StoreApps.Where(x => x.IsPublic);
 
-        if (!string.IsNullOrWhiteSpace(request.NameLike)) query = query.Where(x => x.Name.Contains(request.NameLike));
+        if (!string.IsNullOrWhiteSpace(request.NameLike)) 
+            query = query.Where(x => x.Name.Contains(request.NameLike));
 
         // Total count before pagination
         var totalSize = await query.CountAsync();

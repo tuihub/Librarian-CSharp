@@ -104,17 +104,31 @@ public class App
     // many-to-many relation(optional)
     public ICollection<AppCategory> AppCategories { get; } = new List<AppCategory>();
 
-    public void UpdateFromPb(TuiHub.Protos.Librarian.Sephirah.V1.App app)
+    public void UpdateFromPb(TuiHub.Protos.Librarian.Sephirah.V1.App app, bool updateServerControlledFields = false)
     {
+        // Update version info
         RevisedVersion = app.VersionNumber;
         RevisedAt = app.VersionDate.ToDateTime();
-        CreatorDeviceId = app.CreatorDeviceId.Id;
+        UpdatedAt = DateTime.UtcNow;
+        
+        // Update server-controlled fields only if explicitly allowed
+        if (updateServerControlledFields)
+        {
+            CreatorDeviceId = app.CreatorDeviceId?.Id ?? CreatorDeviceId;
+            BoundStoreAppId = app.BoundStoreAppId.Id != 0 ? app.BoundStoreAppId.Id : BoundStoreAppId;
+        }
+        
+        // Update user-controllable fields
         AppSources = app.AppSources.ToDictionary(
             kv => kv.Key.ToEnum<WellKnowns.AppInfoSource>(),
             kv => kv.Value);
         IsPublic = app.Public;
-        BoundStoreAppId = app.BoundStoreAppId.Id;
-        StopStoreManage = app.StopStoreManage;
+        
+        if (app.HasStopStoreManage)
+        {
+            StopStoreManage = app.StopStoreManage;
+        }
+        
         Name = app.Name;
         Type = app.Type.ToEnumByString<Enums.AppType>();
         Description = app.Description;
