@@ -41,7 +41,7 @@ public static partial class Enums
         Android,
         Ios,
         Windows,
-        MacOS,
+        Macos,
         Linux,
         Web
     }
