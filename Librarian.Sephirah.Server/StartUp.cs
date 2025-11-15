@@ -66,7 +66,7 @@ public static class StartUp
         });
 
         // Add ApplicationDbContext DI
-        builder.Services.AddDbContext<ApplicationDbContext>(o =>
+		builder.Services.AddDbContext<ApplicationDbContext>(o =>
         {
             ApplicationDbType dbType;
             string dbConnStr;
@@ -81,12 +81,20 @@ public static class StartUp
                 dbConnStr = GlobalContext.SystemConfig.DbConnStr;
             }
 
-            if (dbType == ApplicationDbType.SQLite)
-                o.UseSqlite(dbConnStr);
-            else if (dbType == ApplicationDbType.MySQL)
-                o.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr));
-            else if (dbType == ApplicationDbType.PostgreSQL)
-                o.UseNpgsql(dbConnStr);
+			var migrationsAssembly = dbType switch
+			{
+				ApplicationDbType.SQLite => "Librarian.Common.Migrations.SQLite",
+				ApplicationDbType.MySQL => "Librarian.Common.Migrations.MySql",
+				ApplicationDbType.PostgreSQL => "Librarian.Common.Migrations.PostgreSQL",
+				_ => throw new ArgumentException("DbType Error.")
+			};
+
+			if (dbType == ApplicationDbType.SQLite)
+				o.UseSqlite(dbConnStr, b => b.MigrationsAssembly(migrationsAssembly));
+			else if (dbType == ApplicationDbType.MySQL)
+				o.UseMySql(dbConnStr, ServerVersion.AutoDetect(dbConnStr), b => b.MigrationsAssembly(migrationsAssembly));
+			else if (dbType == ApplicationDbType.PostgreSQL)
+				o.UseNpgsql(dbConnStr, b => b.MigrationsAssembly(migrationsAssembly));
             else throw new ArgumentException("DbType Error.");
         });
 

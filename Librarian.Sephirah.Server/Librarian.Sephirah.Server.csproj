@@ -24,6 +24,9 @@
     <ItemGroup>
         <ProjectReference Include="..\Librarian.Sephirah\Librarian.Sephirah.csproj"/>
         <ProjectReference Include="..\Librarian.Angela\Librarian.Angela.csproj"/>
+		<ProjectReference Include="..\Librarian.Common.Migrations.SQLite\Librarian.Common.Migrations.SQLite.csproj" />
+		<ProjectReference Include="..\Librarian.Common.Migrations.MySql\Librarian.Common.Migrations.MySql.csproj" />
+		<ProjectReference Include="..\Librarian.Common.Migrations.PostgreSQL\Librarian.Common.Migrations.PostgreSQL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
