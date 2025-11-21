@@ -1,16 +1,24 @@
 using Grpc.Core;
 using Librarian.Common.Constants;
+using Librarian.Common.Models.Db;
+using Librarian.Common.Utils;
 using Librarian.Sephirah.Angela;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
+    [Authorize(Policy = "AngelaAccess")]
     public override async Task<GetTokenResponse> GetToken(GetTokenRequest request, ServerCallContext context)
     {
+        string accessToken, refreshToken;
+        var username = request.Username;
+        var password = request.Password;
+
         // First verify user exists and is admin using Angela's requirement
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Username);
+        var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == username);
         if (user == null) throw new RpcException(new Status(StatusCode.NotFound, "User does not exist"));
 
         // Verify user is active
@@ -21,20 +29,21 @@ public partial class AngelaService
         if (user.Type != Enums.UserType.Admin)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
 
-        // Use AutoMapper to convert request and delegate to Sephirah
-        var sephirahRequest = s_mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.GetTokenRequest>(request);
-
-        try
+        if (PasswordHasher.VerifyHashedPassword(user.Password, password))
         {
-            var sephirahResponse = await _sephirahClient.GetTokenAsync(sephirahRequest);
-
-            // Use AutoMapper to convert response
-            return s_mapper.Map<GetTokenResponse>(sephirahResponse);
+            // get token
+            accessToken = JwtUtil.GenerateAccessToken(user.Id);
+            refreshToken = JwtUtil.GenerateRefreshToken(user.Id);
         }
-        catch (RpcException ex)
+        else
         {
-            // Re-throw Sephirah authentication errors
-            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "Username and password not match."));
         }
+
+        return new GetTokenResponse
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 }

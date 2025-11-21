@@ -1,6 +1,10 @@
 using Grpc.Core;
+using Librarian.Common.Helpers;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using InternalID = Librarian.Sephirah.Angela.InternalID;
+using PagingResponse = Librarian.Sephirah.Angela.PagingResponse;
 
 namespace Librarian.Angela.Services;
 
@@ -10,25 +14,49 @@ public partial class AngelaService
     public override async Task<SearchStoreAppsResponse> SearchStoreApps(SearchStoreAppsRequest request,
         ServerCallContext context)
     {
-        // Use AutoMapper to convert request
-        var sephirahRequest = s_mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.SearchStoreAppsRequest>(request);
+        // Default to showing only public store apps
+        var query = _dbContext.StoreApps.Where(x => x.IsPublic);
 
-        // Forward the authorization header to Sephirah
-        var headers = new Metadata();
-        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-            headers.Add("authorization", authHeader.Value);
+        if (!string.IsNullOrWhiteSpace(request.NameLike))
+            query = query.Where(x => x.Name.Contains(request.NameLike));
 
-        try
+        // Total count before pagination
+        var totalSize = await query.CountAsync();
+
+        // Apply pagination and execute
+        if (request.Paging != null)
         {
-            var sephirahResponse = await _sephirahClient.SearchStoreAppsAsync(sephirahRequest, headers);
+            var pagingRequest = s_mapper.Map<TuiHub.Protos.Librarian.V1.PagingRequest>(request.Paging);
+            query = query.ApplyPagingRequest(pagingRequest);
+        }
+        var storeApps = await query.ToListAsync();
 
-            // Use AutoMapper to convert response
-            return s_mapper.Map<SearchStoreAppsResponse>(sephirahResponse);
-        }
-        catch (RpcException ex)
+        var response = new SearchStoreAppsResponse
         {
-            // Re-throw Sephirah errors
-            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+            Paging = new PagingResponse
+            {
+                TotalSize = totalSize
+            }
+        };
+
+        foreach (var storeApp in storeApps)
+        {
+            var angelaStoreApp = new StoreApp
+            {
+                Id = new InternalID { Id = storeApp.Id },
+                Name = storeApp.Name,
+                Type = storeApp.Type.ToString(),
+                Description = storeApp.Description,
+                IconImageId = new InternalID { Id = storeApp.IconImageId },
+                BackgroundImageId = new InternalID { Id = storeApp.BackgroundImageId },
+                CoverImageId = new InternalID { Id = storeApp.CoverImageId },
+                Developer = storeApp.Developer,
+                Publisher = storeApp.Publisher,
+            };
+            angelaStoreApp.Tags.AddRange(storeApp.Tags);
+            response.StoreApps.Add(angelaStoreApp);
         }
+
+        return response;
     }
 }

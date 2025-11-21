@@ -1,7 +1,9 @@
 using Grpc.Core;
+using Librarian.Common.Helpers;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using Microsoft.EntityFrameworkCore;
+using InternalID = Librarian.Sephirah.Angela.InternalID;
 using ListStoreAppBinariesRequest = Librarian.Sephirah.Angela.ListStoreAppBinariesRequest;
 using ListStoreAppBinariesResponse = Librarian.Sephirah.Angela.ListStoreAppBinariesResponse;
 using StoreAppBinary = Librarian.Sephirah.Angela.StoreAppBinary;
@@ -14,41 +16,47 @@ public partial class AngelaService
     public override async Task<ListStoreAppBinariesResponse> ListStoreAppBinaries(ListStoreAppBinariesRequest request,
         ServerCallContext context)
     {
-        // Use AutoMapper to convert request
-        var sephirahRequest = s_mapper.Map<GetStoreAppSummaryRequest>(request);
+        var storeAppId = request.StoreAppId.Id;
 
-        // Forward the authorization header to Sephirah
-        var headers = new Metadata();
-        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-            headers.Add("authorization", authHeader.Value);
+        // Verify store app exists
+        var storeAppExists = await _dbContext.StoreApps.AnyAsync(x => x.Id == storeAppId);
+        if (!storeAppExists)
+            throw new RpcException(new Status(StatusCode.NotFound, "Store app not found"));
 
-        try
+        var query = _dbContext.StoreAppBinaries.Where(x => x.StoreAppId == storeAppId);
+
+        var totalSize = await query.CountAsync();
+
+        // Apply paging
+        if (request.Paging != null)
         {
-            var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
+            var pagingRequest = s_mapper.Map<TuiHub.Protos.Librarian.V1.PagingRequest>(request.Paging);
+            query = query.ApplyPagingRequest(pagingRequest);
+        }
 
-            var response = new ListStoreAppBinariesResponse
-            {
-                Paging = new PagingResponse
-                {
-                    TotalSize = sephirahResponse.StoreApp.AppBinaryCount
-                }
-            };
+        var binaries = await query.ToListAsync();
 
-            // Use AutoMapper to convert binaries
-            foreach (var sephirahBinary in sephirahResponse.StoreApp.Binaries)
+        var response = new ListStoreAppBinariesResponse
+        {
+            Paging = new PagingResponse
             {
-                var binary = s_mapper.Map<StoreAppBinary>(sephirahBinary);
-                // Set required fields that AutoMapper can't infer
-                binary.StoreAppId = request.StoreAppId;
-                response.Binaries.Add(binary);
+                TotalSize = totalSize
             }
+        };
 
-            return response;
-        }
-        catch (RpcException ex)
+        foreach (var binary in binaries)
         {
-            // Re-throw Sephirah errors
-            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
+            var angelaBinary = new StoreAppBinary
+            {
+                Id = new InternalID { Id = binary.Id },
+                Name = binary.Name,
+                SentinelId = new InternalID { Id = binary.SentinelId },
+                SentinelGeneratedId = binary.SentinelGeneratedId,
+                StoreAppId = request.StoreAppId
+            };
+            response.Binaries.Add(angelaBinary);
         }
+
+        return response;
     }
 }

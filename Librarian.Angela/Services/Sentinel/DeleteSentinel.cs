@@ -12,9 +12,6 @@ public partial class AngelaService
     public override async Task<DeleteSentinelResponse> DeleteSentinel(DeleteSentinelRequest request,
         ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         var sentinelId = request.Id.Id;
         var sentinel = await _dbContext.Sentinels
             .Include(s => s.SentinelLibraries)

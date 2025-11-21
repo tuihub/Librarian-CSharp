@@ -1,8 +1,9 @@
 using Grpc.Core;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
-using TuiHub.Protos.Librarian.Sephirah.V1;
+using Microsoft.EntityFrameworkCore;
 using StoreApp = Librarian.Sephirah.Angela.StoreApp;
+using InternalID = Librarian.Sephirah.Angela.InternalID;
 
 namespace Librarian.Angela.Services;
 
@@ -12,30 +13,28 @@ public partial class AngelaService
     public override async Task<GetStoreAppResponse> GetStoreApp(GetStoreAppRequest request,
         ServerCallContext context)
     {
-        // Use AutoMapper to convert request
-        var sephirahRequest = s_mapper.Map<GetStoreAppSummaryRequest>(request);
+        var storeApp = await _dbContext.StoreApps
+            .FirstOrDefaultAsync(x => x.Id == request.Id.Id);
 
-        // Forward the authorization header to Sephirah
-        var headers = new Metadata();
-        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-            headers.Add("authorization", authHeader.Value);
+        if (storeApp == null) throw new RpcException(new Status(StatusCode.NotFound, "Store app not found"));
 
-        try
+        var angelaStoreApp = new StoreApp
         {
-            var sephirahResponse = await _sephirahClient.GetStoreAppSummaryAsync(sephirahRequest, headers);
+            Id = new InternalID { Id = storeApp.Id },
+            Name = storeApp.Name,
+            Type = storeApp.Type.ToString(),
+            Description = storeApp.Description,
+            IconImageId = new InternalID { Id = storeApp.IconImageId },
+            BackgroundImageId = new InternalID { Id = storeApp.BackgroundImageId },
+            CoverImageId = new InternalID { Id = storeApp.CoverImageId },
+            Developer = storeApp.Developer,
+            Publisher = storeApp.Publisher,
+        };
+        angelaStoreApp.Tags.AddRange(storeApp.Tags);
 
-            // Use AutoMapper to convert StoreApp
-            var storeApp = s_mapper.Map<StoreApp>(sephirahResponse.StoreApp.StoreApp);
-
-            return new GetStoreAppResponse
-            {
-                StoreApp = storeApp
-            };
-        }
-        catch (RpcException ex)
+        return new GetStoreAppResponse
         {
-            // Re-throw Sephirah errors
-            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
-        }
+            StoreApp = angelaStoreApp
+        };
     }
 }

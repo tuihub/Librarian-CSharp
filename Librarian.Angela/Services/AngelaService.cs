@@ -19,14 +19,11 @@ public partial class AngelaService : Sephirah.Angela.AngelaService.AngelaService
     private readonly ApplicationDbContext _dbContext;
     private readonly IdGenerator _idGenerator;
     private readonly ILogger _logger;
-    private readonly LibrarianSephirahService.LibrarianSephirahServiceClient _sephirahClient;
 
-    public AngelaService(ILogger<AngelaService> logger, ApplicationDbContext dbContext,
-        LibrarianSephirahService.LibrarianSephirahServiceClient sephirahClient, IdGenerator idGenerator)
+    public AngelaService(ILogger<AngelaService> logger, ApplicationDbContext dbContext, IdGenerator idGenerator)
     {
         _logger = logger;
         _dbContext = dbContext;
-        _sephirahClient = sephirahClient;
         _idGenerator = idGenerator;
     }
 }

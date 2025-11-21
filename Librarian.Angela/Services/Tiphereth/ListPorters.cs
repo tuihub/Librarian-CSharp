@@ -10,9 +10,6 @@ public partial class AngelaService
     [Authorize(Policy = "AngelaAccess")]
     public override Task<ListPortersResponse> ListPorters(ListPortersRequest request, ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         var response = new ListPortersResponse();
 
         // Mock getting a Porter list

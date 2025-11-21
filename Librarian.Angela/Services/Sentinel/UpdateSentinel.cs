@@ -12,9 +12,6 @@ public partial class AngelaService
     public override async Task<UpdateSentinelResponse> UpdateSentinel(UpdateSentinelRequest request,
         ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         var sentinelId = request.Sentinel.Id.Id;
         var sentinel = await _dbContext.Sentinels.FirstOrDefaultAsync(s => s.Id == sentinelId);
 

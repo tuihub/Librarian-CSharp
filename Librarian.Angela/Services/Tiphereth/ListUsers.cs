@@ -12,10 +12,6 @@ public partial class AngelaService
     [Authorize(Policy = "AngelaAccess")]
     public override async Task<ListUsersResponse> ListUsers(ListUsersRequest request, ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        if (context.GetBearerToken() != null)
-            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         // Query users
         IQueryable<Common.Models.Db.User> usersDb = _dbContext.Users;
 

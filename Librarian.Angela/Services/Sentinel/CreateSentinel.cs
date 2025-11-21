@@ -12,9 +12,6 @@ public partial class AngelaService
     public override async Task<CreateSentinelResponse> CreateSentinel(CreateSentinelRequest request,
         ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         // Generate a new internal ID using a simple timestamp approach
         var internalId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 

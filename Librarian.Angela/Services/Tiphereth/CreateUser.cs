@@ -13,10 +13,6 @@ public partial class AngelaService
     [EnableRateLimiting("bcrypt_fixed")]
     public override async Task<CreateUserResponse> CreateUser(CreateUserRequest request, ServerCallContext context)
     {
-        // Verify that the user is an administrator
-        if (context.GetBearerToken() != null)
-            UserUtil.VerifyUserAdminAndThrow(context, _dbContext);
-
         var internalId = _idGenerator.CreateId();
 
         // Create a new user

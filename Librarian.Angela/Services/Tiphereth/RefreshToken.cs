@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Librarian.Common.Constants;
+using Librarian.Common.Models.Db;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Angela;
 using Microsoft.AspNetCore.Authorization;
@@ -9,42 +10,29 @@ namespace Librarian.Angela.Services;
 
 public partial class AngelaService
 {
-    [Authorize(AuthenticationSchemes = "RefreshToken")]
+    [Authorize(AuthenticationSchemes = "RefreshToken", Policy = "AngelaAccess")]
     public override async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request,
         ServerCallContext context)
     {
+        string accessTokenNew, refreshTokenNew;
         var internalId = context.GetInternalIdFromHeader();
 
         // Get user and verify status and permissions for Angela admin-only access
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == internalId);
+        var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == internalId);
         if (user == null)
             throw new RpcException(new Status(StatusCode.NotFound, "User not found"));
 
         if (user.Status != Enums.UserStatus.Active)
             throw new RpcException(new Status(StatusCode.PermissionDenied, "User not active"));
 
-        if (user.Type != Enums.UserType.Admin)
-            throw new RpcException(new Status(StatusCode.PermissionDenied, "Only administrators can access Angela"));
+        // get new token
+        accessTokenNew = JwtUtil.GenerateAccessToken(internalId);
+        refreshTokenNew = JwtUtil.GenerateRefreshToken(internalId);
 
-        // Use AutoMapper to convert request and delegate to Sephirah
-        var sephirahRequest = s_mapper.Map<TuiHub.Protos.Librarian.Sephirah.V1.RefreshTokenRequest>(request);
-
-        // Forward the authorization header to Sephirah
-        var headers = new Metadata();
-        if (context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization") is { } authHeader)
-            headers.Add("authorization", authHeader.Value);
-
-        try
+        return new RefreshTokenResponse
         {
-            var sephirahResponse = await _sephirahClient.RefreshTokenAsync(sephirahRequest, headers);
-
-            // Use AutoMapper to convert response
-            return s_mapper.Map<RefreshTokenResponse>(sephirahResponse);
-        }
-        catch (RpcException ex)
-        {
-            // Re-throw Sephirah authentication errors
-            throw new RpcException(new Status(ex.StatusCode, ex.Status.Detail));
-        }
+            AccessToken = accessTokenNew,
+            RefreshToken = refreshTokenNew
+        };
     }
 }
