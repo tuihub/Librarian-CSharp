@@ -73,7 +73,7 @@
                     <label for="newRefreshToken" class="form-label">Refresh Token</label>
                     <InputText id="newRefreshToken" type="password" class="form-control"
                                @bind-Value="newSentinel.RefreshToken"/>
-                    <div class="form-text">Long-lived token for Sentinel authentication</div>
+                    <div class="form-text">Long-lived token for Sentinel authentication (Optional)</div>
                 </div>
 
                 <div class="mb-3">
@@ -497,7 +497,6 @@ else
         [Required]
         public string DownloadPath { get; set; } = string.Empty;
 
-        [Required]
         public string RefreshToken { get; set; } = string.Empty;
 
         public string AltUrlsString { get; set; } = string.Empty;
