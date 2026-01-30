@@ -391,3 +391,4 @@ Desktop.ini
 appsettings.Development.json
 launchSettings.json
 *.runsettings
+.vscode/
