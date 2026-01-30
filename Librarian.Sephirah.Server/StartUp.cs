@@ -10,6 +10,7 @@ using Librarian.Common.Configs;
 using Librarian.Common.MappingProfiles;
 using Librarian.Common.Utils;
 using Librarian.Sephirah.Services;
+using Librarian.Sephirah.Sentinel.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -115,25 +116,6 @@ public static class StartUp
 
         // Add grpc
         builder.Services.AddGrpc().AddJsonTranscoding();
-
-        // Add SephirahClient for Angela service delegation
-        builder.Services
-            .AddGrpcClient<
-                LibrarianSephirahService.LibrarianSephirahServiceClient>(options =>
-            {
-                // Use localhost for in-process calls
-                options.Address = new Uri("http://localhost:5147");
-                options.ChannelOptionsActions.Add(channelOptions =>
-                {
-                    // Allow unencrypted HTTP/2
-                    channelOptions.HttpHandler = new HttpClientHandler
-                    {
-                        // Return `true` to allow certificates that are untrusted/invalid
-                        ServerCertificateCustomValidationCallback =
-                            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                    };
-                });
-            });
 
         if (builder.Environment.IsDevelopment())
         {
@@ -258,6 +240,7 @@ public static class StartUp
         // Configure the HTTP request pipeline.
         app.MapGrpcService<SephirahService>();
         app.MapGrpcService<AngelaService>();
+        app.MapGrpcService<SephirahSentinelService>();
 
         // add server reflection when env is dev
         if (app.Environment.IsDevelopment()) app.MapGrpcReflectionService();

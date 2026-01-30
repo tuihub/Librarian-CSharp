@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sentinel.V1;
 
-namespace Librarian.Sentinel.Services;
+namespace Librarian.Sephirah.Sentinel.Services;
 
 public partial class SephirahSentinelService : LibrarianSephirahSentinelService.LibrarianSephirahSentinelServiceBase
 {

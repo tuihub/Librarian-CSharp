@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using TuiHub.Protos.Librarian.Sentinel.V1;
 using DbModels = Librarian.Common.Models.Db;
 
-namespace Librarian.Sentinel.Services;
+namespace Librarian.Sephirah.Sentinel.Services;
 
 public partial class SephirahSentinelService
 {

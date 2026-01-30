@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Porter.Server", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Sephirah.Server", "Librarian.Sephirah.Server\Librarian.Sephirah.Server.csproj", "{98D8AC39-FF1A-4AA1-85E9-363E0085FFAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Sentinel", "Librarian.Sentinel\Librarian.Sentinel.csproj", "{718A0218-8138-424B-B1A6-3167E5C96D69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Sephirah.Sentinel", "Librarian.Sephirah.Sentinel\Librarian.Sephirah.Sentinel.csproj", "{718A0218-8138-424B-B1A6-3167E5C96D69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librarian.Angela.BlazorServer", "Librarian.Angela.BlazorServer\Librarian.Angela.BlazorServer.csproj", "{7E454731-66F2-4B05-9348-29F4BB3E5C07}"
 EndProject
