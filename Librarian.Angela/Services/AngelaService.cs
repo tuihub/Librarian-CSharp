@@ -3,6 +3,7 @@ using IdGen;
 using Librarian.Angela.Mapping;
 using Librarian.Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
 namespace Librarian.Angela.Services;
@@ -14,7 +15,7 @@ public partial class AngelaService : Sephirah.Angela.AngelaService.AngelaService
         cfg.AddProfile<StoreAppMappingProfile>();
         cfg.AddProfile<TipherethMappingProfile>();
         cfg.AddProfile<SentinelMappingProfile>();
-    }).CreateMapper();
+    }, NullLoggerFactory.Instance).CreateMapper();
 
     private readonly ApplicationDbContext _dbContext;
     private readonly IdGenerator _idGenerator;

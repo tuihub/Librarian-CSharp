@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OpenApi.Models;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 
@@ -109,7 +110,7 @@ public static class StartUp
             mc.AddProfile<SentinelMappingProfile>();
             mc.AddProfile<StoreAppMappingProfile>();
             mc.AddProfile<TipherethMappingProfile>();
-        });
+        }, NullLoggerFactory.Instance);
         var mapper = mapperConfig.CreateMapper();
         StaticContext.Mapper = mapper;
         builder.Services.AddSingleton<IMapper>(mapper);

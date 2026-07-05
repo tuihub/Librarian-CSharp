@@ -3,6 +3,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Librarian.Common.Constants;
 using Librarian.Common.MappingProfiles;
+using Microsoft.Extensions.Logging.Abstractions;
 using TuiHub.Protos.Librarian.Sephirah.V1;
 using TuiHub.Protos.Librarian.V1;
 using Xunit;
@@ -27,7 +28,7 @@ public class SephirahProfileMappingTests
         var configuration = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<SephirahProfile>();
-        });
+        }, NullLoggerFactory.Instance);
         _mapper = configuration.CreateMapper();
     }
 
@@ -615,4 +616,3 @@ public class SephirahProfileMappingTests
 
     #endregion
 }
-
