@@ -12,15 +12,15 @@ public static class JwtUtil
 {
     public static string GenerateTokenForDownloadServer(long internalId)
     {
-        var expireMinutes = 1440;
-        var audience = "DLServer";
+        var config = GlobalContext.JwtConfig.DownloadServerToken;
+        var expireMinutes = config.ExpireMinutes;
+        var audience = config.Audience;
         var issuer = GlobalContext.JwtConfig.Issuer;
 
         var handler = new JwtSecurityTokenHandler();
         var ecdsa = ECDsa.Create();
         ecdsa.ImportECPrivateKey(
-            Convert.FromBase64String(
-                "MHQCAQEEIChovn0zZY2oz4uZltebqvmEUdKNrutbBvjNsdJfMNP/oAcGBSuBBAAKoUQDQgAEiDwoPSh9/8MOHe2HPjNE6Nz9cTtavMRHQcCrteWpwaiLnXy3BGlDMDhBFdAgr1COEWUh2fvjW40ztPsAguoblA=="),
+            Convert.FromBase64String(config.EcPrivateKeyBase64),
             out _);
         var descriptor = new SecurityTokenDescriptor
         {
